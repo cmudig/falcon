@@ -1,0 +1,27 @@
+{
+  "name": "falcon2-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Houses the package and examples for falcon2",
+  "main": "index.js",
+  "repository": "git+https://github.com/cmudig/falcon.git",
+  "author": "xnought <bertuccd@oregonstate.edu>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cmudig/falcon/issues"
+  },
+  "homepage": "https://github.com/cmudig/falcon#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  },
+  "directories": {
+    "examples": "./examples/*"
+  },
+  "workspaces": [
+    "./falcon2",
+    "./examples/*"
+  ]
+}

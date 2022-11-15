@@ -1,5 +1,5 @@
 {
-  "name": "falcon-vis",
+  "name": "falcon2",
   "version": "0.0.0",
   "main": "build",
   "repository": "git@github.com:cmudig/falcon.git",
@@ -7,7 +7,6 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "dev": "cd svelte && yarn && yarn dev --open",
     "build": "tsc"
   },
   "dependencies": {
@@ -21,7 +20,7 @@
     "ndarray-linear-interpolate": "^1.0.0",
     "ndarray-ops": "^1.2.2",
     "ndarray-prefix-sum": "^1.0.0",
-    "vega": "^5.22.1"
+    "vega-statistics": "^1.8.0"
   },
   "devDependencies": {
     "@types/cwise": "^1.0.4",
