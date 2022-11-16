@@ -12,6 +12,7 @@
   },
   "homepage": "https://github.com/cmudig/falcon#readme",
   "scripts": {
+    "start:flights": "yarn workspace arrow-flights dev --open",
     "test": "yarn workspace falcon2 test",
     "build": "yarn workspace falcon2 build",
     "format": "yarn workspace falcon2 format"
