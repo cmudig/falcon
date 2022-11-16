@@ -12,7 +12,8 @@
   },
   "homepage": "https://github.com/cmudig/falcon#readme",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "yarn workspace falcon2 build"
   },
   "devDependencies": {
     "typescript": "^4.8.4"
