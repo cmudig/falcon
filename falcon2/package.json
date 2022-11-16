@@ -1,7 +1,7 @@
 {
   "name": "falcon2",
   "version": "0.0.0",
-  "main": "src",
+  "main": "build",
   "repository": "git@github.com:cmudig/falcon.git",
   "author": "cmudig",
   "license": "MIT",

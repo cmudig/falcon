@@ -4,7 +4,6 @@ import type {
   Views as ViewsSpecs,
   View1D as ViewSpec1D,
   View2D as ViewSpec2D,
-  BinConfig,
 } from "../api";
 import { Interval } from "../basic";
 import type { DataBase, Index } from "../db/index";
@@ -109,7 +108,6 @@ export class Falcon<V extends string, D extends string> {
   }
 }
 
-type OnUpdate<T> = (updatedState: T) => void;
 type Brush = Interval<number>;
 type Brushes<DimensionName> = Map<DimensionName, Brush>;
 
@@ -147,7 +145,6 @@ export class FalconView<V extends string, D extends string> {
 
     const { db } = this.falcon;
 
-    let data: any = null;
     if (this.spec.type === "1D") {
       const { dimension } = this.spec;
 
@@ -606,6 +603,8 @@ function getResFromSpec<D extends string>(spec: ViewSpec<D>) {
     return spec.dimension.resolution;
   } else if (spec.type === "2D") {
     return [...spec.dimensions.map((d) => d.resolution)];
+  } else {
+    throw Error();
   }
 }
 
@@ -721,7 +720,7 @@ function format1DBinsOutput<D>(dim: Dimension<D>): Bins {
   const binConfig = dim.binConfig!;
 
   let interval = binConfig.start;
-  let bins = [];
+  let bins: IntervalBin[] = [];
   for (let i = 0; i < numBins(binConfig); i++) {
     let start = interval;
     interval += binConfig.step;
@@ -741,7 +740,7 @@ function format2DBinsOutput<D>(dims: Dimension<D>[]) {
   let bins2D: Bins[] = [];
   let xInterval = dimXConfig.start;
   for (let x_i = 0; x_i < numBins(dimXConfig); x_i++) {
-    let binsY = [];
+    let binsY: IntervalBin2D[] = [];
     let yInterval = dimYConfig.start;
     for (let y_i = 0; y_i < numBins(dimYConfig); y_i++) {
       const bin: IntervalBin2D = {
