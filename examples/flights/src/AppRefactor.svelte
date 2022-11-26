@@ -22,6 +22,19 @@
 			extent: [0, 4000],
 			resolution: 400,
 		});
+
+		// setup onChange functions
+		const disposeCountListener = count.onChange(({ filter, total }) => {
+			console.log(filter, total);
+		});
+		const disposeDistanceListener = distanceView.onChange(
+			({ filter, total, bin }) => {
+				console.log(filter, total, bin);
+			}
+		);
+
+		// get initial counts
+		await falcon.all();
 	});
 </script>
 
