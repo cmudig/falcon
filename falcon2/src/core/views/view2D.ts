@@ -25,4 +25,6 @@ export class View2D extends ViewAbstract<View2DState> {
   async select(selection: [Interval<number>, Interval<number>]) {
     console.log(selection);
   }
+  count1DIndex(): void {}
+  count2DIndex(): void {}
 }

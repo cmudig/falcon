@@ -24,4 +24,7 @@ export class View0D extends ViewAbstract<View0DState> {
     this.state.filter = total;
     this.signalOnChange(this.state);
   }
+
+  count1DIndex(): void {}
+  count2DIndex(): void {}
 }

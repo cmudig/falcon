@@ -5,9 +5,11 @@ type OnChange<S> = (state: S) => void;
 export abstract class ViewAbstract<S extends object> {
   falcon: Falcon;
   onChangeListeners: Set<OnChange<S>>;
+  isActive: boolean;
   constructor(falcon: Falcon) {
     this.falcon = falcon;
     this.onChangeListeners = new Set();
+    this.isActive = false;
   }
 
   /**
@@ -28,5 +30,18 @@ export abstract class ViewAbstract<S extends object> {
     });
   }
 
+  /**
+   * Set all other views passive
+   * and this one active
+   */
+  protected makeActiveView() {
+    this.falcon.views.forEach((view) => {
+      view.isActive = false;
+    });
+    this.isActive = true;
+  }
+
   abstract all(): Promise<void> | void;
+  abstract count1DIndex(): void;
+  abstract count2DIndex(): void;
 }

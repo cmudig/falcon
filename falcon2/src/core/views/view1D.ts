@@ -55,12 +55,33 @@ export class View1D extends ViewAbstract<View1DState> {
   /**
    * prefetch the 1D falcon index
    */
-  async prefetch() {}
+  async prefetch() {
+    if (!this.isActive) {
+      this.makeActiveView();
+
+      // fetch the index
+      // store the index
+    }
+  }
 
   /**
    * compute counts from the falcon index
    */
-  async select(selection: Interval<number>) {}
+  async select(selection: Interval<number>) {
+    await this.prefetch();
+
+    // use the index to count for the passive views
+    this.falcon.views.forEach((view) => {
+      const isPassive = !view.isActive;
+      if (isPassive) {
+        // given the active brush, count the index for the passive view
+        view.count1DIndex();
+      }
+    });
+  }
+
+  count1DIndex(): void {}
+  count2DIndex(): void {}
 
   /**
    * As I update the db code, these can be phased out
