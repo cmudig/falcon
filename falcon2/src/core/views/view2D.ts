@@ -3,7 +3,7 @@ import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
 
-interface View2DState {
+export interface View2DState {
   total: number[][] | null;
   filter: number[][] | null;
   binX: number[] | null;

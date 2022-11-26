@@ -2,10 +2,11 @@ import { ViewAbstract } from "./viewAbstract";
 import type { Falcon } from "../falcon";
 
 /* defines how the parameter is typed for on change */
-interface View0DState {
+export interface View0DState {
   total: number | null;
   filter: number | null;
 }
+export type CountState = View0DState;
 
 export class View0D extends ViewAbstract<View0DState> {
   state: View0DState;

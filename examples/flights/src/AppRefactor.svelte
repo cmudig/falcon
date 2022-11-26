@@ -1,12 +1,16 @@
 <script lang="ts">
 	import View1DHist from "./components/View1DHist.svelte";
 	import { Falcon } from "../../../falcon2/src/core/falcon";
+	import type {
+		View0DState,
+		View1DState,
+	} from "../../../falcon2/src/core/views";
 	import { ArrowDB } from "../../../falcon2/src/db/arrow";
 	import { tableFromIPC } from "apache-arrow";
 	import { onMount } from "svelte";
 
-	let countSvelte = 0;
-	let distanceViewSvelte;
+	let countSvelte: View0DState;
+	let distanceViewSvelte: View1DState;
 	onMount(async () => {
 		// arrow Data
 		const data = await fetch("data/flights-10k.arrow");
@@ -27,8 +31,8 @@
 		});
 
 		// setup onChange functions
-		const disposeCountListener = count.onChange(({ filter, total }) => {
-			countSvelte = filter;
+		const disposeCountListener = count.onChange((state) => {
+			countSvelte = state;
 		});
 		const disposeDistanceListener = distanceView.onChange((state) => {
 			distanceViewSvelte = state;
@@ -42,7 +46,7 @@
 	});
 </script>
 
-<main>count: {countSvelte.toLocaleString()}</main>
+<main>count: {countSvelte?.filter.toLocaleString()}</main>
 <View1DHist
 	state={distanceViewSvelte}
 	dimLabel="Arrival Delay"
