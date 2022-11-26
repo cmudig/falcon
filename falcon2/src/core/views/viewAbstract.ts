@@ -4,12 +4,10 @@ type OnChange<S> = (state: S) => void;
 
 export abstract class ViewAbstract<S extends object> {
   falcon: Falcon;
-  state: S | null;
   onChangeListeners: Set<OnChange<S>>;
   constructor(falcon: Falcon) {
     this.falcon = falcon;
     this.onChangeListeners = new Set();
-    this.state = null;
   }
 
   /**

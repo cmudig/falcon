@@ -1,9 +1,12 @@
 <script lang="ts">
+	import View1DHist from "./components/View1DHist.svelte";
 	import { Falcon } from "../../../falcon2/src/core/falcon";
 	import { ArrowDB } from "../../../falcon2/src/db/arrow";
 	import { tableFromIPC } from "apache-arrow";
 	import { onMount } from "svelte";
 
+	let countSvelte = 0;
+	let distanceViewSvelte;
 	onMount(async () => {
 		// arrow Data
 		const data = await fetch("data/flights-10k.arrow");
@@ -25,20 +28,37 @@
 
 		// setup onChange functions
 		const disposeCountListener = count.onChange(({ filter, total }) => {
-			console.log(filter, total);
+			countSvelte = filter;
 		});
-		const disposeDistanceListener = distanceView.onChange(
-			({ filter, total, bin }) => {
-				console.log(filter, total, bin);
-			}
-		);
+		const disposeDistanceListener = distanceView.onChange((state) => {
+			distanceViewSvelte = state;
+		});
 
 		// get initial counts
 		await falcon.all();
+
+		// interact
+		distanceView.select([0, 100]);
 	});
 </script>
 
-<main>hello!</main>
+<main>count: {countSvelte.toLocaleString()}</main>
+<View1DHist
+	state={distanceViewSvelte}
+	dimLabel="Arrival Delay"
+	width={400}
+	on:mouseenter={() => {
+		// arrivalDelay.prefetch();
+	}}
+	on:brush={(event) => {
+		// const interval = event.detail;
+		// if (interval !== null) {
+		// 	arrivalDelay.brush(interval);
+		// } else {
+		// 	arrivalDelay.brush();
+		// }
+	}}
+/>
 
 <style>
 	:global(body, html) {
