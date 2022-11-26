@@ -13,13 +13,18 @@ export class Falcon {
     this.db = db;
     this.views = new Set();
   }
+
   /**
    * add 0D view, does not initialize the view
    */
-  count() {
+  view0D() {
     const view = new View0D(this);
     this.views.add(view);
     return view;
+  }
+  count() {
+    // count is an alias for view0D
+    return this.view0D();
   }
 
   /**
