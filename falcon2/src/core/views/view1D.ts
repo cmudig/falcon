@@ -80,32 +80,31 @@ export class View1D extends ViewAbstract<View1DState> {
    * compute counts from the falcon index
    */
   async add(
-    select: Interval<number> | undefined = undefined,
+    filter: Interval<number> | undefined = undefined,
     convertToPixels = true
   ) {
     await this.prefetch();
 
-    if (select) {
+    if (filter) {
       // just end now if the filter hasn't changed
-      if (
-        this.lastFilter[0] === select[0] &&
-        this.lastFilter[1] === select[1]
-      ) {
+      const filterStayedTheSame =
+        this.lastFilter[0] === filter[0] && this.lastFilter[1] === filter[1];
+      if (filterStayedTheSame) {
         return;
       }
 
       // add filter
-      this.falcon.filters.set(this.dimension.name, select);
+      this.falcon.filters.set(this.dimension.name, filter);
 
       // convert active selection into pixels if needed
-      const selectPixels = convertToPixels ? this.toPixels(select) : select;
+      const selectPixels = convertToPixels ? this.toPixels(filter) : filter;
 
       // use the index to count for the passive views
       this.falcon.passiveViews.forEach(async (passiveView) => {
         await passiveView.count1DIndex(selectPixels);
       });
 
-      this.lastFilter = select;
+      this.lastFilter = filter;
     } else {
       // remove filter
       this.falcon.filters.delete(this.dimension.name);
