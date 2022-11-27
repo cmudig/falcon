@@ -171,7 +171,7 @@ export class View2D extends ViewAbstract<View2DState> {
     } else {
       // select the columns and subtract them to get in between [A, B]
       const A = index.hists.pick(pixels[0], null, null);
-      const B = index.hists.pick(pixels[0], null, null);
+      const B = index.hists.pick(pixels[1], null, null);
       const result = sub(A, B);
 
       this.state.filter = result.data;
