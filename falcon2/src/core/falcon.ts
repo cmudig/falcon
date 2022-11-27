@@ -4,9 +4,9 @@ import type { DataBase as OldDatabase } from "../db";
 import { FalconDB, DatabasePort, DimensionFilters, Index } from "./db/db";
 import type { View } from "./views";
 import { excludeMap } from "./util";
+import { Dimension } from "./dimension";
 
 export type OldDB = OldDatabase<string, string>;
-type Dimension = any;
 
 export class Falcon {
   db: FalconDB;
