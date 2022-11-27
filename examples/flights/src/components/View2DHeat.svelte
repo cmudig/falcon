@@ -6,7 +6,7 @@
 	import type { View2DState } from "../../../../falcon2/src/core/views";
 
 	const dispatch = createEventDispatcher<{
-		brush: [number, number][] | null;
+		brush: [[number, number], [number, number]] | null;
 	}>();
 
 	export let state: View2DState;
@@ -122,7 +122,7 @@
 				const brush2D = [
 					signal["x\\.binStart"],
 					signal["y\\.binStart"],
-				];
+				] as [[number, number], [number, number]];
 				if (brush2D[0] && brush2D[1]) {
 					dispatch("brush", brush2D);
 				} else {

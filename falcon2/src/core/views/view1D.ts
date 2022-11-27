@@ -22,7 +22,6 @@ export class View1D extends ViewAbstract<View1DState> {
     this.dimension = dimension;
     this.state = { total: null, filter: null, bin: null };
     this.toPixels = () => [0, 0];
-    this.lastFilter = [0, 0];
   }
 
   /**
@@ -150,5 +149,7 @@ export class View1D extends ViewAbstract<View1DState> {
     // signal user
     this.signalOnChange(this.state);
   }
-  count2DIndex(): void {}
+  async count2DIndex(pixels?: [Interval<number>, Interval<number>]) {
+    console.log(pixels);
+  }
 }

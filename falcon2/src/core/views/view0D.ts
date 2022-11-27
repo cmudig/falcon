@@ -47,5 +47,7 @@ export class View0D extends ViewAbstract<View0DState> {
     // signal user
     this.signalOnChange(this.state);
   }
-  count2DIndex(): void {}
+  async count2DIndex(pixels?: [Interval<number>, Interval<number>]) {
+    console.log(pixels);
+  }
 }

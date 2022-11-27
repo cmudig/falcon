@@ -3,12 +3,7 @@ import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
 import { sub } from "../../util";
-import {
-  createBinConfig,
-  readableBins,
-  brushToPixelSpace,
-  excludeMap,
-} from "../util";
+import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 
 export interface View2DState {
   total: Int32Array | null;
@@ -22,6 +17,7 @@ export class View2D extends ViewAbstract<View2DState> {
   dimensions: [Dimension, Dimension];
   state: View2DState;
   toPixels: (brush: Brush2D) => Brush2D;
+  lastFilter: Brush2D | undefined;
   constructor(falcon: Falcon, dimensions: [Dimension, Dimension]) {
     super(falcon);
     this.dimensions = dimensions;
@@ -103,6 +99,62 @@ export class View2D extends ViewAbstract<View2DState> {
     }
   }
 
+  filterNoChange(filter: Brush2D) {
+    if (!this.lastFilter) return false;
+    const [lastX, lastY] = this.lastFilter;
+    const [filterX, filterY] = filter;
+    return (
+      lastX[0] === filterX[0] &&
+      lastX[1] === filterX[1] &&
+      lastY[0] === filterY[0] &&
+      lastY[1] === filterY[1]
+    );
+  }
+  /**
+   * compute counts from the falcon index
+   */
+  async add(filter: Brush2D | undefined = undefined, convertToPixels = true) {
+    await this.prefetch();
+
+    if (filter) {
+      // just end now if the filter hasn't changed
+      const filterStayedTheSame = this.filterNoChange(filter);
+      if (filterStayedTheSame) {
+        return;
+      }
+
+      // add filter
+      this.falcon.filters.set(this.dimensions[0].name, filter[0]);
+      this.falcon.filters.set(this.dimensions[1].name, filter[1]);
+
+      // convert active selection into pixels if needed
+      const selectPixels = convertToPixels ? this.toPixels(filter) : filter;
+
+      // use the index to count for the passive views
+      this.falcon.passiveViews.forEach(async (passiveView) => {
+        await passiveView.count2DIndex(selectPixels);
+      });
+
+      this.lastFilter = filter;
+    } else {
+      // just end now if the filter hasn't changed
+      const filterStayedTheSame = this.lastFilter === filter;
+      if (filterStayedTheSame) {
+        return;
+      }
+
+      // remove filter
+      this.falcon.filters.delete(this.dimensions[0].name);
+      this.falcon.filters.delete(this.dimensions[1].name);
+      // and revert back counts
+      this.falcon.passiveViews.forEach(async (passiveView) => {
+        await passiveView.count2DIndex();
+      });
+
+      this.lastFilter = filter;
+    }
+  }
+
   /**
    * Given an active 1D view, count for this passive view
    */
@@ -129,5 +181,7 @@ export class View2D extends ViewAbstract<View2DState> {
     // signal user
     this.signalOnChange(this.state);
   }
-  count2DIndex() {}
+  async count2DIndex(pixels?: Brush2D) {
+    console.log(pixels);
+  }
 }

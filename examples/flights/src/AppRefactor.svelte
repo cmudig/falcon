@@ -122,9 +122,9 @@
 		// interact
 		const interval = event.detail;
 		if (interval !== null) {
-			// await depDelayVsArrDelayState.add(interval);
+			await depDelayVsArrDelayView.add(interval);
 		} else {
-			// await depDelayVsArrDelayState.add();
+			await depDelayVsArrDelayView.add();
 		}
 	}}
 />
