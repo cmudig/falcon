@@ -16,7 +16,7 @@ export class View1D extends ViewAbstract<View1DState> {
   dimension: Dimension;
   state: View1DState;
   toPixels: (brush: Interval<number>) => Interval<number>;
-  lastFilter: Interval<number>;
+  lastFilter: Interval<number> | undefined;
   constructor(falcon: Falcon, dimension: Dimension) {
     super(falcon);
     this.dimension = dimension;
@@ -88,7 +88,9 @@ export class View1D extends ViewAbstract<View1DState> {
     if (filter) {
       // just end now if the filter hasn't changed
       const filterStayedTheSame =
-        this.lastFilter[0] === filter[0] && this.lastFilter[1] === filter[1];
+        this.lastFilter &&
+        this.lastFilter[0] === filter[0] &&
+        this.lastFilter[1] === filter[1];
       if (filterStayedTheSame) {
         return;
       }
@@ -106,19 +108,27 @@ export class View1D extends ViewAbstract<View1DState> {
 
       this.lastFilter = filter;
     } else {
+      // just end now if the filter hasn't changed
+      const filterStayedTheSame = this.lastFilter === filter;
+      if (filterStayedTheSame) {
+        return;
+      }
+
       // remove filter
       this.falcon.filters.delete(this.dimension.name);
       // and revert back counts
       this.falcon.passiveViews.forEach(async (passiveView) => {
-        await passiveView.count1DIndex(null);
+        await passiveView.count1DIndex();
       });
+
+      this.lastFilter = filter;
     }
   }
 
   /**
    * Given an active 1D view, count for this passive view
    */
-  async count1DIndex(pixels: Interval<number> | null) {
+  async count1DIndex(pixels?: Interval<number>) {
     // grab index
     const index = await this.falcon.index.get(this)!;
     if (index === undefined) {
@@ -126,7 +136,7 @@ export class View1D extends ViewAbstract<View1DState> {
     }
 
     // update state
-    if (pixels === null) {
+    if (!pixels) {
       this.state.filter = index.noBrush.data as Int32Array;
     } else {
       // select the columns and subtract them to get in between [A, B]

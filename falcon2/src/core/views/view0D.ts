@@ -29,7 +29,7 @@ export class View0D extends ViewAbstract<View0DState> {
   /**
    * Given an active 1D view, count for this passive view
    */
-  async count1DIndex(pixels: Interval<number> | null): Promise<void> {
+  async count1DIndex(pixels?: Interval<number>): Promise<void> {
     // take in the index
     const index = await this.falcon.index.get(this)!;
     if (index === undefined) {
@@ -37,11 +37,9 @@ export class View0D extends ViewAbstract<View0DState> {
     }
 
     // update state
-    if (pixels === null) {
-      console.log("noBrush");
+    if (!pixels) {
       this.state.filter = index.noBrush.get(0);
     } else {
-      console.log("pixels");
       const [A, B] = pixels;
       this.state.filter = index.hists.get(B) - index.hists.get(A);
     }

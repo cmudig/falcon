@@ -9,14 +9,27 @@ type Dimension = any;
 
 export class Falcon {
   db: FalconDB;
-  views: Set<View>;
+  views: View[];
   filters: DimensionFilters;
   index: Index;
   constructor(db: OldDB) {
     this.db = new DatabasePort(db);
-    this.views = new Set();
+    this.views = [];
     this.filters = new Map();
     this.index = new Map();
+  }
+
+  private saveView(view: View) {
+    this.views.push(view);
+  }
+  private deleteView(viewToDelete: View) {
+    this.views = this.views.filter((view) => view !== viewToDelete);
+  }
+  get passiveViews() {
+    return this.views.filter((view) => !view.isActive);
+  }
+  get activeView() {
+    return this.views.filter((view) => view.isActive);
   }
 
   /**
@@ -24,7 +37,7 @@ export class Falcon {
    */
   view0D() {
     const view = new View0D(this);
-    this.views.add(view);
+    this.saveView(view);
     return view;
   }
   count() {
@@ -37,7 +50,7 @@ export class Falcon {
    */
   view1D(dimension: Dimension) {
     const view = new View1D(this, dimension);
-    this.views.add(view);
+    this.saveView(view);
     return view;
   }
 
@@ -46,12 +59,8 @@ export class Falcon {
    */
   view2D(dimensions: [Dimension, Dimension]) {
     const view = new View2D(this, dimensions);
-    this.views.add(view);
+    this.saveView(view);
     return view;
-  }
-
-  get passiveViews() {
-    return Array.from(this.views).filter((view) => !view.isActive);
   }
 
   /**
