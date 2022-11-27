@@ -63,7 +63,7 @@ export class View1D extends ViewAbstract<View1DState> {
       this.makeActiveView();
 
       // fetch the index
-      // and store
+      // and store globally
       this.falcon.index = this.falcon.db.load1DIndex(
         this,
         this.dimension.resolution,
@@ -76,30 +76,43 @@ export class View1D extends ViewAbstract<View1DState> {
   /**
    * compute counts from the falcon index
    */
-  async add(select: Interval<number>, convertToPixels = true) {
+  async add(
+    select: Interval<number> | undefined = undefined,
+    convertToPixels = true
+  ) {
     await this.prefetch();
 
-    // add filter
-    this.falcon.filters.set(this.dimension.name, select);
+    if (select && this.falcon.index.size) {
+      // add filter
+      this.falcon.filters.set(this.dimension.name, select);
 
-    // convert active selection into pixels if needed
-    const selectPixels = convertToPixels ? this.toPixels(select) : select;
+      // convert active selection into pixels if needed
+      const selectPixels = convertToPixels ? this.toPixels(select) : select;
 
-    // use the index to count for the passive views
-    this.falcon.passiveViews.forEach((view) => {
-      view.count1DIndex(selectPixels);
-    });
+      // use the index to count for the passive views
+      this.falcon.passiveViews.forEach(async (passiveView) => {
+        await passiveView.count1DIndex(selectPixels);
+      });
+    } else {
+      this.remove();
+    }
   }
 
-  remove() {
-    // remove filter
-    this.falcon.filters.delete(this.dimension.name);
+  async remove() {
+    if (this.falcon.index.size) {
+      // remove filter
+      this.falcon.filters.delete(this.dimension.name);
+      // and revert back counts
+      this.falcon.passiveViews.forEach(async (passiveView) => {
+        await passiveView.count1DIndex(null);
+      });
+    }
   }
 
   /**
    * Given an active 1D view, count for this passive view
    */
-  count1DIndex(pixels: Interval<number>): void {
+  count1DIndex(filterPixels: Interval<number> | null): void {
     // take in the index
     // do subtractions
     // update state

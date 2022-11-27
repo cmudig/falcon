@@ -29,12 +29,23 @@ export class View0D extends ViewAbstract<View0DState> {
   /**
    * Given an active 1D view, count for this passive view
    */
-  count1DIndex(pixels: Interval<number>): void {
-    console.log(pixels);
+  async count1DIndex(pixels: Interval<number> | null): Promise<void> {
     // take in the index
-    // do subtractions
+    const index = await this.falcon.index.get(this)!;
+    if (index === undefined) {
+      throw Error("Cannot count for undefined index in 0D");
+    }
+
     // update state
+    if (pixels === null) {
+      this.state.filter = index.noBrush.get(0);
+    } else {
+      const [A, B] = pixels;
+      this.state.filter = index.hists.get(B) - index.hists.get(A);
+    }
+
     // signal user
+    this.signalOnChange(this.state);
   }
   count2DIndex(): void {}
 }
