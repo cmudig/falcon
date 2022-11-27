@@ -26,7 +26,7 @@
 	let falcon: Falcon;
 	onMount(async () => {
 		// arrow Data
-		const data = await fetch("data/flights-10k.arrow");
+		const data = await fetch("data/flights-1m.arrow");
 		const buffer = await data.arrayBuffer();
 		const table = tableFromIPC(buffer);
 
