@@ -3,7 +3,7 @@ import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
-import { sub } from "../../util";
+import { sub, summedAreaTableLookup } from "../../util";
 
 /* defines how the parameter is typed for on change */
 export interface View1DState {
@@ -138,10 +138,9 @@ export class View1D extends ViewAbstract<View1DState> {
       this.state.filter = index.noBrush.data as Int32Array;
     } else {
       // select the columns and subtract them to get in between [A, B]
-      const [A, B] = pixels;
-      const colB = index.hists.pick(B, null);
-      const colA = index.hists.pick(A, null);
-      const result = sub(colA, colB);
+      const A = index.hists.pick(pixels[0], null);
+      const B = index.hists.pick(pixels[1], null);
+      const result = sub(A, B);
 
       this.state.filter = result.data;
     }
@@ -150,6 +149,27 @@ export class View1D extends ViewAbstract<View1DState> {
     this.signalOnChange(this.state);
   }
   async count2DIndex(pixels?: [Interval<number>, Interval<number>]) {
-    console.log(pixels);
+    // grab index
+    const index = await this.falcon.index.get(this)!;
+    if (index === undefined) {
+      throw Error("Index not defined for 1D passive view");
+    }
+
+    // update state
+    if (!pixels) {
+      this.state.filter = index.noBrush.data as Int32Array;
+    } else {
+      const A = index.hists.pick(pixels[0][1], pixels[1][1], null);
+      const B = index.hists.pick(pixels[0][1], pixels[1][0], null);
+      const C = index.hists.pick(pixels[0][0], pixels[1][1], null);
+      const D = index.hists.pick(pixels[0][0], pixels[1][0], null);
+
+      const result = summedAreaTableLookup(A, B, C, D);
+
+      this.state.filter = result.data;
+    }
+
+    // signal user
+    this.signalOnChange(this.state);
   }
 }

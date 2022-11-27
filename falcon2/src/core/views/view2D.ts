@@ -2,7 +2,7 @@ import { ViewAbstract } from "./viewAbstract";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
-import { sub } from "../../util";
+import { sub, summedAreaTableLookup } from "../../util";
 import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 
 export interface View2DState {
@@ -162,7 +162,7 @@ export class View2D extends ViewAbstract<View2DState> {
     // grab index
     const index = await this.falcon.index.get(this)!;
     if (index === undefined) {
-      throw Error("Index not defined for 1D passive view");
+      throw Error("Index not defined for 2D passive view");
     }
 
     // update state
@@ -170,10 +170,9 @@ export class View2D extends ViewAbstract<View2DState> {
       this.state.filter = index.noBrush.data as Int32Array;
     } else {
       // select the columns and subtract them to get in between [A, B]
-      const [A, B] = pixels;
-      const colB = index.hists.pick(B, null, null);
-      const colA = index.hists.pick(A, null, null);
-      const result = sub(colA, colB);
+      const A = index.hists.pick(pixels[0], null, null);
+      const B = index.hists.pick(pixels[0], null, null);
+      const result = sub(A, B);
 
       this.state.filter = result.data;
     }
@@ -182,6 +181,27 @@ export class View2D extends ViewAbstract<View2DState> {
     this.signalOnChange(this.state);
   }
   async count2DIndex(pixels?: Brush2D) {
-    console.log(pixels);
+    // grab index
+    const index = await this.falcon.index.get(this)!;
+    if (index === undefined) {
+      throw Error("Index not defined for 2D passive view");
+    }
+
+    // update state
+    if (!pixels) {
+      this.state.filter = index.noBrush.data as Int32Array;
+    } else {
+      // select the columns and subtract them to get in between [A, B]
+      const A = index.hists.pick(pixels[0][1], pixels[1][1], null, null);
+      const B = index.hists.pick(pixels[0][1], pixels[1][0], null, null);
+      const C = index.hists.pick(pixels[0][0], pixels[1][1], null, null);
+      const D = index.hists.pick(pixels[0][0], pixels[1][0], null, null);
+      const result = summedAreaTableLookup(A, B, C, D);
+
+      this.state.filter = result.data;
+    }
+
+    // signal user
+    this.signalOnChange(this.state);
   }
 }
