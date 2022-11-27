@@ -12,12 +12,15 @@
 	import { ArrowDB } from "../../../falcon2/src/db/arrow";
 	import { tableFromIPC } from "apache-arrow";
 	import { onMount } from "svelte";
+	import logo from "../../../logo/logo.png";
 
 	let totalCountState: View0DState;
 	let distanceState: View1DState;
 	let distanceView: View1D;
 	let delayState: View1DState;
 	let delayView: View1D;
+	let airTimeView: View1D;
+	let airTimeState: View1DState;
 	let depDelayVsArrDelayView: View2D;
 	let depDelayVsArrDelayState: View2DState;
 
@@ -34,6 +37,13 @@
 
 		// create views
 		const count = falcon.count();
+		airTimeView = falcon.view1D({
+			type: "continuous",
+			name: "AIR_TIME",
+			bins: 25,
+			extent: [0, 500],
+			resolution: 400,
+		});
 		distanceView = falcon.view1D({
 			type: "continuous",
 			name: "DISTANCE",
@@ -47,14 +57,14 @@
 				name: "DEP_DELAY",
 				bins: 25,
 				extent: [-20, 60],
-				resolution: 600,
+				resolution: 500,
 			},
 			{
 				type: "continuous",
 				name: "ARR_DELAY",
 				bins: 25,
 				extent: [-20, 60],
-				resolution: 600,
+				resolution: 500,
 			},
 		]);
 
@@ -68,6 +78,9 @@
 		depDelayVsArrDelayView.onChange((state) => {
 			depDelayVsArrDelayState = state;
 		});
+		airTimeView.onChange((state) => {
+			airTimeState = state;
+		});
 
 		// get initial counts
 		await falcon.all();
@@ -76,49 +89,56 @@
 
 <main>
 	<div>
+		<img src={logo} alt="falcon" width="50px" />
 		<h1>Flights</h1>
+
 		<h3>
-			selected: {totalCountState?.filter.toLocaleString()}
+			<span style="font-weight: 250;">selected</span>
+			<code style="color: var(--primary-color);"
+				>{totalCountState?.filter.toLocaleString()}</code
+			>
 		</h3>
 	</div>
-	<!-- <View1DHist
-	state={delayState}
-	dimLabel="Departure Delay"
-	width={400}
-	on:mouseenter={() => {
-		delayView.prefetch();
-	}}
-	on:brush={async (event) => {
-		// interact
-		const interval = event.detail;
-		if (interval !== null) {
-			await delayView.add(interval);
-		} else {
-			await delayView.add();
-		}
-	}}
-/> -->
-	<View1DHist
-		state={distanceState}
-		dimLabel="Distance"
-		width={400}
-		on:mouseenter={() => {
-			distanceView.prefetch();
-		}}
-		on:brush={async (event) => {
-			// interact
-			const interval = event.detail;
-			if (interval !== null) {
-				await distanceView.add(interval);
-			} else {
-				await distanceView.add();
-			}
-		}}
-	/>
+	<div>
+		<View1DHist
+			state={airTimeState}
+			dimLabel="Air Time"
+			width={400}
+			on:mouseenter={() => {
+				airTimeView.prefetch();
+			}}
+			on:brush={async (event) => {
+				// interact
+				const interval = event.detail;
+				if (interval !== null) {
+					await airTimeView.add(interval);
+				} else {
+					await airTimeView.add();
+				}
+			}}
+		/>
+		<View1DHist
+			state={distanceState}
+			dimLabel="Distance"
+			width={400}
+			on:mouseenter={() => {
+				distanceView.prefetch();
+			}}
+			on:brush={async (event) => {
+				// interact
+				const interval = event.detail;
+				if (interval !== null) {
+					await distanceView.add(interval);
+				} else {
+					await distanceView.add();
+				}
+			}}
+		/>
+	</div>
 	<View2DHeat
 		state={depDelayVsArrDelayState}
-		width={600}
-		height={600}
+		width={500}
+		height={500}
 		labelX="Departure Delay"
 		labelY="Arrival Delay"
 		on:mouseenter={() => {
@@ -134,12 +154,6 @@
 			}
 		}}
 	/>
-
-	<button
-		on:click={() => {
-			console.log(falcon);
-		}}>Log Falcon Object</button
-	>
 </main>
 
 <style>
@@ -154,5 +168,10 @@
 		margin: 0;
 		background-color: var(--bg-color);
 		color: var(--text-color);
+		padding: 20px;
+	}
+	code {
+		font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+			monospace;
 	}
 </style>
