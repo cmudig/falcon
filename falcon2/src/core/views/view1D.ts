@@ -71,7 +71,7 @@ export class View1D extends ViewAbstract<View1DState> {
         this,
         this.dimension.resolution,
         this.falcon.passiveViews,
-        this.falcon.filters
+        this.falcon.passiveFilters
       );
     }
   }

@@ -3,7 +3,7 @@ import type {
   View1D as OldView1D,
   View2D as OldView2D,
 } from "../../api";
-import type { View, View1D, View2D } from "../views";
+import { View, View0D, View1D, View2D } from "../views";
 import { NdArray } from "ndarray";
 import { Interval } from "../../basic";
 import { Dimension } from "../dimension";
@@ -96,22 +96,24 @@ export class DatabasePort implements FalconDB {
 }
 
 function oldViewInterface(view: View) {
-  if ("dimension" in view) {
+  if (view instanceof View1D) {
     const oldView: OldView1D<string> = {
       dimension: view.dimension,
       type: "1D",
     };
     return oldView;
-  } else if ("dimensions" in view) {
+  } else if (view instanceof View2D) {
     const oldView: OldView2D<string> = {
       dimensions: view.dimensions,
       type: "2D",
     };
     return oldView;
-  } else {
+  } else if (view instanceof View0D) {
     const oldView: OldView0D = {
       type: "0D",
     };
     return oldView;
+  } else {
+    throw Error("Only 0D, 1D, and 2D view conversions");
   }
 }

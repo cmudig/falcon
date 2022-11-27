@@ -3,6 +3,7 @@ import { View0D, View1D, View2D } from "./views";
 import type { DataBase as OldDatabase } from "../db";
 import { FalconDB, DatabasePort, DimensionFilters, Index } from "./db/db";
 import type { View } from "./views";
+import { excludeMap } from "./util";
 
 export type OldDB = OldDatabase<string, string>;
 type Dimension = any;
@@ -29,7 +30,20 @@ export class Falcon {
     return this.views.filter((view) => !view.isActive);
   }
   get activeView() {
-    return this.views.filter((view) => view.isActive);
+    return this.views.filter((view) => view.isActive)[0];
+  }
+  get passiveFilters() {
+    const { activeView } = this;
+    if (activeView instanceof View1D) {
+      return excludeMap(this.filters, activeView.dimension.name);
+    } else if (activeView instanceof View2D) {
+      return excludeMap(
+        this.filters,
+        ...activeView.dimensions.map((d) => d.name)
+      );
+    } else {
+      throw Error("no other view can be an active view");
+    }
   }
 
   /**

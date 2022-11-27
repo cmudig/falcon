@@ -96,3 +96,9 @@ export function scaleLinear({
 
   return (x: number) => m * x + b;
 }
+
+export function excludeMap<K, V>(map: Map<K, V>, ...exclude: K[]) {
+  return new Map<K, V>(
+    Array.from(map.entries()).filter(([key, _]) => !exclude.includes(key))
+  );
+}
