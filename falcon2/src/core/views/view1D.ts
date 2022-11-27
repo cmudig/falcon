@@ -2,8 +2,8 @@ import { ViewAbstract } from "./viewAbstract";
 import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
-import type { Interval } from "../../basic";
-import { sub, summedAreaTableLookup } from "../../util";
+import type { Interval } from "../../old/basic";
+import { sub, summedAreaTableLookup } from "../../old/util";
 
 /* defines how the parameter is typed for on change */
 export interface View1DState {
@@ -37,7 +37,7 @@ export class View1D extends ViewAbstract<View1DState> {
     );
     this.dimension.binConfig = createBinConfig(
       this.dimension,
-      this.dimension.extent
+      this.dimension.extent!
     );
   }
 

@@ -1,7 +1,7 @@
 import { Table } from "apache-arrow";
 import ndarray, { NdArray } from "ndarray";
 import prefixSum from "ndarray-prefix-sum";
-import { Dimension, View1D, View2D, Views } from "../api";
+import { Dimension, View1D, View2D, Views } from "../old/api";
 import { Interval } from "../basic";
 import { BitSet, union } from "../bitset";
 import { CUM_ARR_TYPE, HIST_TYPE } from "../consts";

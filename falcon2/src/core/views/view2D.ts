@@ -1,8 +1,8 @@
 import { ViewAbstract } from "./viewAbstract";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
-import type { Interval } from "../../basic";
-import { sub, summedAreaTableLookup } from "../../util";
+import type { Interval } from "../../old/basic";
+import { sub, summedAreaTableLookup } from "../../old/util";
 import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 
 export interface View2DState {

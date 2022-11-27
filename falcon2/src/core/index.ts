@@ -4,9 +4,9 @@ import type {
   Views as ViewsSpecs,
   View1D as ViewSpec1D,
   View2D as ViewSpec2D,
-} from "../api";
-import { Interval } from "../basic";
-import type { DataBase, Index } from "../db/index";
+} from "../old/api";
+import { Interval } from "../old/basic";
+import type { DataBase, Index } from "../old/db/index";
 import {
   binTime,
   bin,
@@ -14,7 +14,7 @@ import {
   summedAreaTableLookup,
   extent,
   numBins,
-} from "../util";
+} from "../old/util";
 import { NdArray } from "ndarray";
 
 /**

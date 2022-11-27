@@ -1,5 +1,5 @@
 import { NdArray } from "ndarray";
-import { Dimension, View1D, View2D, Views } from "../api";
+import { Dimension, View1D, View2D, Views } from "../old/api";
 import { Interval } from "../basic";
 
 export interface Hists {

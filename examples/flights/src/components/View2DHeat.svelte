@@ -22,7 +22,6 @@
 	export let strokeWidth = 1;
 
 	$: rowFormat = convertFormat(state);
-	$: console.log(rowFormat);
 	function convertFormat(state: View2DState) {
 		let rows = [];
 		if (state) {

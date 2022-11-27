@@ -1,7 +1,7 @@
-import { bin, binTime, numBins } from "../util";
+import { bin, binTime, numBins } from "../old/util";
 import { Dimension } from "./dimension";
-import type { Interval } from "../basic";
-import { BinConfig } from "../api";
+import type { Interval } from "../old/basic";
+import { BinConfig } from "../old/api";
 
 export function createBinConfig(
   dimension: Dimension,

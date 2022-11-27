@@ -1,9 +1,9 @@
 import ndarray, { NdArray } from "ndarray";
 import prefixSum from "ndarray-prefix-sum";
-import { Dimension, View, View1D, View2D, Views } from "../api";
+import { Dimension, View, View1D, View2D, Views } from "../old/api";
 import { Interval } from "../basic";
 import { numBins, stepSize } from "../util";
-import { BinConfig } from "./../api";
+import { BinConfig } from "../old/api";
 import { CUM_ARR_TYPE, HIST_TYPE } from "./../consts";
 import { AsyncIndex, DataBase } from "./db";
 

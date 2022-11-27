@@ -1,6 +1,6 @@
 import { View0D, View1D, View2D } from "./views";
 
-import type { DataBase as OldDatabase } from "../db";
+import type { DataBase as OldDatabase } from "../old/db";
 import { FalconDB, DatabasePort, DimensionFilters, Index } from "./db/db";
 import type { View } from "./views";
 import { excludeMap } from "./util";

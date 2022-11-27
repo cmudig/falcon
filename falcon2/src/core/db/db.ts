@@ -2,12 +2,12 @@ import type {
   View0D as OldView0D,
   View1D as OldView1D,
   View2D as OldView2D,
-} from "../../api";
+} from "../../old/api";
 import { View, View0D, View1D, View2D } from "../views";
 import { NdArray } from "ndarray";
-import { Interval } from "../../basic";
+import { Interval } from "../../old/basic";
 import { Dimension } from "../dimension";
-import { DataBase } from "../../db";
+import { DataBase } from "../../old/db";
 
 type ArrayType = NdArray;
 

@@ -1,5 +1,5 @@
 import { ViewAbstract } from "./viewAbstract";
-import { Interval } from "../../basic";
+import { Interval } from "../../old/basic";
 import type { Falcon } from "../falcon";
 
 /* defines how the parameter is typed for on change */
