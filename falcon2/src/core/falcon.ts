@@ -23,9 +23,6 @@ export class Falcon {
   private saveView(view: View) {
     this.views.push(view);
   }
-  private deleteView(viewToDelete: View) {
-    this.views = this.views.filter((view) => view !== viewToDelete);
-  }
   get passiveViews() {
     return this.views.filter((view) => !view.isActive);
   }
