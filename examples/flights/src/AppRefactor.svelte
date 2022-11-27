@@ -47,14 +47,14 @@
 				name: "DEP_DELAY",
 				bins: 25,
 				extent: [-20, 60],
-				resolution: 400,
+				resolution: 600,
 			},
 			{
 				type: "continuous",
 				name: "ARR_DELAY",
 				bins: 25,
 				extent: [-20, 60],
-				resolution: 400,
+				resolution: 600,
 			},
 		]);
 
@@ -111,10 +111,12 @@
 />
 <View2DHeat
 	state={depDelayVsArrDelayState}
-	width={400}
-	height={400}
+	width={600}
+	height={600}
+	labelX="Departure Delay"
+	labelY="Arrival Delay"
 	on:mouseenter={() => {
-		// depDelayVsArrDelayView.prefetch();
+		depDelayVsArrDelayView.prefetch();
 	}}
 	on:brush={async (event) => {
 		// interact

@@ -9,24 +9,6 @@
 		brush: [number, number][] | null;
 	}>();
 
-	function generateGrid(m: number, n: number, step = 10) {
-		let bins = [];
-		for (let i = 0, iChunk = 0; i < m; i++, iChunk += step) {
-			for (let j = 0, jChunk = 0; j < n; j++, jChunk += step) {
-				const count = Math.abs(Math.floor(Math.random() * 1000));
-				bins.push({
-					x: { binStart: iChunk, binEnd: iChunk + step },
-					y: { binStart: jChunk, binEnd: jChunk + step },
-					total: count,
-					filter: Math.max(
-						0,
-						count - Math.floor(Math.random() * 100)
-					),
-				});
-			}
-		}
-		return bins;
-	}
 	export let state: View2DState;
 	export let title = "";
 	export let width = 400;
@@ -83,7 +65,7 @@
 						select: { type: "interval", encodings: ["x", "y"] },
 					},
 				],
-				mark: { type: "point", strokeWidth: strokeWidth },
+				mark: { type: "circle", strokeWidth: strokeWidth },
 				encoding: {
 					x: {
 						field: "x.binStart",
@@ -103,7 +85,7 @@
 				},
 			},
 			{
-				mark: { type: "point", strokeWidth: strokeWidth },
+				mark: { type: "circle", strokeWidth: strokeWidth },
 				encoding: {
 					x: {
 						field: "x.binStart",
