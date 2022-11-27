@@ -69,7 +69,6 @@ export class View1D extends ViewAbstract<View1DState> {
       // and store globally
       this.falcon.index = this.falcon.db.load1DIndex(
         this,
-        this.dimension.resolution,
         this.falcon.passiveViews,
         this.falcon.passiveFilters
       );

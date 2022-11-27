@@ -26,15 +26,14 @@ export interface FalconDB {
   load2DAll(view: View2D, filters?: DimensionFilters): AsyncOrSync<ArrayType>;
   load1DIndex(
     activeView: View1D,
-    activePixels: number,
     passiveViews: View[],
     filters?: DimensionFilters
   ): Index;
-  //   load2DIndex(
-  //     activeView: View2D,
-  //     passiveViews: View[],
-  //     filters?: DimensionFilters
-  //   ): ViewReturn<ArrayType>;
+  load2DIndex(
+    activeView: View2D,
+    passiveViews: View[],
+    filters?: DimensionFilters
+  ): Index;
   extent(dimension: Dimension): AsyncOrSync<Interval<number>>;
   length(): AsyncOrSync<number>;
 }
@@ -62,10 +61,11 @@ export class DatabasePort implements FalconDB {
   }
   load1DIndex(
     activeView: View1D,
-    activePixels: number,
     passiveViews: View[],
     filters: DimensionFilters
   ) {
+    const pixels = activeView.dimension.resolution;
+
     // convert to interface format that the old db wants
     const activeInterface = oldViewInterface(activeView) as OldView1D<string>;
     const passiveInterfaces = passiveViews.map(oldViewInterface);
@@ -79,7 +79,44 @@ export class DatabasePort implements FalconDB {
     // convert out of the result to our format
     const result = this.db.loadData1D(
       activeInterface,
-      activePixels,
+      pixels,
+      viewNameMapInterface,
+      filters
+    );
+
+    const viewObjMap: Index = new Map();
+    for (const viewName of viewNameMap.keys()) {
+      const index = result.get(viewName)! as Promise<IndexContainer> &
+        IndexContainer;
+      const view = viewNameMap.get(viewName)! as View;
+      viewObjMap.set(view, index);
+    }
+    return viewObjMap;
+  }
+  load2DIndex(
+    activeView: View2D,
+    passiveViews: View[],
+    filters: DimensionFilters
+  ) {
+    const pixels = activeView.dimensions.map((d) => d.resolution) as [
+      number,
+      number
+    ];
+
+    // convert to interface format that the old db wants
+    const activeInterface = oldViewInterface(activeView) as OldView2D<string>;
+    const passiveInterfaces = passiveViews.map(oldViewInterface);
+    const viewNameMapInterface = new Map(
+      passiveInterfaces.map((inter, i) => [i.toString(), inter])
+    );
+    const viewNameMap = new Map(
+      passiveViews.map((view, i) => [i.toString(), view])
+    );
+
+    // convert out of the result to our format
+    const result = this.db.loadData2D(
+      activeInterface,
+      pixels,
       viewNameMapInterface,
       filters
     );
