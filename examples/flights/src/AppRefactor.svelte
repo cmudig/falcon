@@ -74,8 +74,14 @@
 	});
 </script>
 
-<main>count: {totalCountState?.filter.toLocaleString()}</main>
-<!-- <View1DHist
+<main>
+	<div>
+		<h1>Flights</h1>
+		<h3>
+			selected: {totalCountState?.filter.toLocaleString()}
+		</h3>
+	</div>
+	<!-- <View1DHist
 	state={delayState}
 	dimLabel="Departure Delay"
 	width={400}
@@ -92,58 +98,61 @@
 		}
 	}}
 /> -->
-<View1DHist
-	state={distanceState}
-	dimLabel="Distance"
-	width={400}
-	on:mouseenter={() => {
-		distanceView.prefetch();
-	}}
-	on:brush={async (event) => {
-		// interact
-		const interval = event.detail;
-		if (interval !== null) {
-			await distanceView.add(interval);
-		} else {
-			await distanceView.add();
-		}
-	}}
-/>
-<View2DHeat
-	state={depDelayVsArrDelayState}
-	width={600}
-	height={600}
-	labelX="Departure Delay"
-	labelY="Arrival Delay"
-	on:mouseenter={() => {
-		depDelayVsArrDelayView.prefetch();
-	}}
-	on:brush={async (event) => {
-		// interact
-		const interval = event.detail;
-		if (interval !== null) {
-			await depDelayVsArrDelayView.add(interval);
-		} else {
-			await depDelayVsArrDelayView.add();
-		}
-	}}
-/>
+	<View1DHist
+		state={distanceState}
+		dimLabel="Distance"
+		width={400}
+		on:mouseenter={() => {
+			distanceView.prefetch();
+		}}
+		on:brush={async (event) => {
+			// interact
+			const interval = event.detail;
+			if (interval !== null) {
+				await distanceView.add(interval);
+			} else {
+				await distanceView.add();
+			}
+		}}
+	/>
+	<View2DHeat
+		state={depDelayVsArrDelayState}
+		width={600}
+		height={600}
+		labelX="Departure Delay"
+		labelY="Arrival Delay"
+		on:mouseenter={() => {
+			depDelayVsArrDelayView.prefetch();
+		}}
+		on:brush={async (event) => {
+			// interact
+			const interval = event.detail;
+			if (interval !== null) {
+				await depDelayVsArrDelayView.add(interval);
+			} else {
+				await depDelayVsArrDelayView.add();
+			}
+		}}
+	/>
 
-<button
-	on:click={() => {
-		console.log(falcon);
-	}}>Log Falcon Object</button
->
+	<button
+		on:click={() => {
+			console.log(falcon);
+		}}>Log Falcon Object</button
+	>
+</main>
 
 <style>
 	:global(:root) {
 		--bg-color: hsl(240, 23%, 9%);
 		--primary-color: #00e6c7;
+		--text-color: white;
 	}
 	:global(body, html) {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 			Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 		margin: 0;
 		background-color: var(--bg-color);
+		color: var(--text-color);
 	}
 </style>
