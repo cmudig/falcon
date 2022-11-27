@@ -10,9 +10,13 @@
 	import { tableFromIPC } from "apache-arrow";
 	import { onMount } from "svelte";
 
-	let countSvelte: View0DState;
-	let distanceViewSvelte: View1DState;
+	let totalCountState: View0DState;
+	let distanceState: View1DState;
 	let distanceView: View1D;
+	let delayState: View1DState;
+	let delayView: View1D;
+
+	let falcon: Falcon;
 	onMount(async () => {
 		// arrow Data
 		const data = await fetch("data/flights-10k.arrow");
@@ -21,7 +25,7 @@
 
 		// falcon library
 		const falconArrow = new ArrowDB(table);
-		const falcon = new Falcon(falconArrow);
+		falcon = new Falcon(falconArrow);
 
 		// create views
 		const count = falcon.count();
@@ -31,13 +35,22 @@
 			extent: [0, 4000],
 			resolution: 400,
 		});
+		delayView = falcon.view1D({
+			name: "DEP_DELAY",
+			bins: 25,
+			extent: [-20, 60],
+			resolution: 400,
+		});
 
 		// setup onChange functions
-		const disposeCountListener = count.onChange((state) => {
-			countSvelte = state;
+		count.onChange((state) => {
+			totalCountState = state;
 		});
-		const disposeDistanceListener = distanceView.onChange((state) => {
-			distanceViewSvelte = state;
+		distanceView.onChange((state) => {
+			distanceState = state;
+		});
+		delayView.onChange((state) => {
+			delayState = state;
 		});
 
 		// get initial counts
@@ -45,24 +58,47 @@
 	});
 </script>
 
-<main>count: {countSvelte?.filter.toLocaleString()}</main>
+<main>count: {totalCountState?.filter.toLocaleString()}</main>
 <View1DHist
-	state={distanceViewSvelte}
-	dimLabel="Arrival Delay"
+	state={delayState}
+	dimLabel="Departure Delay"
+	width={400}
+	on:mouseenter={() => {
+		delayView.prefetch();
+	}}
+	on:brush={async (event) => {
+		// interact
+		const interval = event.detail;
+		if (interval !== null) {
+			await delayView.add(interval);
+		} else {
+			await delayView.add();
+		}
+	}}
+/>
+<View1DHist
+	state={distanceState}
+	dimLabel="Distance"
 	width={400}
 	on:mouseenter={() => {
 		distanceView.prefetch();
 	}}
-	on:brush={(event) => {
+	on:brush={async (event) => {
 		// interact
 		const interval = event.detail;
 		if (interval !== null) {
-			distanceView.add(interval);
+			await distanceView.add(interval);
 		} else {
-			distanceView.remove();
+			await distanceView.add();
 		}
 	}}
 />
+
+<button
+	on:click={() => {
+		console.log(falcon);
+	}}>Log Falcon Object</button
+>
 
 <style>
 	:global(body, html) {

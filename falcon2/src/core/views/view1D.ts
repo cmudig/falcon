@@ -3,6 +3,7 @@ import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
+import { sub } from "../../util";
 
 /* defines how the parameter is typed for on change */
 export interface View1DState {
@@ -15,11 +16,13 @@ export class View1D extends ViewAbstract<View1DState> {
   dimension: Dimension;
   state: View1DState;
   toPixels: (brush: Interval<number>) => Interval<number>;
+  lastFilter: Interval<number>;
   constructor(falcon: Falcon, dimension: Dimension) {
     super(falcon);
     this.dimension = dimension;
     this.state = { total: null, filter: null, bin: null };
     this.toPixels = () => [0, 0];
+    this.lastFilter = [0, 0];
   }
 
   /**
@@ -82,7 +85,15 @@ export class View1D extends ViewAbstract<View1DState> {
   ) {
     await this.prefetch();
 
-    if (select && this.falcon.index.size) {
+    if (select) {
+      // just end now if the filter hasn't changed
+      if (
+        this.lastFilter[0] === select[0] &&
+        this.lastFilter[1] === select[1]
+      ) {
+        return;
+      }
+
       // add filter
       this.falcon.filters.set(this.dimension.name, select);
 
@@ -93,13 +104,9 @@ export class View1D extends ViewAbstract<View1DState> {
       this.falcon.passiveViews.forEach(async (passiveView) => {
         await passiveView.count1DIndex(selectPixels);
       });
-    } else {
-      this.remove();
-    }
-  }
 
-  async remove() {
-    if (this.falcon.index.size) {
+      this.lastFilter = select;
+    } else {
       // remove filter
       this.falcon.filters.delete(this.dimension.name);
       // and revert back counts
@@ -112,11 +119,28 @@ export class View1D extends ViewAbstract<View1DState> {
   /**
    * Given an active 1D view, count for this passive view
    */
-  count1DIndex(filterPixels: Interval<number> | null): void {
-    // take in the index
-    // do subtractions
+  async count1DIndex(pixels: Interval<number> | null) {
+    // grab index
+    const index = await this.falcon.index.get(this)!;
+    if (index === undefined) {
+      throw Error("Index not defined for 1D passive view");
+    }
+
     // update state
+    if (pixels === null) {
+      this.state.filter = index.noBrush.data as Int32Array;
+    } else {
+      // select the columns and subtract them to get in between [A, B]
+      const [A, B] = pixels;
+      const colB = index.hists.pick(B, null);
+      const colA = index.hists.pick(A, null);
+      const result = sub(colA, colB);
+
+      this.state.filter = result.data;
+    }
+
     // signal user
+    this.signalOnChange(this.state);
   }
   count2DIndex(): void {}
 }
