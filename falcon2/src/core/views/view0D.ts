@@ -1,4 +1,5 @@
 import { ViewAbstract } from "./viewAbstract";
+import { Interval } from "../../basic";
 import type { Falcon } from "../falcon";
 
 /* defines how the parameter is typed for on change */
@@ -25,6 +26,15 @@ export class View0D extends ViewAbstract<View0DState> {
     this.signalOnChange(this.state);
   }
 
-  count1DIndex(): void {}
+  /**
+   * Given an active 1D view, count for this passive view
+   */
+  count1DIndex(pixels: Interval<number>): void {
+    console.log(pixels);
+    // take in the index
+    // do subtractions
+    // update state
+    // signal user
+  }
   count2DIndex(): void {}
 }

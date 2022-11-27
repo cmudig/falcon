@@ -4,6 +4,7 @@
 	import type {
 		View0DState,
 		View1DState,
+		View1D,
 	} from "../../../falcon2/src/core/views";
 	import { ArrowDB } from "../../../falcon2/src/db/arrow";
 	import { tableFromIPC } from "apache-arrow";
@@ -11,6 +12,7 @@
 
 	let countSvelte: View0DState;
 	let distanceViewSvelte: View1DState;
+	let distanceView: View1D;
 	onMount(async () => {
 		// arrow Data
 		const data = await fetch("data/flights-10k.arrow");
@@ -23,7 +25,7 @@
 
 		// create views
 		const count = falcon.count();
-		const distanceView = falcon.view1D({
+		distanceView = falcon.view1D({
 			name: "DISTANCE",
 			bins: 25,
 			extent: [0, 4000],
@@ -40,9 +42,6 @@
 
 		// get initial counts
 		await falcon.all();
-
-		// interact
-		distanceView.select([0, 100]);
 	});
 </script>
 
@@ -52,15 +51,16 @@
 	dimLabel="Arrival Delay"
 	width={400}
 	on:mouseenter={() => {
-		// arrivalDelay.prefetch();
+		distanceView.prefetch();
 	}}
 	on:brush={(event) => {
-		// const interval = event.detail;
-		// if (interval !== null) {
-		// 	arrivalDelay.brush(interval);
-		// } else {
-		// 	arrivalDelay.brush();
-		// }
+		// interact
+		const interval = event.detail;
+		if (interval !== null) {
+			distanceView.add(interval);
+		} else {
+			distanceView.remove();
+		}
 	}}
 />
 

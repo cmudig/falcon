@@ -1,17 +1,22 @@
 import { View0D, View1D, View2D } from "./views";
 
-import type { DataBase } from "../db";
+import type { DataBase as OldDatabase } from "../db";
+import { FalconDB, DatabasePort, DimensionFilters, Index } from "./db/db";
 import type { View } from "./views";
 
-export type DB = DataBase<string, string>;
+export type OldDB = OldDatabase<string, string>;
 type Dimension = any;
 
 export class Falcon {
-  db: DB;
+  db: FalconDB;
   views: Set<View>;
-  constructor(db: DB) {
-    this.db = db;
+  filters: DimensionFilters;
+  index: Index;
+  constructor(db: OldDB) {
+    this.db = new DatabasePort(db);
     this.views = new Set();
+    this.filters = new Map();
+    this.index = new Map();
   }
 
   /**
@@ -43,6 +48,10 @@ export class Falcon {
     const view = new View2D(this, dimensions);
     this.views.add(view);
     return view;
+  }
+
+  get passiveViews() {
+    return Array.from(this.views).filter((view) => !view.isActive);
   }
 
   /**

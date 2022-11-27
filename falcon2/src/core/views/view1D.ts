@@ -1,9 +1,8 @@
 import { ViewAbstract } from "./viewAbstract";
-import { createBinConfig, readableBins } from "../util";
+import { createBinConfig, readableBins, brushToPixelSpace } from "../util";
 import type { Falcon } from "../falcon";
 import type { Dimension } from "../dimension";
 import type { Interval } from "../../basic";
-import type { View1D as OldView1D } from "../../api";
 
 /* defines how the parameter is typed for on change */
 export interface View1DState {
@@ -15,10 +14,12 @@ export interface View1DState {
 export class View1D extends ViewAbstract<View1DState> {
   dimension: Dimension;
   state: View1DState;
+  toPixels: (brush: Interval<number>) => Interval<number>;
   constructor(falcon: Falcon, dimension: Dimension) {
     super(falcon);
     this.dimension = dimension;
     this.state = { total: null, filter: null, bin: null };
+    this.toPixels = () => [0, 0];
   }
 
   /**
@@ -26,10 +27,12 @@ export class View1D extends ViewAbstract<View1DState> {
    */
   async createBinConfig() {
     if (this.dimension?.extent === undefined) {
-      this.dimension.extent = await this.falcon.db.getDimensionExtent(
-        this.dimension
-      );
+      this.dimension.extent = await this.falcon.db.extent(this.dimension);
     }
+    this.toPixels = brushToPixelSpace(
+      this.dimension.extent!,
+      this.dimension.resolution
+    );
     this.dimension.binConfig = createBinConfig(
       this.dimension,
       this.dimension.extent
@@ -44,10 +47,9 @@ export class View1D extends ViewAbstract<View1DState> {
     this.state.bin = readableBins(this.dimension.binConfig!);
 
     // count
-    const dimension = this.oldDimensionInterface;
-    const result = await this.falcon.db.histogram(dimension);
-    this.state.total = result.hist.data as Int32Array;
-    this.state.filter = result.noBrush.data as Int32Array;
+    const result = await this.falcon.db.load1DAll(this);
+    this.state.total = result.data as Int32Array;
+    this.state.filter = result.data as Int32Array;
 
     this.signalOnChange(this.state);
   }
@@ -57,44 +59,51 @@ export class View1D extends ViewAbstract<View1DState> {
    */
   async prefetch() {
     if (!this.isActive) {
+      // make the current one active
       this.makeActiveView();
 
       // fetch the index
-      // store the index
+      // and store
+      this.falcon.index = this.falcon.db.load1DIndex(
+        this,
+        this.dimension.resolution,
+        this.falcon.passiveViews,
+        this.falcon.filters
+      );
     }
   }
 
   /**
    * compute counts from the falcon index
    */
-  async select(selection: Interval<number>) {
+  async add(select: Interval<number>, convertToPixels = true) {
     await this.prefetch();
 
+    // add filter
+    this.falcon.filters.set(this.dimension.name, select);
+
+    // convert active selection into pixels if needed
+    const selectPixels = convertToPixels ? this.toPixels(select) : select;
+
     // use the index to count for the passive views
-    this.falcon.views.forEach((view) => {
-      const isPassive = !view.isActive;
-      if (isPassive) {
-        // given the active brush, count the index for the passive view
-        view.count1DIndex();
-      }
+    this.falcon.passiveViews.forEach((view) => {
+      view.count1DIndex(selectPixels);
     });
   }
 
-  count1DIndex(): void {}
-  count2DIndex(): void {}
+  remove() {
+    // remove filter
+    this.falcon.filters.delete(this.dimension.name);
+  }
 
   /**
-   * As I update the db code, these can be phased out
-   * this is just so I can still interact with the old code
+   * Given an active 1D view, count for this passive view
    */
-  get oldViewInterface() {
-    const oldView: OldView1D<string> = {
-      dimension: this.oldDimensionInterface,
-      type: "1D",
-    };
-    return oldView;
+  count1DIndex(pixels: Interval<number>): void {
+    // take in the index
+    // do subtractions
+    // update state
+    // signal user
   }
-  get oldDimensionInterface() {
-    return this.dimension;
-  }
+  count2DIndex(): void {}
 }
