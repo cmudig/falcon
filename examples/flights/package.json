@@ -10,5 +10,9 @@
   },
   "devDependencies": {
     "vite": "^4.1.0"
+  },
+  "dependencies": {
+    "d3": "^7.8.2",
+    "falcon2": "0.0.15"
   }
 }
