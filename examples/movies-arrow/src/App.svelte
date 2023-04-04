@@ -65,7 +65,7 @@
 			},
 		]);
 
-		await falcon.initializeAllCounts();
+		await falcon.all();
 		console.warn = () => {};
 	}
 

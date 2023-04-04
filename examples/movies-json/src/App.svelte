@@ -128,7 +128,7 @@
 			});
 		});
 
-		await falcon.initializeAllCounts();
+		await falcon.all();
 	}
 	let instances: Iterable<Record<string, any>>;
 	let page = 0;

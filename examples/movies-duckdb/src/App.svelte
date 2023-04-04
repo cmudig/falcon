@@ -70,7 +70,7 @@
 			});
 		});
 
-		await falcon.initializeAllCounts();
+		await falcon.all();
 		await views[0].activate();
 		await views[0].select([6.41, 8.52]);
 		falcon.filters = falcon.filters;

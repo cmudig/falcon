@@ -78,7 +78,7 @@
 			},
 		]);
 
-		await falcon.initializeAllCounts();
+		await falcon.all();
 		entries = await falcon.entries({ length: numEntries });
 	}
 

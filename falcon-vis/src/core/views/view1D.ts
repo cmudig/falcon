@@ -77,7 +77,7 @@ export class View1D extends ViewAbstract<View1DState> {
    *
    * @returns the View1D class itself
    */
-  async initializeAllCounts() {
+  async all() {
     await this.createBins();
 
     const counts = await this.falcon.db.histogramView1D(
@@ -107,7 +107,7 @@ export class View1D extends ViewAbstract<View1DState> {
 
         // we just count the whole shebang too
         if (rangeNotComputed) {
-          await view.initializeAllCounts();
+          await view.all();
         }
       });
 
