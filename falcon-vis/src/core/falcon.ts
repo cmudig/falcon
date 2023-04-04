@@ -92,11 +92,15 @@ export class Falcon {
   }
 
   /**
+   * creates an iterator over the filtered entries located at the offset and with a specified length
+   * for example, if we have 100 filtered entries, I can position myself halfway (offset = 50) and if I want
+   * just 10 entries I would use length = 10
+   *
    * @param offset the offset to start the iteration from (within filtered)
    * @param length the number of entries to return
-   * @returns an iterable that iterates over instances from the filter
+   * @returns iterator over the filtered entries basically a list of objects
    */
-  async getEntries({ offset = 0, length = Infinity } = {}) {
+  async entries({ offset = 0, length = Infinity } = {}) {
     return this.db.entries(offset, length, this.filters);
   }
 

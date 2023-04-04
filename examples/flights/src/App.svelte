@@ -80,7 +80,7 @@
 		]);
 
 		await falcon.initializeAllCounts();
-		entries = await falcon.getEntries({ length: numEntries });
+		entries = await falcon.entries({ length: numEntries });
 	}
 
 	let page = 0;
@@ -127,7 +127,7 @@
 							if (resolved) {
 								resolved = false;
 								request = falcon
-									.getEntries({
+									.entries({
 										length: numEntries,
 									})
 									.then((d) => {
@@ -149,7 +149,7 @@
 				<button
 					on:click={async () => {
 						page = Math.max(page - numEntries, 0);
-						entries = await falcon.getEntries({
+						entries = await falcon.entries({
 							length: numEntries,
 							offset: page,
 						});
@@ -158,7 +158,7 @@
 				<button
 					on:click={async () => {
 						page += numEntries;
-						entries = await falcon.getEntries({
+						entries = await falcon.entries({
 							length: numEntries,
 							offset: page,
 						});
