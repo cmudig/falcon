@@ -18,37 +18,9 @@ export class Falcon {
    */
   constructor(db: FalconDB) {
     this.db = db;
-    this.views = new ViewSet();
+    this.views = new ViewSet(); // this may be a bs abstraction
     this.filters = new Map();
     this.index = new Map();
-  }
-
-  /**
-   * verifies if we can continue to do stuff on the data
-   * throws an error if the data does not exist
-   */
-  async assertDataExists(...dimensions: Dimension[]) {
-    /**
-     * Check if the table exists
-     */
-    const tableExistsInDB = await this.db.tableExists();
-    if (!tableExistsInDB) {
-      throw new Error(`Table does not exists in the database`);
-    }
-
-    /**
-     * If provided, check if the dimensions exist
-     */
-    dimensions?.forEach(async (dimension) => {
-      if (dimension) {
-        const dimensionExistsInDB = await this.db.dimensionExists(dimension);
-        if (!dimensionExistsInDB) {
-          throw new Error(
-            `Dimension '${dimension.name}' does not exist in the data table`
-          );
-        }
-      }
-    });
   }
 
   /**
@@ -56,18 +28,13 @@ export class Falcon {
    *
    * @returns the view
    */
-  async linkCount(onChange?: OnChange<View0DState>) {
+  async view0D(onChange?: OnChange<View0DState>) {
     await this.assertDataExists();
-    return this.createView0D(onChange);
-  }
-  private createView0D(onChange?: OnChange<View0DState>) {
     const view = new View0D(this);
     this.views.add(view);
-
     if (onChange) {
       view.addOnChangeListener(onChange);
     }
-
     return view;
   }
 
@@ -76,18 +43,13 @@ export class Falcon {
    *
    * @returns the 1D view you can directly filter with .select()
    */
-  async linkView1D(dimension: Dimension, onChange?: OnChange<View1DState>) {
+  async view1D(dimension: Dimension, onChange?: OnChange<View1DState>) {
     await this.assertDataExists(dimension);
-    return this.createView1D(dimension, onChange);
-  }
-  private createView1D(dimension: Dimension, onChange?: OnChange<View1DState>) {
     const view = new View1D(this, dimension);
     this.views.add(view);
-
     if (onChange) {
       view.addOnChangeListener(onChange);
     }
-
     return view;
   }
 
@@ -130,5 +92,33 @@ export class Falcon {
   }
   otherFilters(view: View1D): Filters {
     return excludeMap(this.filters, view.dimension);
+  }
+
+  /**
+   * verifies if we can continue to do stuff on the data
+   * throws an error if the data does not exist
+   */
+  async assertDataExists(...dimensions: Dimension[]) {
+    /**
+     * Check if the table exists
+     */
+    const tableExistsInDB = await this.db.tableExists();
+    if (!tableExistsInDB) {
+      throw new Error(`Table does not exists in the database`);
+    }
+
+    /**
+     * If provided, check if the dimensions exist
+     */
+    dimensions?.forEach(async (dimension) => {
+      if (dimension) {
+        const dimensionExistsInDB = await this.db.dimensionExists(dimension);
+        if (!dimensionExistsInDB) {
+          throw new Error(
+            `Dimension '${dimension.name}' does not exist in the data table`
+          );
+        }
+      }
+    });
   }
 }

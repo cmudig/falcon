@@ -28,13 +28,13 @@
 	}
 
 	function compose(falcon: Falcon, view1Ds: Dimension[]) {
-		falcon.linkCount((state) => {
+		falcon.view0D((state) => {
 			countState = state;
 		});
 
 		viewStates = new Array(view1Ds.length);
 		const views = view1Ds.map(async (dim, i) =>
-			falcon.linkView1D(dim, (state) => {
+			falcon.view1D(dim, (state) => {
 				viewStates[i] = state;
 			})
 		);
