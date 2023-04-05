@@ -60,6 +60,19 @@ export class ArrowDB implements FalconDB {
     return new ArrowDB(table);
   }
 
+  /**
+   * compute the best number of bins for a histogram
+   * given the data
+   *
+   * @resource [plot](https://github.com/observablehq/plot/blob/97924e7682e49d35a34da794ca98bf0c7e8a3c28/src/transforms/bin.js#L320)
+   * @resource [lord and savior](https://twitter.com/mbostock/status/1429281697854464002)
+   * @resource [numpy](https://numpy.org/doc/stable/reference/generated/numpy.histogram_bin_edges.html)
+   */
+  estimateNumBins(dimension: Dimension, maxThreshold = 200): number {
+    const optimalBins = 10;
+    return Math.max(optimalBins, maxThreshold);
+  }
+
   length(filters?: Filters): number {
     if (filters) {
       const filterMask: BitSet | null = union(
@@ -621,4 +634,28 @@ class LRUMap<K, V> extends Map<K, V> {
     }
     return super.set(key, value);
   }
+}
+
+/**
+ * sample defined by
+ * $$\sigma^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2$$
+ *
+ * this can probably be optimized faster to be like [the boss](https://github.com/d3/d3-array/blob/main/src/variance.js#L1)
+ */
+function sampleVariance(vector: Vector) {
+  let variance = 0,
+    n = vector.length;
+  let mu = mean(vector);
+  for (const x_i of vector) {
+    variance += (x_i - mu) ** 2;
+  }
+  return n > 1 ? variance / (n - 1) : variance;
+}
+function mean(vector: Vector) {
+  let mean = 0,
+    n = vector.length;
+  for (const x_i of vector) {
+    mean += x_i;
+  }
+  return mean / n;
 }
