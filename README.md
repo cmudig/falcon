@@ -58,9 +58,7 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
     -   [x] when a passive view0D is added
     -   [x] when a passive view1D is added
 -   [x] automatically compute optimal number of bins
--   [ ] update key settings (bins, range/extent)
-    -   [ ] updateBins()
-    -   [ ] updateRange()
+-   [x] update key settings (bins, range/extent)
 -   [ ] Create one example at different data levels for the paper
     -   [ ] 100k (json)
     -   [ ] 1m (arrow)

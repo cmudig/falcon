@@ -5,6 +5,7 @@
 		type View1DState,
 		View1D,
 		ArrowDB,
+		DuckDB,
 	} from "falcon-vis";
 	import { onMount } from "svelte";
 	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
@@ -25,6 +26,7 @@
 	});
 
 	async function moviesArrow() {
+		// const db = await DuckDB.fromParquetFile("data/movies-3k.parquet");
 		const db = await ArrowDB.fromArrowFile("data/movies-3k.arrow");
 		index = new FalconVis(db);
 
@@ -104,12 +106,11 @@
 
 	<button
 		on:click={async () => {
-			await index.view0D((state) => {
-				console.log("worked bitch!");
-				console.log(state);
+			views[1].update({
+				...views[1].dimension,
+				bins: 100,
 			});
-			await index.link();
-		}}>add view0D</button
+		}}>update</button
 	>
 </main>
 
