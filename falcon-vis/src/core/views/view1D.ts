@@ -35,13 +35,22 @@ export class View1D extends ViewAbstract<View1DState> {
   state: View1DState | CategoricalView1DState;
   toPixels: (brush: Interval<number>) => Interval<number>;
   lastFilter: DimensionFilter | undefined;
-  isAttached: boolean;
   constructor(falcon: FalconVis, dimension: Dimension) {
     super(falcon);
     this.dimension = dimension;
     this.state = { total: null, filter: null, bin: null };
     this.toPixels = () => [0, 0];
-    this.isAttached = true;
+  }
+
+  /**
+   * slowest way to update data
+   *
+   * @todo this breaks when an active view is on
+   * @todo replace this with targeted updates instead of just recomputing everything
+   */
+  async update(dimension: Dimension) {
+    this.dimension = dimension;
+    await this.falcon.link();
   }
 
   /**
