@@ -55,6 +55,9 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
 ## Plan
 
 -   [ ] handle when views are added or removed
+    -   [ ] when a passive view is added
+    -   [ ] when a passive view is removed
+    -   [ ] when an active view is removed
 -   [ ] handle when view should not be updated, but still applies filter
 -   [ ] automatically compute optimal number of bins
 -   [ ] update key settings (bins, range/extent)
