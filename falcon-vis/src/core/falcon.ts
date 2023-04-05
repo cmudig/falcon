@@ -100,6 +100,7 @@ export class FalconVis {
     } else {
       /**
        * @todo compute the passive index individually instead of the entire thing
+       * @todo this fails for the .update() on view1D
        * setup a system that diffs from the current index and filters
        */
       const forceToCompute = true; // turns off optimizations
