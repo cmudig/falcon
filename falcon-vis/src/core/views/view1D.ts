@@ -287,9 +287,16 @@ export class View1D extends ViewAbstract<View1DState> {
 
   /**
    * detaches from the global falcon index
+   *
+   * if I detach an active view, I need to relink
    */
   async detach() {
     this.falcon.views.remove(this);
     this.falcon.index.delete(this);
+
+    // if we remove the active view, revert back
+    if (this.isActive) {
+      await this.falcon.link();
+    }
   }
 }
