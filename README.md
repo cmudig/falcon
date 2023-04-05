@@ -51,3 +51,17 @@ Check out the workspace [`package.json`](package.json) or the specific example's
 ## Development
 
 Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server.
+
+## Plan
+
+-   [ ] handle when views are added or removed
+-   [ ] handle when view should not be updated, but still applies filter
+-   [ ] automatically compute optimal number of bins
+-   [ ] update key settings (bins, range/extent)
+-   [ ] handle destruction of views and data
+-   [ ] Create one example at different data levels for the paper
+    -   [ ] 100k (json)
+    -   [ ] 1m (arrow)
+    -   [ ] 10m (duckdb-wasm parquet)
+    -   [ ] 35m (http)
+    -   [ ] 180m (motherduck)
