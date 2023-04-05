@@ -49,7 +49,7 @@
 			"diffusiondb"
 			// new Map([["timestamp", "epoch(timestamp)*1000"]])
 		);
-		falcon = new Falcon(db);
+		falcon = new FalconVis(db);
 
 		views = await compose(falcon, [
 			{

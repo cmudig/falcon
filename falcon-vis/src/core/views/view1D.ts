@@ -6,7 +6,7 @@ import {
   binNumberFunctionCategorical,
   numBinsContinuous,
 } from "../util";
-import type { Falcon } from "../falcon";
+import type { FalconVis } from "../falcon";
 import type {
   CategoricalRange,
   ContinuousRange,
@@ -36,7 +36,7 @@ export class View1D extends ViewAbstract<View1DState> {
   toPixels: (brush: Interval<number>) => Interval<number>;
   lastFilter: DimensionFilter | undefined;
   isAttached: boolean;
-  constructor(falcon: Falcon, dimension: Dimension) {
+  constructor(falcon: FalconVis, dimension: Dimension) {
     super(falcon);
     this.dimension = dimension;
     this.state = { total: null, filter: null, bin: null };

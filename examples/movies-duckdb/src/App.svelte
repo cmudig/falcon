@@ -33,7 +33,7 @@
 			fullUrl("data/movies-3k.parquet")
 		);
 		// const db = await ArrowDB.fromArrowFile("data/movies-3k.arrow");
-		falcon = new Falcon(db);
+		falcon = new FalconVis(db);
 
 		count = await falcon.view0D((state) => {
 			countState = state;

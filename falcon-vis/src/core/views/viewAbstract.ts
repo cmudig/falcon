@@ -1,11 +1,11 @@
 import type { Interval } from "../util";
-import type { Falcon } from "../falcon";
+import type { FalconVis } from "../falcon";
 import type { CategoricalRange } from "../dimension";
 
 export type OnChange<S> = (state: S) => void;
 
 export abstract class ViewAbstract<S extends object> {
-  falcon: Falcon;
+  falcon: FalconVis;
   onChangeListeners: Set<OnChange<S>>;
   isActive: boolean;
 
@@ -13,7 +13,7 @@ export abstract class ViewAbstract<S extends object> {
    * Links this new view with all other views through the falcon object
    * by default is passive (isActive = false)
    */
-  constructor(falcon: Falcon) {
+  constructor(falcon: FalconVis) {
     this.isActive = false;
     this.linkTogetherWithOtherViews(falcon);
     this.onChangeListeners = new Set();
@@ -39,7 +39,7 @@ export abstract class ViewAbstract<S extends object> {
     totalRange?: CategoricalRange
   ): void;
 
-  private linkTogetherWithOtherViews(falcon: Falcon) {
+  private linkTogetherWithOtherViews(falcon: FalconVis) {
     this.falcon = falcon;
   }
 

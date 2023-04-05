@@ -4,7 +4,7 @@ import type { Dimension } from "./dimension";
 import type { FalconDB, FalconIndex, Filters } from "./db/db";
 import type { OnChange } from "./views/viewAbstract";
 
-export class Falcon {
+export class FalconVis {
   db: FalconDB;
   views: ViewSet;
   filters: Filters;

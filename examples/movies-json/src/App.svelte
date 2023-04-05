@@ -29,7 +29,7 @@
 		json = await fetch("data/movies.json").then((res) => res.json());
 		const db = new JsonDB(json);
 
-		falcon = new Falcon(db);
+		falcon = new FalconVis(db);
 
 		count = await falcon.view0D();
 		count.addOnChangeListener((state) => {

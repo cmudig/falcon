@@ -51,7 +51,7 @@
 			undefined,
 			(q) => q
 		);
-		falcon = new Falcon(db);
+		falcon = new FalconVis(db);
 
 		views = await compose(falcon, [
 			{

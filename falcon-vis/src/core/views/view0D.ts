@@ -1,7 +1,7 @@
 import { binNumberFunctionCategorical } from "../util";
 import { ViewAbstract } from "./viewAbstract";
 import type { Interval } from "../util";
-import type { Falcon } from "../falcon";
+import type { FalconVis } from "../falcon";
 import type { CategoricalRange } from "../dimension";
 
 /* defines how the parameter is typed for on change */
@@ -15,7 +15,7 @@ export type CountState = View0DState;
 export class View0D extends ViewAbstract<View0DState> {
   state: View0DState;
 
-  constructor(falcon: Falcon) {
+  constructor(falcon: FalconVis) {
     super(falcon);
     this.state = { total: null, filter: null };
   }
