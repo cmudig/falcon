@@ -1,5 +1,6 @@
 import { tableFromIPC, Table } from "apache-arrow";
 import { BitSet, union } from "../bitset";
+import { greatScott } from "../bins";
 import { FalconDB, SyncIndex } from "./db";
 import { FalconArray } from "../falconArray";
 import { Row, RowIterator } from "../iterator";
@@ -73,19 +74,18 @@ export class ArrowDB implements FalconDB {
     maxThreshold = 200,
     noKnowledgeEstimate = 15
   ): number {
-    if (dimension.range) {
-      const arrowColumn = this.data.getChild(dimension.name)!;
-      if (arrowColumn.length <= 1) {
-        // can't do much with one data point
-        return 1;
-      }
+    const arrowColumn = this.data.getChild(dimension.name)!;
+    if (arrowColumn.length <= 1) {
+      // can't do much with one data point
+      return 1;
+    }
 
+    if (dimension.range) {
       const standardDeviation = Math.sqrt(sampleVariance(arrowColumn)); // \sqrt{\sigma^2}
       const [min, max] = dimension.range;
       const optimalBins = greatScott(min, max, standardDeviation);
-      return Math.max(optimalBins, maxThreshold);
+      return Math.min(optimalBins, maxThreshold);
     }
-
     // if we don't have a min max range, just return the no knowledge estimate
     return noKnowledgeEstimate;
   }
@@ -675,13 +675,4 @@ function mean(vector: Vector) {
     mean += x_i;
   }
   return mean / n;
-}
-
-/**
- * [Great Scott!](https://www.youtube.com/watch?v=LXboNl2vWH8)
- * straight up taken from [d3](https://github.com/d3/d3-array/blob/main/src/threshold/scott.js#L2)
- * thank you mike
- */
-function greatScott(min: number, max: number, standardDeviation: number) {
-  return Math.ceil((max - min) / (3.49 * standardDeviation));
 }

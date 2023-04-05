@@ -52,6 +52,12 @@ export class View1D extends ViewAbstract<View1DState> {
       this.dimension.range = await this.falcon.db.range(this.dimension);
     }
     if (this.dimension.type === "continuous") {
+      // if the bins are specified, autocompute the best num of bins!
+      this.dimension.bins =
+        this.dimension.bins ??
+        (await this.falcon.db.estimateNumBins(this.dimension, 200, 15));
+      console.log(this.dimension.bins);
+
       this.dimension.binConfig = createBinConfigContinuous(
         this.dimension,
         this.dimension.range!

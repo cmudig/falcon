@@ -9,11 +9,11 @@ export interface ContinuousDimension extends AbstractDimension {
   /* continuous range of values */
   type: "continuous";
 
-  /* max number of bins to create, the result could be less bins */
-  bins: number;
-
   /* expected bin resolution we need to brush over*/
   resolution: number;
+
+  /* max number of bins to create, the result could be less bins */
+  bins?: number;
 
   /* [min, max] interval to count between */
   range?: ContinuousRange;

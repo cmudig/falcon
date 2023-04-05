@@ -1,3 +1,4 @@
+import { greatScott } from "../bins";
 import {
   Dimension,
   ContinuousRange,
@@ -100,6 +101,39 @@ export abstract class SQLDB implements FalconDB {
               ${length >= 0 && length < Infinity ? `LIMIT ${length}` : ""}
               OFFSET ${offset}`);
     return filteredTable;
+  }
+
+  /**
+   * compute the best number of bins for a histogram
+   * given the data
+   *
+   * @resource [plot](https://github.com/observablehq/plot/blob/97924e7682e49d35a34da794ca98bf0c7e8a3c28/src/transforms/bin.js#L320)
+   * @resource [lord and savior](https://twitter.com/mbostock/status/1429281697854464002)
+   * @resource [numpy](https://numpy.org/doc/stable/reference/generated/numpy.histogram_bin_edges.html)
+   */
+  async estimateNumBins(
+    dimension: ContinuousDimension,
+    maxThreshold = 200,
+    noKnowledgeEstimate = 15
+  ): Promise<number> {
+    const count = await this.length();
+    if (count <= 1) {
+      return 1;
+    }
+
+    if (dimension.range) {
+      const standardDeviationQuery = await this.query(
+        `SELECT STDDEV(${this.getName(dimension)}) AS standardDeviation FROM ${
+          this.table
+        }`
+      );
+      const { standardDeviation } = this.getASValues(standardDeviationQuery);
+      const [min, max] = dimension.range;
+      const optimalBins = greatScott(min, max, standardDeviation);
+      return Math.min(optimalBins, maxThreshold);
+    }
+    // if we don't have a min max range, just return the no knowledge estimate
+    return noKnowledgeEstimate;
   }
 
   async length(filters?: Filters) {

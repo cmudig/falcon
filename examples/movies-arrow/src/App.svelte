@@ -36,13 +36,11 @@
 		const usGross = await index.view1D({
 			type: "continuous",
 			name: "US_Gross",
-			bins: 25,
 			resolution: 400,
 		});
 		const worldGross = await index.view1D({
 			type: "continuous",
 			name: "Worldwide_Gross",
-			bins: 25,
 			resolution: 400,
 		});
 
