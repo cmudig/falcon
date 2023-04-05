@@ -60,6 +60,7 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
     -   [ ] when an passive view0D is removed
     -   [ ] when an passive view1D is removed
     -   [ ] when an active view1D is removed
+    -   [ ] handle when want to detach, but not detach filter
 -   [ ] handle when view should not be updated, but still applies filter
 -   [ ] automatically compute optimal number of bins
 -   [ ] update key settings (bins, range/extent)
