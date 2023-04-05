@@ -12,7 +12,7 @@ A simple javascript API that links visualizations at scale.
 
 With FalconVis, you can interact with linked visualizations without delay. Seriously! It's latency free on interaction!
 
-### Live Examples
+## Live Examples
 
 -   add
 -   a
@@ -20,7 +20,7 @@ With FalconVis, you can interact with linked visualizations without delay. Serio
 -   of
 -   links
 
-# Usage
+## Usage
 
 TODO: put usage here to get started quick
 
@@ -42,12 +42,12 @@ TODO fill in and add examples
 
 <br><a href="#">#</a> view.<b>onChange</b>()
 
-### Examples
+## Examples
 
 To see real working examples, check out the self-contained examples in the [`examples/`](examples/) directory.
 
 Check out the workspace [`package.json`](package.json) or the specific example's `package.json` for more information on how to run them.
 
-### Development
+## Development
 
 Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server.
