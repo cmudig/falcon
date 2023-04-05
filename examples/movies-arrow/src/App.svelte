@@ -103,6 +103,15 @@
 			</div>
 		{/each}
 	</div>
+
+	<button
+		on:click={async () => {
+			await index.view0D((state) => {
+				console.log("worked bitch!");
+				console.log(state);
+			});
+		}}>add view0D</button
+	>
 </main>
 
 <style>

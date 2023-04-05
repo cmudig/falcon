@@ -25,17 +25,34 @@ export class FalconVis {
 
   /**
    * Creates a 0D view that counts the number of entries
+   * if this is called when there is already an active view, it will just compute this passive index
    *
    * @returns the view
    */
   async view0D(onChange?: OnChange<View0DState>) {
     await this.assertDataExists();
-    const view = new View0D(this);
-    this.views.add(view);
+    const view0D = new View0D(this);
+    this.views.add(view0D);
     if (onChange) {
-      view.addOnChangeListener(onChange);
+      view0D.addOnChangeListener(onChange);
     }
-    return view;
+
+    // if we have an active view, just compute the passive index for this view0D only
+    // not the whole thing!
+    if (this.views.active) {
+      await this.addToIndexIfAddedLaterOn(view0D, this.views.active);
+    }
+
+    return view0D;
+  }
+
+  private async addToIndexIfAddedLaterOn(view0D: View0D, av: View1D) {
+    // handle the case when there is already an active view
+    // aka, just compute the passive index for this view0D
+    const index = this.db.falconIndexView1D(av, [view0D], this.filters);
+    const view0DCube = await index.get(view0D)!;
+    this.index.set(view0D, view0DCube);
+    av.select(av.lastFilter, true);
   }
 
   /**

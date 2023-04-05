@@ -18,7 +18,7 @@ export interface FalconCube {
 }
 export type SyncIndex = Map<View, FalconCube>;
 export type AsyncIndex = Map<View, Promise<FalconCube>>;
-export type FalconIndex = SyncIndex | AsyncIndex;
+export type FalconIndex = Map<View, Promise<FalconCube> | FalconCube>;
 export type AsyncOrSync<T> = Promise<T> | T;
 export type Filter = DimensionFilter;
 export type Filters = Map<Dimension, Filter>;

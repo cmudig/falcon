@@ -136,7 +136,7 @@ export class View1D extends ViewAbstract<View1DState> {
   /**
    * compute counts from the falcon index
    */
-  async select(filter?: DimensionFilter, convertToPixels = true) {
+  async select(filter?: DimensionFilter, force = false) {
     if (filter) {
       if (this.dimension.type === "continuous") {
         // just end now if the filter hasn't changed
@@ -144,17 +144,16 @@ export class View1D extends ViewAbstract<View1DState> {
           this.lastFilter &&
           this.lastFilter[0] === filter[0] &&
           this.lastFilter[1] === filter[1];
-        if (filterStayedTheSame) {
+        if (filterStayedTheSame && force === false) {
           return;
         }
+        console.log("in here!");
 
         // add filter
         this.falcon.filters.set(this.dimension, filter);
 
         // convert active selection into pixels if needed
-        let selectPixels = convertToPixels
-          ? this.toPixels(filter as ContinuousRange)
-          : filter;
+        let selectPixels = this.toPixels(filter as ContinuousRange);
 
         if (this.isActive) {
           // use the index to count for the passive views
