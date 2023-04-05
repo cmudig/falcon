@@ -59,7 +59,7 @@
 			countState = state;
 		});
 
-		await index.all();
+		await index.link();
 
 		console.warn = () => {};
 	}
@@ -110,6 +110,7 @@
 				console.log("worked bitch!");
 				console.log(state);
 			});
+			await index.link();
 		}}>add view0D</button
 	>
 </main>

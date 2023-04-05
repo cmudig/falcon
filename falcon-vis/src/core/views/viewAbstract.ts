@@ -75,4 +75,7 @@ export abstract class ViewAbstract<S extends object> {
     });
     this.isActive = true;
   }
+
+  abstract detach(): void | Promise<void>;
+  abstract attach(): void | Promise<void>;
 }

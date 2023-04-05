@@ -89,4 +89,20 @@ export class View0D extends ViewAbstract<View0DState> {
     // signal user
     this.signalOnChange(this.state);
   }
+
+  /**
+   * attaches to the global falcon index
+   */
+  async attach() {
+    this.falcon.views.add(this);
+    await this.falcon.link();
+  }
+
+  /**
+   * detaches from the global falcon index
+   */
+  async detach() {
+    this.falcon.views.remove(this);
+    this.falcon.index.delete(this);
+  }
 }

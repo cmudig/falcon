@@ -37,23 +37,23 @@ export class FalconVis {
       view0D.addOnChangeListener(onChange);
     }
 
-    // if we have an active view, just compute the passive index for this view0D only
-    // not the whole thing!
-    if (this.views.active) {
-      await this.addToIndexIfAddedLaterOn(view0D, this.views.active);
-    }
+    // // if we have an active view, just compute the passive index for this view0D only
+    // // not the whole thing!
+    // if (this.views.active) {
+    //   await this.addToIndexIfAddedLaterOn(view0D, this.views.active);
+    // }
 
     return view0D;
   }
 
-  private async addToIndexIfAddedLaterOn(view0D: View0D, av: View1D) {
-    // handle the case when there is already an active view
-    // aka, just compute the passive index for this view0D
-    const index = this.db.falconIndexView1D(av, [view0D], this.filters);
-    const view0DCube = await index.get(view0D)!;
-    this.index.set(view0D, view0DCube);
-    av.select(av.lastFilter, true);
-  }
+  // private async addToIndexIfAddedLaterOn(view0D: View0D, av: View1D) {
+  //   // handle the case when there is already an active view
+  //   // aka, just compute the passive index for this view0D
+  //   const index = this.db.falconIndexView1D(av, [view0D], this.filters);
+  //   const view0DCube = await index.get(view0D)!;
+  //   this.index.set(view0D, view0DCube);
+  //   av.select(av.lastFilter, true);
+  // }
 
   /**
    * Creates a 1D view and links with the other views under this falcon object
@@ -90,6 +90,21 @@ export class FalconVis {
   async all() {
     for (const view of this.views) {
       await view.all();
+    }
+  }
+
+  async link() {
+    const av = this.views.active;
+    if (!av) {
+      await this.all();
+    } else {
+      /**
+       * @todo compute the passive index individually instead of the entire thing
+       * setup a system that diffs from the current index and filters
+       */
+      const forceToCompute = true; // turns off optimizations
+      await av.computeIndex(forceToCompute);
+      await av.select(av.lastFilter, forceToCompute);
     }
   }
 

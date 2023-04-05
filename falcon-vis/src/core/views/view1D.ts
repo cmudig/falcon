@@ -95,8 +95,8 @@ export class View1D extends ViewAbstract<View1DState> {
   /**
    * prefetch the 1D falcon index
    */
-  async prefetch() {
-    if (!this.isActive) {
+  async computeIndex(force = false) {
+    if (!this.isActive || force) {
       // make sure we have binConfigs computed for all views if this one is activated
       await this.falcon.views.forEach(async (view) => {
         const rangeNotComputed =
@@ -130,7 +130,7 @@ export class View1D extends ViewAbstract<View1DState> {
    * this prefetches the falcon index under the hood that does all the speedups
    */
   async activate() {
-    await this.prefetch();
+    await this.computeIndex();
   }
 
   /**
@@ -147,7 +147,6 @@ export class View1D extends ViewAbstract<View1DState> {
         if (filterStayedTheSame && force === false) {
           return;
         }
-        console.log("in here!");
 
         // add filter
         this.falcon.filters.set(this.dimension, filter);
@@ -210,15 +209,6 @@ export class View1D extends ViewAbstract<View1DState> {
         }
       }
     }
-  }
-
-  detach() {
-    this.falcon.views.remove(this);
-    this.isAttached = false;
-  }
-  attach() {
-    this.falcon.views.add(this);
-    this.isAttached = true;
   }
 
   /**
@@ -285,5 +275,21 @@ export class View1D extends ViewAbstract<View1DState> {
 
     // signal user
     this.signalOnChange(this.state);
+  }
+
+  /**
+   * attaches to the global falcon index
+   */
+  async attach() {
+    this.falcon.views.add(this);
+    await this.falcon.link();
+  }
+
+  /**
+   * detaches from the global falcon index
+   */
+  async detach() {
+    this.falcon.views.remove(this);
+    this.falcon.index.delete(this);
   }
 }
