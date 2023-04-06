@@ -133,9 +133,9 @@
 
 <style>
 	:global(:root) {
-		--bg-color: hsl(240, 23%, 9%);
-		--primary-color: #00e6c7;
-		--text-color: white;
+		--bg-color: white;
+		--primary-color: #22ccb5;
+		--text-color: black;
 	}
 	:global(body, html) {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -154,21 +154,6 @@
 		flex-wrap: wrap;
 		flex-direction: column;
 		gap: 20px;
-	}
-	.hist-baby {
-	}
-
-	/* #images {
-		display: flex;
-		gap: 20px;
-		flex-direction: row;
-		flex-wrap: wrap;
-		overflow-y: scroll;
-	} */
-	img {
-		border: 1px solid transparent;
-		border-radius: 5px;
-		object-fit: contain;
 	}
 	#falcon-app {
 		display: flex;
