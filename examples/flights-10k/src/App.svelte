@@ -34,19 +34,16 @@
 <svelte:window on:mouseup={async () => {}} />
 
 <main>
+	<header>
+		<img
+			src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+			alt="FalconVis Logo"
+			width="300px"
+		/>
+	</header>
+
 	<div id="falcon-app">
 		<div class="hist">
-			<div>
-				<img src="logo.png" alt="falcon logo" width="50px" />
-				<h1>DiffusionDB x Falcon</h1>
-
-				<h3>
-					<span style="font-weight: 250;">selected</span>
-					<code style="color: var(--primary-color);"
-						>{countState?.filter.toLocaleString()}</code
-					>
-				</h3>
-			</div>
 			{#each views as view, i}
 				{@const state = viewStates[i]}
 				{@const Histogram =
@@ -143,7 +140,7 @@
 		margin: 0;
 		background-color: var(--bg-color);
 		color: var(--text-color);
-		padding: 20px;
+		/* padding: 20px; */
 	}
 	code {
 		font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
@@ -160,5 +157,11 @@
 		flex-direction: row;
 		gap: 30px;
 		height: 100vh;
+	}
+	header {
+		background-color: rgb(232, 232, 232);
+		padding: 15px;
+		margin: 15px;
+		border-radius: 5px;
 	}
 </style>
