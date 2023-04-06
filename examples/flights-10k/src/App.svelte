@@ -6,6 +6,9 @@
 	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
 
+	import LinearProgress from "@smui/linear-progress";
+	import TotalCount from "./components/TotalCount.svelte";
+
 	let falcon: FalconVis;
 	let countView: View0D;
 	let countState: View0DState;
@@ -41,10 +44,17 @@
 
 <main>
 	<!-- section for all the visualizations -->
-	<div id="vis">visualizations here</div>
+	<div id="vis">
+		<div>
+			<TotalCount width={1000} height={20} />
+		</div>
+		<div>
+			<!-- histograms -->
+		</div>
+	</div>
 
 	<!-- section for all entries in the table  -->
-	<div id="table">table here</div>
+	<div id="table" />
 
 	<!-- <div id="falcon-app">
 		<div class="hist">
