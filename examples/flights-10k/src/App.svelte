@@ -31,18 +31,22 @@
 	let resolved = true;
 </script>
 
-<svelte:window on:mouseup={async () => {}} />
+<header>
+	<img
+		src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+		alt="FalconVis Logo"
+		width="300px"
+	/>
+</header>
 
 <main>
-	<header>
-		<img
-			src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
-			alt="FalconVis Logo"
-			width="300px"
-		/>
-	</header>
+	<!-- section for all the visualizations -->
+	<div id="vis">visualizations here</div>
 
-	<div id="falcon-app">
+	<!-- section for all entries in the table  -->
+	<div id="table">table here</div>
+
+	<!-- <div id="falcon-app">
 		<div class="hist">
 			{#each views as view, i}
 				{@const state = viewStates[i]}
@@ -107,7 +111,6 @@
 				<table>
 					{#if entries}
 						{@const arrayEntries = [...entries]}
-						<!-- {@const keys = Object.keys(arrayEntries[0])} -->
 						{@const keys = views.map((v) => v.dimension.name)}
 						<tr>
 							{#each keys as key}
@@ -125,7 +128,7 @@
 				</table>
 			</div>
 		{/if}
-	</div>
+	</div> -->
 </main>
 
 <style>
@@ -140,7 +143,7 @@
 		margin: 0;
 		background-color: var(--bg-color);
 		color: var(--text-color);
-		/* padding: 20px; */
+		padding: 5px;
 	}
 	code {
 		font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
@@ -159,9 +162,18 @@
 		height: 100vh;
 	}
 	header {
-		background-color: rgb(232, 232, 232);
+		background-color: rgb(237, 237, 237);
 		padding: 15px;
-		margin: 15px;
 		border-radius: 5px;
+	}
+	#table {
+		border: 1px solid black;
+		width: 100%;
+		height: 800px;
+	}
+	#vis {
+		border: 1px solid red;
+		width: 100%;
+		height: 500px;
 	}
 </style>
