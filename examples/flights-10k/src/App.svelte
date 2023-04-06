@@ -3,17 +3,18 @@
 	import type { View0D, View1D, View0DState, View1DState } from "falcon-vis";
 
 	import { onMount } from "svelte";
-	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
-
-	import LinearProgress from "@smui/linear-progress";
 	import TotalCount from "./components/TotalCount.svelte";
 
 	let falcon: FalconVis;
 	let countView: View0D;
 	let countState: View0DState;
-	let views: View1D[] = [];
-	let viewStates: View1DState[] = [];
+
+	let distance: View1D;
+	let distanceCounts: View1DState;
+
+	let arrivalDelay: View1D;
+	let arrivalDelayCounts: View1DState;
 
 	onMount(async () => {
 		const jsObject = await fetch("flights-10k.json").then((d) => d.json());
@@ -24,12 +25,27 @@
 			countState = updated;
 		});
 
-		// make the 1 dimensional views
-		const distance = await falcon.view1D({
-			type: "continuous",
-			name: "Distance",
-			resolution: 400,
-		});
+		distance = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "Distance",
+				resolution: 400,
+				bins: 5,
+			},
+			(updatedDistanceCounts) => {
+				distanceCounts = updatedDistanceCounts;
+			}
+		);
+		arrivalDelay = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "ArrDelay",
+				resolution: 400,
+			},
+			(updatedArrivalDelayCounts) => {
+				arrivalDelayCounts = updatedArrivalDelayCounts;
+			}
+		);
 
 		await falcon.link();
 	});
@@ -63,14 +79,45 @@
 			/>
 		</div>
 		<div>
-			<!-- histograms -->
+			<ContinuousHistogram
+				state={distanceCounts}
+				title="Distance flown counts"
+				dimLabel="Distance in miles"
+				on:mouseenter={async () => {
+					await distance.activate();
+				}}
+				on:select={async (e) => {
+					const selection = e.detail;
+					if (selection !== null) {
+						await distance.select(selection);
+					} else {
+						await distance.select();
+					}
+				}}
+			/>
+
+			<ContinuousHistogram
+				state={arrivalDelayCounts}
+				title="Arrival Delay counts"
+				dimLabel="Minutes delayed"
+				on:mouseenter={async () => {
+					await arrivalDelay.activate();
+				}}
+				on:select={async (e) => {
+					const selection = e.detail;
+					if (selection !== null) {
+						await arrivalDelay.select(selection);
+					} else {
+						await arrivalDelay.select();
+					}
+				}}
+			/>
 		</div>
-	</div>
 
-	<!-- section for all entries in the table  -->
-	<div id="table" />
+		<!-- section for all entries in the table  -->
+		<div id="table" />
 
-	<!-- <div id="falcon-app">
+		<!-- <div id="falcon-app">
 		<div class="hist">
 			{#each views as view, i}
 				{@const state = viewStates[i]}
@@ -153,6 +200,7 @@
 			</div>
 		{/if}
 	</div> -->
+	</div>
 </main>
 
 <style>

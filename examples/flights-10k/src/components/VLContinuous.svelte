@@ -19,10 +19,10 @@
 	export let height = 125;
 	export let countLabel = "Count";
 	export let dimLabel = "";
-	export let labelColor = "hsla(0, 0%, 100%, 0.9)";
-	export let backgroundBarColor = "hsla(0, 0%, 100%, 0.5)";
+	export let labelColor = "black";
+	export let backgroundBarColor = "lightgrey";
 	export let foregroundBarColor = "hsla(172, 97%, 45%, 0.95)";
-	export let backgroundColor = "hsl(240,23%,9%)";
+	export let backgroundColor = "white";
 	export let onlyFiltered = false;
 
 	$: data = {
@@ -35,10 +35,10 @@
 		data: {
 			name: "table",
 		},
-		background: backgroundColor,
+		background: "transparent",
 		width: width,
 		height: height,
-		title: title,
+		title: { text: title, anchor: "start" },
 		layer: [
 			{
 				params: [
@@ -63,7 +63,7 @@
 						field: onlyFiltered ? "filteredCount" : "count",
 						type: "quantitative",
 						axis: {
-							title: countLabel,
+							title: null,
 							titleColor: labelColor,
 							tickCount: 3,
 							labelColor: labelColor,
