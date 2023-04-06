@@ -60,8 +60,11 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
 -   [x] automatically compute optimal number of bins
 -   [x] update key settings (bins, range/extent)
 -   [ ] Create one example at different data levels for the paper
+
     -   [ ] 100k (json)
     -   [ ] 1m (arrow)
     -   [ ] 10m (duckdb-wasm parquet)
     -   [ ] 35m (http)
     -   [ ] 180m (motherduck)
+
+-   [ ] cut out all the unused columns in the flights data
