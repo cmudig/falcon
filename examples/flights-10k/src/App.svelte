@@ -24,6 +24,13 @@
 			countState = updated;
 		});
 
+		// make the 1 dimensional views
+		const distance = await falcon.view1D({
+			type: "continuous",
+			name: "Distance",
+			resolution: 400,
+		});
+
 		await falcon.link();
 	});
 
