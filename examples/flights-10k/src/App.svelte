@@ -46,7 +46,14 @@
 	<!-- section for all the visualizations -->
 	<div id="vis">
 		<div>
-			<TotalCount width={1000} height={20} />
+			<TotalCount
+				data={{
+					selected: countState?.filter ?? 0,
+					total: countState?.total ?? 0,
+				}}
+				width={1000}
+				height={20}
+			/>
 		</div>
 		<div>
 			<!-- histograms -->

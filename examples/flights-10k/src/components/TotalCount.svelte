@@ -22,6 +22,7 @@
 				type: "quantitative",
 				title: null,
 				field: "selected",
+				axis: { tickCount: 5 },
 			},
 			color: { value: barColor },
 		},
