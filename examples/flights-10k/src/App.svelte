@@ -41,6 +41,8 @@
 				type: "continuous",
 				name: "ArrDelay",
 				resolution: 400,
+				range: [-20, 60],
+				bins: 5,
 			},
 			(updatedArrivalDelayCounts) => {
 				arrivalDelayCounts = updatedArrivalDelayCounts;
@@ -48,13 +50,35 @@
 		);
 
 		await falcon.link();
+
+		entries = await falcon.entries({
+			length: numEntries,
+			offset: page,
+		});
 	});
 
 	let page = 0;
 	let numEntries = 20;
 	let entries: Iterable<Record<string, any>>;
-	let request: Promise<void>;
 	let resolved = true;
+
+	function updateEntriesWhenStateChanges(viewStates: View1DState[]) {
+		// make a request for entries
+		if (falcon && resolved) {
+			resolved = false;
+			falcon
+				.entries({
+					length: numEntries,
+					offset: page,
+				})
+				.then((_entries) => {
+					resolved = true;
+					entries = _entries;
+				});
+		}
+	}
+
+	$: updateEntriesWhenStateChanges([distanceCounts, arrivalDelayCounts]);
 </script>
 
 <header>
@@ -115,91 +139,49 @@
 		</div>
 
 		<!-- section for all entries in the table  -->
-		<div id="table" />
-
-		<!-- <div id="falcon-app">
-		<div class="hist">
-			{#each views as view, i}
-				{@const state = viewStates[i]}
-				{@const Histogram =
-					view.dimension.type === "continuous"
-						? ContinuousHistogram
-						: CategoricalHistogram}
-				<div class="hist-baby">
-					<Histogram
-						{state}
-						dimLabel={view.dimension.name.replaceAll("_", " ")}
-						on:select={async (e) => {
-							const selection = e.detail;
-							if (selection !== null) {
-								await view.select(selection);
-							} else {
-								await view.select();
-							}
-
-							if (resolved) {
-								resolved = false;
-								request = falcon
-									.entries({
-										length: numEntries,
-									})
-									.then((d) => {
-										resolved = true;
-										entries = d;
-									});
-							}
-						}}
-						on:mouseenter={async () => {
-							await view.activate();
-						}}
-					/>
+		<div id="table">
+			{#if entries}
+				<div>
+					<button
+						on:click={async () => {
+							page = Math.max(page - numEntries, 0);
+							entries = await falcon.entries({
+								length: numEntries,
+								offset: page,
+							});
+						}}>back</button
+					>
+					<button
+						on:click={async () => {
+							page += numEntries;
+							entries = await falcon.entries({
+								length: numEntries,
+								offset: page,
+							});
+						}}>next</button
+					>
 				</div>
-			{/each}
-		</div>
-
-		{#if entries}
-			<div>
-				<button
-					on:click={async () => {
-						page = Math.max(page - numEntries, 0);
-						entries = await falcon.entries({
-							length: numEntries,
-							offset: page,
-						});
-					}}>back</button
-				>
-				<button
-					on:click={async () => {
-						page += numEntries;
-						entries = await falcon.entries({
-							length: numEntries,
-							offset: page,
-						});
-					}}>next</button
-				>
-			</div>
-			<div id="images">
-				<table>
-					{#if entries}
-						{@const arrayEntries = [...entries]}
-						{@const keys = views.map((v) => v.dimension.name)}
-						<tr>
-							{#each keys as key}
-								<th>{key}</th>
-							{/each}
-						</tr>
-						{#each arrayEntries as instance}
+				<div id="images">
+					<table>
+						{#if entries}
+							{@const keys = ["ArrDelay", "Distance"]}
 							<tr>
 								{#each keys as key}
-									<td>{instance[key]}</td>
+									<th>{key}</th>
 								{/each}
 							</tr>
-						{/each}
-					{/if}
-				</table>
-			</div>
-		{/if}
-	</div> -->
+							{#each Array.from(entries) as instance}
+								<tr>
+									{#each keys as key}
+										<td>{instance[key]}</td>
+									{/each}
+								</tr>
+							{/each}
+						{/if}
+					</table>
+				</div>
+			{/if}
+		</div>
 	</div>
 </main>
 
