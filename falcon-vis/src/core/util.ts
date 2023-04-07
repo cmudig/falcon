@@ -87,12 +87,15 @@ export function binTime(maxbins: number, extent: Interval<number>): BinConfig {
   };
 }
 
+/**
+ * This function requires dimension.bins to exist
+ */
 export function createBinConfigContinuous(
   dimension: ContinuousDimension,
   extent: Interval<number>
 ) {
   const binningFunc = dimension.time ? binTime : binContinuous;
-  return binningFunc(dimension.bins, extent);
+  return binningFunc(dimension.bins!, extent);
 }
 
 export function readableBinsContinuous(binConfig: BinConfig) {
