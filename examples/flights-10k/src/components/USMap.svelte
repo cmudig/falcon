@@ -18,6 +18,8 @@
 		{#each states as state}
 			<path
 				{...state}
+				stroke={"hsla(0, 0%, 0%, 0.075)"}
+				stroke-width={0.75}
 				fill={stateToColor.get(state.id) ?? defaultColor}
 				on:click={() => {
 					dispatch("select", state.id);
