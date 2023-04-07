@@ -39,3 +39,6 @@ export type Dimension = ContinuousDimension | CategoricalDimension;
 export type ContinuousRange = Interval<number>;
 export type CategoricalRange = any[];
 export type DimensionFilter = ContinuousRange | CategoricalRange;
+
+export type KeyRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
+export type KeyOptional<T, K extends keyof T> = T & Partial<Pick<T, K>>;
