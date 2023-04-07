@@ -55,6 +55,20 @@
 	}
 
 	let selected = [];
+
+	async function selectMap(selected) {
+		if (selected.length > 0) {
+			await view.activate();
+			await view.select(selected);
+			stateToStyle = structuredClone(stateToStyleClone);
+			stateToStyle.set(selected[0], {
+				...stateToStyle.get(selected[0]),
+				stroke: "black",
+			});
+			stateToStyle = stateToStyle;
+		}
+	}
+	$: selectMap(selected);
 </script>
 
 <UsMap
@@ -62,15 +76,6 @@
 	{stateToStyle}
 	on:select={(e) => {
 		selected = e.detail;
-		if (!selected.indexOf(e.detail[0])) {
-			stateToStyle.set(selected[0], {
-				...stateToStyle.get(selected[0]),
-				stroke: "black",
-			});
-		} else {
-			// stateToStyle.set(selected[0], stateToStyleClone.get(selected[0]));
-		}
-		stateToStyle = stateToStyle;
 	}}
 	on:mouseenter={() => {
 		// console.log("working");
