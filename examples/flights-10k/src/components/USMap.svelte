@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { states } from "./states";
-	export let stateToColor: Map<string, string> = new Map([["CA", "red"]]);
 	import { createEventDispatcher } from "svelte";
+	import { states } from "./states";
+
 	const dispatch = createEventDispatcher<{ select: string }>();
+
+	export let stateToColor: Map<string, string> = new Map([["CA", "red"]]);
+	export let width = 500;
 	export let defaultColor = "hsla(0, 0%, 0%, 0.025)";
 </script>
 
 <svg
-	width="468"
-	height="280"
+	{width}
 	viewBox="0 0 468 280"
 	fill="none"
 	xmlns="http://www.w3.org/2000/svg"

@@ -9,12 +9,13 @@
 	} from "falcon-vis";
 	import * as d3 from "d3";
 
-	export let falcon: FalconVis;
-	export let dimension: CategoricalDimension;
-	export let numberToColor = d3.interpolateRgbBasis([
+	const primaryColorInterpolate = d3.interpolateRgbBasis([
 		"rgb(255,255,255)",
 		"rgb(14,225,197)",
 	]);
+	export let falcon: FalconVis;
+	export let dimension: CategoricalDimension;
+	export let numberToColor = (n: number) => primaryColorInterpolate(n);
 
 	let view: View1D;
 	let stateToColor = new Map();
@@ -29,7 +30,10 @@
 	function updateStateColorMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
 		const counts = viewCounts.filter;
-		const maxCount = Math.max(...counts);
+		let maxCount = Math.max(...counts);
+		if (maxCount <= 0) {
+			maxCount = 1;
+		}
 		const stateToColorMap = new Map();
 
 		for (let i = 0; i < stateNames.length; i++) {
@@ -45,6 +49,7 @@
 </script>
 
 <UsMap
+	width={500}
 	{stateToColor}
 	on:select={({ detail: state }) => {
 		console.log(state);
