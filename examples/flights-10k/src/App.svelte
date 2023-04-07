@@ -103,22 +103,35 @@
 			/>
 		</div>
 		<div>
-			<ContinuousHistogram
-				state={distanceCounts}
-				title="Distance flown counts"
-				dimLabel="Distance in miles"
-				on:mouseenter={async () => {
-					await distance.activate();
-				}}
-				on:select={async (e) => {
-					const selection = e.detail;
-					if (selection !== null) {
-						await distance.select(selection);
-					} else {
-						await distance.select();
-					}
-				}}
-			/>
+			<div class="hist">
+				<div class="top">
+					<div class="title">Distance Flown</div>
+					<div>
+						<button
+							class="reset"
+							on:click={() => {
+								console.log("reset this bitch!");
+							}}>Reset</button
+						>
+					</div>
+				</div>
+				<ContinuousHistogram
+					state={distanceCounts}
+					title=""
+					dimLabel="Distance in miles"
+					on:mouseenter={async () => {
+						await distance.activate();
+					}}
+					on:select={async (e) => {
+						const selection = e.detail;
+						if (selection !== null) {
+							await distance.select(selection);
+						} else {
+							await distance.select();
+						}
+					}}
+				/>
+			</div>
 
 			<ContinuousHistogram
 				state={arrivalDelayCounts}
@@ -229,5 +242,24 @@
 		border: 1px solid red;
 		width: 100%;
 		height: 500px;
+	}
+	.hist {
+		display: inline-block;
+	}
+	.top {
+		display: flex;
+		justify-content: space-between;
+	}
+	.title {
+		font-size: 1em;
+		font-weight: 600;
+	}
+	.reset {
+		padding: 0.2em 1em;
+		font-size: 1em;
+		font-weight: 400;
+		font-family: inherit;
+		cursor: pointer;
+		transition: border-color 0.25s;
 	}
 </style>
