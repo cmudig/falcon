@@ -55,33 +55,33 @@
 	}
 
 	let selected = [];
-
-	async function selectMap(selected) {
+	async function selectMap(selected: string[]) {
 		if (selected.length > 0) {
 			await view.activate();
 			await view.select(selected);
 			stateToStyle = structuredClone(stateToStyleClone);
-			stateToStyle.set(selected[0], {
-				...stateToStyle.get(selected[0]),
-				stroke: "black",
+			selected.forEach((state) => {
+				stateToStyle.set(state, {
+					...stateToStyle.get(state),
+					stroke: "black",
+				});
 			});
 			stateToStyle = stateToStyle;
 		}
 	}
-	$: selectMap(selected);
 </script>
 
 <UsMap
 	{width}
 	{stateToStyle}
-	on:select={(e) => {
+	on:select={async (e) => {
 		selected = e.detail;
-	}}
-	on:mouseenter={() => {
-		// console.log("working");
-	}}
-	on:mouseleave={() => {
-		// console.log("working");
+		if (e.detail.length > 0) {
+			await selectMap(selected);
+		} else {
+			await view.select();
+			stateToStyle = structuredClone(stateToStyleClone);
+		}
 	}}
 />
 

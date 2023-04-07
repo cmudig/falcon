@@ -13,7 +13,22 @@
 		stroke: "hsla(0, 0%, 0%, 0.075)",
 		fill: defaultFill,
 	};
+	export let selected = [];
+	let holdingShift = false;
 </script>
+
+<svelte:window
+	on:keyup={(e) => {
+		if (e.key === "Shift") {
+			holdingShift = false;
+		}
+	}}
+	on:keydown={(e) => {
+		if (e.key === "Shift") {
+			holdingShift = true;
+		}
+	}}
+/>
 
 <svg
 	{width}
@@ -30,10 +45,33 @@
 				fill={style.fill ?? defaultStyle.fill}
 				stroke={style.stroke ?? defaultStyle.stroke}
 				on:click={() => {
-					dispatch("select", [state.id]);
+					// if we hold shift, can select multiple or deselect multiple if they are already selected
+					const alreadySelected = selected.includes(state.id);
+					if (holdingShift) {
+						if (alreadySelected) {
+							selected = selected.filter((s) => s !== state.id);
+						} else {
+							// if not, add it to the selection!
+							selected.push(state.id);
+							selected = selected;
+						}
+					} else {
+						// if we don't hold shift, can only select and deselect one
+						if (alreadySelected && selected.length === 1) {
+							selected = [];
+						} else {
+							selected = [state.id];
+						}
+					}
+
+					dispatch("select", selected);
 				}}
-				on:mouseenter
-				on:mouseleave
+				on:mouseenter={() => {
+					dispatch("mouseenter", state.id);
+				}}
+				on:mouseleave={() => {
+					dispatch("mouseenter", state.id);
+				}}
 			/>
 		{/each}
 	</g>
