@@ -63,7 +63,9 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
 
     -   [x] Make a larger map
     -   [x] Orient the histograms and map like figma
-    -   [ ] Create a selectable map view
+    -   [x] Create a selectable map view
+    -   [ ] Create a title, legend, and reset button
+    -   [ ] Make the views outside of the components and just pass in state
     -   [ ] Create a nice table
     -   [ ] Style the website
     -   [ ] Add links

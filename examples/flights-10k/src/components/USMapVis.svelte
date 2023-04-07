@@ -9,6 +9,9 @@
 	} from "falcon-vis";
 	import * as d3 from "d3";
 	import { states } from "./states";
+	import { createEventDispatcher } from "svelte";
+
+	const dispatch = createEventDispatcher();
 
 	const primaryColorInterpolate = d3.interpolateRgbBasis([
 		"rgb(255,255,255)",
@@ -78,9 +81,11 @@
 		selected = e.detail;
 		if (e.detail.length > 0) {
 			await selectMap(selected);
+			dispatch("select", selected);
 		} else {
 			await view.select();
 			stateToStyle = structuredClone(stateToStyleClone);
+			dispatch("select", null);
 		}
 	}}
 />

@@ -35,6 +35,8 @@
 	viewBox="0 0 468 280"
 	fill="none"
 	xmlns="http://www.w3.org/2000/svg"
+	on:mouseenter
+	on:mouseleave
 >
 	<!-- TODO create a map -> from the d  -->
 	<g id="usa" clip-path="url(#clip0_1_121)">
@@ -65,12 +67,6 @@
 					}
 
 					dispatch("select", selected);
-				}}
-				on:mouseenter={() => {
-					dispatch("mouseenter", state.id);
-				}}
-				on:mouseleave={() => {
-					dispatch("mouseenter", state.id);
 				}}
 			/>
 		{/each}
