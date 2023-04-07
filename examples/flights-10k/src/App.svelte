@@ -1,9 +1,16 @@
 <script lang="ts">
 	import { FalconVis, JsonDB } from "falcon-vis";
-	import type { View0D, View1D, View0DState, View1DState } from "falcon-vis";
+	import type {
+		View0D,
+		View1D,
+		View0DState,
+		View1DState,
+		Dimension,
+	} from "falcon-vis";
 
 	import { onMount } from "svelte";
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
+	import Histogram from "./components/Histogram.svelte";
 	import TotalCount from "./components/TotalCount.svelte";
 
 	let falcon: FalconVis;
@@ -16,6 +23,22 @@
 	let arrivalDelay: View1D;
 	let arrivalDelayCounts: View1DState;
 
+	let dims1D: Dimension[] = [
+		{
+			type: "continuous",
+			name: "Distance",
+			resolution: 400,
+			bins: 5,
+		},
+		{
+			type: "continuous",
+			name: "ArrDelay",
+			resolution: 400,
+			range: [-20, 60],
+			bins: 5,
+		},
+	];
+
 	onMount(async () => {
 		const jsObject = await fetch("flights-10k.json").then((d) => d.json());
 		const db = new JsonDB(jsObject);
@@ -24,33 +47,7 @@
 		countView = await falcon.view0D((updated) => {
 			countState = updated;
 		});
-
-		distance = await falcon.view1D(
-			{
-				type: "continuous",
-				name: "Distance",
-				resolution: 400,
-				bins: 5,
-			},
-			(updatedDistanceCounts) => {
-				distanceCounts = updatedDistanceCounts;
-			}
-		);
-		arrivalDelay = await falcon.view1D(
-			{
-				type: "continuous",
-				name: "ArrDelay",
-				resolution: 400,
-				range: [-20, 60],
-				bins: 5,
-			},
-			(updatedArrivalDelayCounts) => {
-				arrivalDelayCounts = updatedArrivalDelayCounts;
-			}
-		);
-
 		await falcon.link();
-
 		entries = await falcon.entries({
 			length: numEntries,
 			offset: page,
@@ -103,52 +100,11 @@
 			/>
 		</div>
 		<div>
-			<div class="hist">
-				<div class="top">
-					<div class="title">Distance Flown</div>
-					<div>
-						<button
-							class="reset"
-							on:click={() => {
-								console.log("reset this bitch!");
-							}}>Reset</button
-						>
-					</div>
-				</div>
-				<ContinuousHistogram
-					state={distanceCounts}
-					title=""
-					dimLabel="Distance in miles"
-					on:mouseenter={async () => {
-						await distance.activate();
-					}}
-					on:select={async (e) => {
-						const selection = e.detail;
-						if (selection !== null) {
-							await distance.select(selection);
-						} else {
-							await distance.select();
-						}
-					}}
-				/>
-			</div>
-
-			<ContinuousHistogram
-				state={arrivalDelayCounts}
-				title="Arrival Delay counts"
-				dimLabel="Minutes delayed"
-				on:mouseenter={async () => {
-					await arrivalDelay.activate();
-				}}
-				on:select={async (e) => {
-					const selection = e.detail;
-					if (selection !== null) {
-						await arrivalDelay.select(selection);
-					} else {
-						await arrivalDelay.select();
-					}
-				}}
-			/>
+			{#if falcon}
+				{#each dims1D as dimension}
+					<Histogram {falcon} {dimension} />
+				{/each}
+			{/if}
 		</div>
 
 		<!-- section for all entries in the table  -->
