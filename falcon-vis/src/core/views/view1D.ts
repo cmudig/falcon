@@ -282,8 +282,10 @@ export class View1D extends ViewAbstract<View1DState> {
       const bin = binNumberFunctionCategorical(totalRange!);
       for (const s of selection) {
         const binKey = bin(s);
-        const counts = index.filter.slice(binKey, null);
-        binCounts.addToItself(counts);
+        if (binKey) {
+          const counts = index.filter.slice(binKey, null);
+          binCounts.addToItself(counts);
+        }
       }
       this.state.filter = binCounts.data as CountsArrayType;
     }

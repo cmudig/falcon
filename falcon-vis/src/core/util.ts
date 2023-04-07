@@ -55,7 +55,7 @@ export function numBinsCategorical(range: CategoricalRange) {
  */
 export function binNumberFunctionCategorical(range: CategoricalRange) {
   const binMapper = new Map(range.map((item, index) => [item, index]));
-  return (item: any) => binMapper.get(item)!;
+  return (item: any) => binMapper.get(item);
 }
 
 /**
