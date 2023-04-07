@@ -114,19 +114,23 @@
 				height={20}
 			/>
 		</div>
-		<div class="hist-grid">
-			{#if falcon}
-				{#each dims1D as dimension}
-					<Histogram {falcon} {dimension} />
-				{/each}
-			{/if}
+		<div id="charts">
+			<div id="hists">
+				{#if falcon}
+					{#each dims1D as dimension}
+						<Histogram {falcon} {dimension} />
+					{/each}
+				{/if}
+			</div>
+			<div id="maps">
+				{#if falcon}
+					<UsMapVis
+						{falcon}
+						dimension={{ type: "categorical", name: "OriginState" }}
+					/>
+				{/if}
+			</div>
 		</div>
-		{#if falcon}
-			<UsMapVis
-				{falcon}
-				dimension={{ type: "categorical", name: "OriginState" }}
-			/>
-		{/if}
 
 		<!-- section for all entries in the table  -->
 		<div id="table">
@@ -221,7 +225,17 @@
 		height: 500px;
 	}
 
-	.hist-grid {
+	#charts {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		gap: 20px;
+	}
+	#maps {
+		padding: 20px;
+	}
+	#hists {
+		/* border: 1px solid red; */
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;

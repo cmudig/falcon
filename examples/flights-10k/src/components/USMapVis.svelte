@@ -16,6 +16,7 @@
 	export let falcon: FalconVis;
 	export let dimension: CategoricalDimension;
 	export let numberToColor = (n: number) => primaryColorInterpolate(n);
+	export let width = 600;
 
 	let view: View1D;
 	let stateToColor = new Map();
@@ -49,7 +50,7 @@
 </script>
 
 <UsMap
-	width={500}
+	{width}
 	{stateToColor}
 	on:select={({ detail: state }) => {
 		console.log(state);
