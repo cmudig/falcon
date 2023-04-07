@@ -121,7 +121,12 @@
 				{/each}
 			{/if}
 		</div>
-		<UsMapVis />
+		{#if falcon}
+			<UsMapVis
+				{falcon}
+				dimension={{ type: "categorical", name: "OriginState" }}
+			/>
+		{/if}
 
 		<!-- section for all entries in the table  -->
 		<div id="table">
