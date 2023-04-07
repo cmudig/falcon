@@ -37,6 +37,19 @@
 			range: [-20, 60],
 			bins: 5,
 		},
+		{
+			type: "continuous",
+			name: "DepDelay",
+			resolution: 400,
+			range: [-20, 60],
+			bins: 5,
+		},
+		{
+			type: "continuous",
+			name: "FlightDate",
+			resolution: 400,
+			bins: 25,
+		},
 	];
 
 	onMount(async () => {
@@ -99,7 +112,7 @@
 				height={20}
 			/>
 		</div>
-		<div>
+		<div class="hist-grid">
 			{#if falcon}
 				{#each dims1D as dimension}
 					<Histogram {falcon} {dimension} />
@@ -199,23 +212,10 @@
 		width: 100%;
 		height: 500px;
 	}
-	.hist {
-		display: inline-block;
-	}
-	.top {
+
+	.hist-grid {
 		display: flex;
-		justify-content: space-between;
-	}
-	.title {
-		font-size: 1em;
-		font-weight: 600;
-	}
-	.reset {
-		padding: 0.2em 1em;
-		font-size: 1em;
-		font-weight: 400;
-		font-family: inherit;
-		cursor: pointer;
-		transition: border-color 0.25s;
+		flex-wrap: wrap;
+		gap: 20px;
 	}
 </style>
