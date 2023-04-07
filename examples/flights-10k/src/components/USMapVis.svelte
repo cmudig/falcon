@@ -8,6 +8,7 @@
 		View1DState,
 	} from "falcon-vis";
 	import * as d3 from "d3";
+	import { states } from "./states";
 
 	const primaryColorInterpolate = d3.interpolateRgbBasis([
 		"rgb(255,255,255)",
@@ -19,41 +20,63 @@
 	export let width = 600;
 
 	let view: View1D;
-	let stateToColor = new Map();
+	let stateToStyle: Map<string, { fill?: string; stroke?: string }> = new Map(
+		states.map((state) => [state.id, { fill: "white" }])
+	);
+	let stateToStyleClone = new Map();
 
 	onMount(async () => {
 		view = await falcon.view1D(dimension, (updatedViewCounts) => {
-			stateToColor = updateStateColorMap(updatedViewCounts);
+			stateToStyle = updateStateStyleMap(updatedViewCounts);
+			stateToStyleClone = structuredClone(stateToStyle);
 		});
 		await view.all();
 	});
 
-	function updateStateColorMap(viewCounts: View1DState) {
+	function updateStateStyleMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
 		const counts = viewCounts.filter;
 		let maxCount = Math.max(...counts);
 		if (maxCount <= 0) {
 			maxCount = 1;
 		}
-		const stateToColorMap = new Map();
-
 		for (let i = 0; i < stateNames.length; i++) {
 			const stateName = stateNames[i];
 			const count = counts[i];
 			const normalizedCount = count / maxCount;
 			const color = numberToColor(normalizedCount);
-			stateToColorMap.set(stateName, color);
+			stateToStyle.set(stateName, {
+				...stateToStyle.get(stateName),
+				fill: color,
+			});
 		}
 
-		return stateToColorMap;
+		return stateToStyle;
 	}
+
+	let selected = [];
 </script>
 
 <UsMap
 	{width}
-	{stateToColor}
-	on:select={({ detail: state }) => {
-		console.log(state);
+	{stateToStyle}
+	on:select={(e) => {
+		selected = e.detail;
+		if (!selected.indexOf(e.detail[0])) {
+			stateToStyle.set(selected[0], {
+				...stateToStyle.get(selected[0]),
+				stroke: "black",
+			});
+		} else {
+			// stateToStyle.set(selected[0], stateToStyleClone.get(selected[0]));
+		}
+		stateToStyle = stateToStyle;
+	}}
+	on:mouseenter={() => {
+		// console.log("working");
+	}}
+	on:mouseleave={() => {
+		// console.log("working");
 	}}
 />
 

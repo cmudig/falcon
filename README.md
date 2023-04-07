@@ -61,9 +61,9 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
 -   [x] update key settings (bins, range/extent)
 -   [ ] Create one example at different data levels
 
-    -   [ ] Make a larger map
+    -   [x] Make a larger map
+    -   [x] Orient the histograms and map like figma
     -   [ ] Create a selectable map view
-    -   [ ] Orient the histograms and map like figma
     -   [ ] Create a nice table
     -   [ ] Style the website
     -   [ ] Add links

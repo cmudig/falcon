@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 	import { states } from "./states";
+	import StatePath from "./StatePath.svelte";
 
-	const dispatch = createEventDispatcher<{ select: string }>();
+	const dispatch = createEventDispatcher();
 
-	export let stateToColor: Map<string, string> = new Map([["CA", "red"]]);
+	export let stateToStyle: Map<string, { fill?: string; stroke?: string }> =
+		new Map([["CA", { fill: "red" }]]);
 	export let width = 500;
-	export let defaultColor = "hsla(0, 0%, 0%, 0.025)";
+	export let defaultFill = "hsla(0, 0%, 0%, 0.025)";
+	export let defaultStyle = {
+		stroke: "hsla(0, 0%, 0%, 0.075)",
+		fill: defaultFill,
+	};
 </script>
 
 <svg
@@ -18,14 +24,16 @@
 	<!-- TODO create a map -> from the d  -->
 	<g id="usa" clip-path="url(#clip0_1_121)">
 		{#each states as state}
-			<path
-				{...state}
-				stroke={"hsla(0, 0%, 0%, 0.075)"}
-				stroke-width={0.75}
-				fill={stateToColor.get(state.id) ?? defaultColor}
+			{@const style = stateToStyle.get(state.id) ?? defaultStyle}
+			<StatePath
+				d={state.d}
+				fill={style.fill ?? defaultStyle.fill}
+				stroke={style.stroke ?? defaultStyle.stroke}
 				on:click={() => {
-					dispatch("select", state.id);
+					dispatch("select", [state.id]);
 				}}
+				on:mouseenter
+				on:mouseleave
 			/>
 		{/each}
 	</g>
