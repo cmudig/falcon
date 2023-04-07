@@ -12,6 +12,7 @@
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
 	import Histogram from "./components/Histogram.svelte";
 	import TotalCount from "./components/TotalCount.svelte";
+	import UsMap from "./components/USMap.svelte";
 
 	let falcon: FalconVis;
 	let countView: View0D;
@@ -119,6 +120,7 @@
 				{/each}
 			{/if}
 		</div>
+		<UsMap />
 
 		<!-- section for all entries in the table  -->
 		<div id="table">
