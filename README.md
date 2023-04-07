@@ -59,12 +59,12 @@ Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run th
     -   [x] when a passive view1D is added
 -   [x] automatically compute optimal number of bins
 -   [x] update key settings (bins, range/extent)
--   [ ] Create one example at different data levels for the paper
+-   [ ] Create one example at different data levels
 
-    -   [ ] 100k (json)
-    -   [ ] 1m (arrow)
-    -   [ ] 10m (duckdb-wasm parquet)
-    -   [ ] 35m (http)
-    -   [ ] 180m (motherduck)
+    -   [ ] Create a selectable map view
+    -   [ ] Orient the histograms and map like figma
+    -   [ ] Create a nice table
+    -   [ ] Style the website
+    -   [ ] Add links
 
 -   [ ] cut out all the unused columns in the flights data

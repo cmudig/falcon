@@ -9,13 +9,6 @@
 	} from "falcon-vis";
 	import * as d3 from "d3";
 
-	/**
-	 * @todo In this file
-	 * 1. take the dimension from categorical
-	 * 2. create a view
-	 * 3. define how the state updates the color of the states
-	 */
-
 	export let falcon: FalconVis;
 	export let dimension: CategoricalDimension;
 	export let numberToColor = d3.interpolateRgbBasis([
