@@ -3,6 +3,7 @@
 	export let stateToColor: Map<string, string> = new Map([["CA", "red"]]);
 	import { createEventDispatcher } from "svelte";
 	const dispatch = createEventDispatcher<{ select: string }>();
+	export let defaultColor = "hsla(0, 0%, 0%, 0.025)";
 </script>
 
 <svg
@@ -17,7 +18,7 @@
 		{#each states as state}
 			<path
 				{...state}
-				fill={stateToColor.get(state.id) ?? "grey"}
+				fill={stateToColor.get(state.id) ?? defaultColor}
 				on:click={() => {
 					dispatch("select", state.id);
 				}}

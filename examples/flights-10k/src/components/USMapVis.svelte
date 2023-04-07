@@ -7,6 +7,7 @@
 		View1D,
 		View1DState,
 	} from "falcon-vis";
+	import * as d3 from "d3";
 
 	/**
 	 * @todo In this file
@@ -17,6 +18,10 @@
 
 	export let falcon: FalconVis;
 	export let dimension: CategoricalDimension;
+	export let numberToColor = d3.interpolateRgbBasis([
+		"rgb(255,255,255)",
+		"rgb(14,225,197)",
+	]);
 
 	let view: View1D;
 	let stateToColor = new Map();
@@ -28,9 +33,6 @@
 		await view.all();
 	});
 
-	function getColor(normalizedNumber: number) {
-		return "red";
-	}
 	function updateStateColorMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
 		const counts = viewCounts.filter;
@@ -41,7 +43,7 @@
 			const stateName = stateNames[i];
 			const count = counts[i];
 			const normalizedCount = count / maxCount;
-			const color = getColor(normalizedCount);
+			const color = numberToColor(normalizedCount);
 			stateToColorMap.set(stateName, color);
 		}
 
