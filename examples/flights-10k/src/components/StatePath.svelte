@@ -5,13 +5,14 @@
 	export let fill: string;
 	export let stroke: string = "hsla(0, 0%, 0%, 0.075)";
 	export let strokeWidth = 0.75;
+	export let hoveringStroke = "slateblue";
 	const dispatch = createEventDispatcher();
 	let isHovering = false;
 </script>
 
 <path
 	{d}
-	stroke={isHovering ? "black" : stroke}
+	stroke={isHovering ? hoveringStroke : stroke}
 	{fill}
 	stroke-width={strokeWidth}
 	on:click

@@ -63,7 +63,7 @@
 			selected.forEach((state) => {
 				stateToStyle.set(state, {
 					...stateToStyle.get(state),
-					stroke: "black",
+					stroke: "hsla(0, 0%, 0%, 0.5)",
 				});
 			});
 			stateToStyle = stateToStyle;
