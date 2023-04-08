@@ -65,7 +65,6 @@ export class View1D extends ViewAbstract<View1DState> {
       this.dimension.bins =
         this.dimension.bins ??
         (await this.falcon.db.estimateNumBins(this.dimension, 200, 15));
-      console.log(this.dimension.bins);
 
       this.dimension.binConfig = createBinConfigContinuous(
         this.dimension,

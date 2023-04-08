@@ -17,24 +17,24 @@
 		"rgb(255,255,255)",
 		"rgb(14,225,197)",
 	]);
-	export let falcon: FalconVis;
-	export let dimension: CategoricalDimension;
+
+	export let state: View1DState;
+	export let title: string = "";
+
 	export let numberToColor = (n: number) => primaryColorInterpolate(n);
 	export let width = 600;
 
-	let view: View1D;
 	let stateToStyle: Map<string, { fill?: string; stroke?: string }> = new Map(
 		states.map((state) => [state.id, { fill: "white" }])
 	);
 	let stateToStyleClone = new Map();
 
-	onMount(async () => {
-		view = await falcon.view1D(dimension, (updatedViewCounts) => {
-			stateToStyle = updateStateStyleMap(updatedViewCounts);
-			stateToStyleClone = structuredClone(stateToStyle);
-		});
-		await view.all();
+	onMount(() => {
+		stateToStyleClone = structuredClone(stateToStyle);
 	});
+	$: if (state) {
+		stateToStyle = updateStateStyleMap(state);
+	}
 
 	function updateStateStyleMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
@@ -60,8 +60,6 @@
 	let selected = [];
 	async function selectMap(selected: string[]) {
 		if (selected.length > 0) {
-			await view.activate();
-			await view.select(selected);
 			stateToStyle = structuredClone(stateToStyleClone);
 			selected.forEach((state) => {
 				stateToStyle.set(state, {
@@ -74,16 +72,18 @@
 	}
 </script>
 
+<div class="title">{title}</div>
 <UsMap
+	on:mouseenter
+	on:mouseleave
 	{width}
 	{stateToStyle}
 	on:select={async (e) => {
 		selected = e.detail;
 		if (e.detail.length > 0) {
-			await selectMap(selected);
+			selectMap(selected);
 			dispatch("select", selected);
 		} else {
-			await view.select();
 			stateToStyle = structuredClone(stateToStyleClone);
 			dispatch("select", null);
 		}

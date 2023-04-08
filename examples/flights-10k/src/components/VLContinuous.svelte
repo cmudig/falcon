@@ -63,7 +63,7 @@
 						field: onlyFiltered ? "filteredCount" : "count",
 						type: "quantitative",
 						axis: {
-							title: null,
+							title: "Count",
 							titleColor: labelColor,
 							tickCount: 3,
 							labelColor: labelColor,

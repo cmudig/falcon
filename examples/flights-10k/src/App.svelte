@@ -54,6 +54,12 @@
 		},
 	];
 
+	let distanceView: View1D;
+	let distanceState: View1DState;
+
+	let originView: View1D;
+	let originState: View1DState;
+
 	onMount(async () => {
 		const jsObject = await fetch("flights-10k.json").then((d) => d.json());
 		const db = new JsonDB(jsObject);
@@ -62,7 +68,27 @@
 		countView = await falcon.view0D((updated) => {
 			countState = updated;
 		});
+
+		distanceView = await falcon.view1D({
+			type: "continuous",
+			name: "Distance",
+			resolution: 400,
+			bins: 5,
+		});
+		distanceView.onChange((updated) => {
+			distanceState = updated;
+		});
+
+		originView = await falcon.view1D({
+			type: "categorical",
+			name: "OriginState",
+		});
+		originView.onChange((updated) => {
+			originState = updated;
+		});
+
 		await falcon.link();
+
 		entries = await falcon.entries({
 			length: numEntries,
 			offset: page,
@@ -106,27 +132,51 @@
 	<div id="vis">
 		<div>
 			<TotalCount
-				data={{
-					selected: countState?.filter ?? 0,
-					total: countState?.total ?? 0,
-				}}
+				filteredCount={countState?.filter ?? 0}
+				totalCount={countState?.total ?? 0}
 				width={1000}
 				height={20}
 			/>
 		</div>
 		<div id="charts">
 			<div id="hists">
-				{#if falcon}
-					{#each dims1D as dimension}
-						<Histogram {falcon} {dimension} />
-					{/each}
+				{#if falcon && distanceState}
+					<Histogram
+						title="Distance Flown"
+						dimLabel="Distance in miles"
+						bins={distanceState.bin}
+						filteredCounts={distanceState.filter}
+						totalCounts={distanceState.total}
+						on:mouseenter={async () => {
+							await distanceView.activate();
+						}}
+						on:select={async (e) => {
+							const selection = e.detail;
+							if (selection !== null) {
+								await distanceView.select(selection);
+							} else {
+								await distanceView.select();
+							}
+						}}
+					/>
 				{/if}
 			</div>
 			<div id="maps">
-				{#if falcon}
+				{#if falcon && originState}
 					<UsMapVis
-						{falcon}
-						dimension={{ type: "categorical", name: "OriginState" }}
+						title="State Origin Airport"
+						state={originState}
+						on:mouseenter={async () => {
+							await originView.activate();
+						}}
+						on:select={async (e) => {
+							const selection = e.detail;
+							if (selection !== null) {
+								await originView.select(selection);
+							} else {
+								await originView.select();
+							}
+						}}
 					/>
 				{/if}
 			</div>
