@@ -106,11 +106,13 @@
 	}}
 />
 
-<div id="legend">
-	<!--  -->
-
-	<Legend data={state.filter} {numberToColor} width={200} height={10} />
-</div>
+<Legend
+	title="{title} Density"
+	data={state.filter}
+	{numberToColor}
+	width={200}
+	height={10}
+/>
 
 <style>
 	/*  put stuff here */

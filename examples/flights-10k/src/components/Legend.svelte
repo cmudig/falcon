@@ -5,6 +5,7 @@
 	export let numberToColor: (t: number) => string;
 	export let width: number;
 	export let height: number;
+	export let title = "Density Legend";
 
 	let min: number, max: number;
 	let legendG: SVGGElement;
@@ -58,7 +59,7 @@
 	}
 </script>
 
-<label for="#legend" class="label">State Counts</label>
+<label for="#legend" class="label">{title}</label>
 <div id="legend">
 	<div>
 		<svg {height} {width} style="border: 0.5px solid grey;">
