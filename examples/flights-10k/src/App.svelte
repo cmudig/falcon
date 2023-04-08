@@ -55,9 +55,15 @@
 	];
 
 	let distanceView: View1D;
-	let distanceState: View1DState;
-
+	let arrDelayView: View1D;
+	let depDelayView: View1D;
+	let flightDateView: View1D;
 	let originView: View1D;
+
+	let distanceState: View1DState;
+	let arrDelayState: View1DState;
+	let depDelayState: View1DState;
+	let flightDateState: View1DState;
 	let originState: View1DState;
 
 	onMount(async () => {
@@ -77,6 +83,38 @@
 		});
 		distanceView.onChange((updated) => {
 			distanceState = updated;
+		});
+
+		arrDelayView = await falcon.view1D({
+			type: "continuous",
+			name: "ArrDelay",
+			resolution: 400,
+			range: [-20, 60],
+			bins: 5,
+		});
+		arrDelayView.onChange((updated) => {
+			arrDelayState = updated;
+		});
+
+		depDelayView = await falcon.view1D({
+			type: "continuous",
+			name: "DepDelay",
+			resolution: 400,
+			range: [-20, 60],
+			bins: 5,
+		});
+		depDelayView.onChange((updated) => {
+			depDelayState = updated;
+		});
+
+		flightDateView = await falcon.view1D({
+			type: "continuous",
+			name: "FlightDate",
+			resolution: 400,
+			bins: 25,
+		});
+		flightDateView.onChange((updated) => {
+			flightDateState = updated;
 		});
 
 		originView = await falcon.view1D({
@@ -160,7 +198,71 @@
 						}}
 					/>
 				{/if}
+
+				{#if falcon && arrDelayState}
+					<Histogram
+						title="Arrival Flight Delay"
+						dimLabel="Delay in + minutes"
+						bins={arrDelayState.bin}
+						filteredCounts={arrDelayState.filter}
+						totalCounts={arrDelayState.total}
+						on:mouseenter={async () => {
+							await arrDelayView.activate();
+						}}
+						on:select={async (e) => {
+							const selection = e.detail;
+							if (selection !== null) {
+								await arrDelayView.select(selection);
+							} else {
+								await arrDelayView.select();
+							}
+						}}
+					/>
+				{/if}
+
+				{#if falcon && depDelayState}
+					<Histogram
+						title="Departure Flight Delay"
+						dimLabel="Delay in + minutes"
+						bins={depDelayState.bin}
+						filteredCounts={depDelayState.filter}
+						totalCounts={depDelayState.total}
+						on:mouseenter={async () => {
+							await depDelayView.activate();
+						}}
+						on:select={async (e) => {
+							const selection = e.detail;
+							if (selection !== null) {
+								await depDelayView.select(selection);
+							} else {
+								await depDelayView.select();
+							}
+						}}
+					/>
+				{/if}
+
+				{#if falcon && flightDateState}
+					<Histogram
+						title="Flight Date"
+						dimLabel="Time of flight"
+						bins={flightDateState.bin}
+						filteredCounts={flightDateState.filter}
+						totalCounts={flightDateState.total}
+						on:mouseenter={async () => {
+							await flightDateView.activate();
+						}}
+						on:select={async (e) => {
+							const selection = e.detail;
+							if (selection !== null) {
+								await flightDateView.select(selection);
+							} else {
+								await flightDateView.select();
+							}
+						}}
+					/>
+				{/if}
 			</div>
+
 			<div id="maps">
 				{#if falcon && originState}
 					<UsMapVis
@@ -270,7 +372,6 @@
 		height: 800px;
 	}
 	#vis {
-		border: 1px solid red;
 		width: 100%;
 		height: 500px;
 	}
@@ -285,7 +386,6 @@
 		padding: 20px;
 	}
 	#hists {
-		/* border: 1px solid red; */
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;

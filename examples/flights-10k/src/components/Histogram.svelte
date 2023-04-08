@@ -33,6 +33,5 @@
 	}
 	#hist-container {
 		display: inline-block;
-		border: 1px solid red;
 	}
 </style>
