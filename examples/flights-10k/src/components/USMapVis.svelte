@@ -1,15 +1,11 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import UsMap from "./USMap.svelte";
-	import type {
-		CategoricalDimension,
-		FalconVis,
-		View1D,
-		View1DState,
-	} from "falcon-vis";
+	import TitleBar from "./TitleBar.svelte";
 	import * as d3 from "d3";
 	import { states } from "./states";
 	import { createEventDispatcher } from "svelte";
+	import type { View1DState } from "falcon-vis";
 
 	const dispatch = createEventDispatcher();
 
@@ -27,15 +23,15 @@
 	let stateToStyle: Map<string, { fill?: string; stroke?: string }> = new Map(
 		states.map((state) => [state.id, { fill: "white" }])
 	);
-	let stateToStyleClone = new Map();
+	let stateToStyleClone = structuredClone(stateToStyle);
 
-	onMount(() => {
-		stateToStyleClone = structuredClone(stateToStyle);
-	});
-	$: if (state) {
+	function copyState(state: View1DState) {
 		stateToStyle = updateStateStyleMap(state);
+		stateToStyleClone = structuredClone(stateToStyle);
 	}
-
+	$: if (state) {
+		copyState(state);
+	}
 	function updateStateStyleMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
 		const counts = viewCounts.filter;
@@ -58,6 +54,9 @@
 	}
 
 	let selected = [];
+	/**
+	 * @TODO fix this mess
+	 */
 	async function selectMap(selected: string[]) {
 		if (selected.length > 0) {
 			stateToStyle = structuredClone(stateToStyleClone);
@@ -68,11 +67,28 @@
 				});
 			});
 			stateToStyle = stateToStyle;
+		} else {
+			// reset it all to noew stroke
+			states.forEach((state) => {
+				stateToStyle.set(state.id, {
+					fill: stateToStyle.get(state.id).fill,
+				});
+			});
+			stateToStyle = stateToStyle;
 		}
 	}
 </script>
 
-<div class="title">{title}</div>
+<TitleBar
+	{title}
+	selection={selected.length > 0 ? selected : null}
+	on:reset={() => {
+		selected = [];
+		// I should remove all the selection
+		selectMap(selected);
+		dispatch("select", null);
+	}}
+/>
 <UsMap
 	on:mouseenter
 	on:mouseleave

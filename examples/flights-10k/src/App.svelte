@@ -116,7 +116,7 @@
 		}
 	}
 
-	$: updateEntriesWhenStateChanges([distanceCounts, arrivalDelayCounts]);
+	$: updateEntriesWhenStateChanges([distanceState, originState]);
 </script>
 
 <header>

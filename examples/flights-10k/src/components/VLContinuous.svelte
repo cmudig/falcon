@@ -44,7 +44,10 @@
 				params: [
 					{
 						name: "select",
-						select: { type: "interval", encodings: ["x"] },
+						select: {
+							type: "interval",
+							encodings: ["x"],
+						},
 					},
 				],
 				mark: { type: "bar", cursor: "col-resize" },
