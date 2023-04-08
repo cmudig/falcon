@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import UsMap from "./USMap.svelte";
 	import TitleBar from "./TitleBar.svelte";
 	import * as d3 from "d3";
 	import { states } from "./states";
 	import { createEventDispatcher } from "svelte";
 	import type { View1DState } from "falcon-vis";
+	import Legend from "./Legend.svelte";
 
 	const dispatch = createEventDispatcher();
 
@@ -35,7 +35,7 @@
 	function updateStateStyleMap(viewCounts: View1DState) {
 		const stateNames = viewCounts.bin;
 		const counts = viewCounts.filter;
-		let maxCount = Math.max(...counts);
+		let [_, maxCount] = d3.extent(counts);
 		if (maxCount <= 0) {
 			maxCount = 1;
 		}
@@ -105,6 +105,12 @@
 		}
 	}}
 />
+
+<div id="legend">
+	<!--  -->
+
+	<Legend data={state.filter} {numberToColor} width={200} height={10} />
+</div>
 
 <style>
 	/*  put stuff here */
