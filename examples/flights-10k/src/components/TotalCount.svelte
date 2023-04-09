@@ -1,13 +1,14 @@
 <script lang="ts">
 	import VegaLite from "svelte-vega/src/VegaLite.svelte";
 	import type { VegaLiteSpec } from "svelte-vega";
+	import TitleBar from "./TitleBar.svelte";
 
 	export let filteredCount: number;
 	export let totalCount: number;
 	export let width = 500;
 	export let height = 50;
 	export let barColor = "hsla(172, 97%, 45%, 0.95)";
-	export let title = "Rows Selected";
+	export let title = "Table Rows Selected";
 
 	$: spec = {
 		$schema: "https://vega.github.io/schema/vega-lite/v5.json",
@@ -31,7 +32,7 @@
 	} as VegaLiteSpec;
 </script>
 
-<div class="title">{title}</div>
+<TitleBar {title} />
 <VegaLite
 	data={{ table: { filteredCount, totalCount } }}
 	{spec}

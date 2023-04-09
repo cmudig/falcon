@@ -1,65 +1,20 @@
 <script lang="ts">
-	import { FalconVis, JsonDB } from "falcon-vis";
-	import type {
-		View0D,
-		View1D,
-		View0DState,
-		View1DState,
-		Dimension,
-	} from "falcon-vis";
+	import { FalconVis, JsonDB, ArrowDB } from "falcon-vis";
+	import type { View0D, View1D, View0DState, View1DState } from "falcon-vis";
 
 	import { onMount } from "svelte";
-	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
 	import Histogram from "./components/Histogram.svelte";
 	import TotalCount from "./components/TotalCount.svelte";
-	import UsMap from "./components/USMap.svelte";
 	import UsMapVis from "./components/USMapVis.svelte";
 
 	let falcon: FalconVis;
 	let countView: View0D;
-	let countState: View0DState;
-
-	let distance: View1D;
-	let distanceCounts: View1DState;
-
-	let arrivalDelay: View1D;
-	let arrivalDelayCounts: View1DState;
-
-	let dims1D: Dimension[] = [
-		{
-			type: "continuous",
-			name: "Distance",
-			resolution: 400,
-			bins: 5,
-		},
-		{
-			type: "continuous",
-			name: "ArrDelay",
-			resolution: 400,
-			range: [-20, 60],
-			bins: 5,
-		},
-		{
-			type: "continuous",
-			name: "DepDelay",
-			resolution: 400,
-			range: [-20, 60],
-			bins: 5,
-		},
-		{
-			type: "continuous",
-			name: "FlightDate",
-			resolution: 400,
-			bins: 25,
-		},
-	];
-
 	let distanceView: View1D;
 	let arrDelayView: View1D;
 	let depDelayView: View1D;
 	let flightDateView: View1D;
 	let originView: View1D;
-
+	let countState: View0DState;
 	let distanceState: View1DState;
 	let arrDelayState: View1DState;
 	let depDelayState: View1DState;
@@ -168,14 +123,6 @@
 <main>
 	<!-- section for all the visualizations -->
 	<div id="vis">
-		<div>
-			<TotalCount
-				filteredCount={countState?.filter ?? 0}
-				totalCount={countState?.total ?? 0}
-				width={1000}
-				height={20}
-			/>
-		</div>
 		<div id="charts">
 			<div id="hists">
 				{#if falcon && distanceState}
@@ -243,6 +190,8 @@
 
 				{#if falcon && flightDateState}
 					<Histogram
+						timeUnit=""
+						type="temporal"
 						title="Flight Date"
 						dimLabel="Time of flight"
 						bins={flightDateState.bin}
@@ -266,7 +215,8 @@
 			<div id="maps">
 				{#if falcon && originState}
 					<UsMapVis
-						title="State Origin Airport"
+						width={700}
+						title="Origin Airport Location by State"
 						state={originState}
 						on:mouseenter={async () => {
 							await originView.activate();
@@ -286,6 +236,14 @@
 
 		<!-- section for all entries in the table  -->
 		<div id="table">
+			<div>
+				<TotalCount
+					filteredCount={countState?.filter ?? 0}
+					totalCount={countState?.total ?? 0}
+					width={800}
+					height={20}
+				/>
+			</div>
 			{#if entries}
 				<div>
 					<button
@@ -367,25 +325,31 @@
 		border-radius: 5px;
 	}
 	#table {
-		border: 1px solid black;
-		width: 100%;
+		border: 1px solid lightgrey;
+		margin-top: 20px;
+		padding: 20px;
+		border-radius: 10px;
 		height: 800px;
 	}
 	#vis {
 		width: 100%;
 		height: 500px;
+		margin-top: 20px;
 	}
 
 	#charts {
 		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
 		gap: 20px;
 	}
 	#maps {
+		border: 1px solid lightgrey;
 		padding: 20px;
+		border-radius: 10px;
 	}
 	#hists {
+		padding: 20px;
+		border-radius: 10px;
+		border: 1px solid lightgrey;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;

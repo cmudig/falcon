@@ -24,6 +24,8 @@
 	export let foregroundBarColor = "hsla(172, 97%, 45%, 0.95)";
 	export let backgroundColor = "white";
 	export let onlyFiltered = false;
+	export let type: "quantitative" | "temporal" = "quantitative";
+	export let timeUnit = "";
 
 	$: data = {
 		table: bins,
@@ -53,7 +55,10 @@
 				mark: { type: "bar", cursor: "col-resize" },
 				encoding: {
 					x: {
+						...(timeUnit ? { timeUnit } : {}),
+						// timeUnit: "utcmonthdate"
 						field: "bin[0]",
+						type,
 						bin: { binned: true },
 						axis: {
 							title: dimLabel,
@@ -84,7 +89,9 @@
 						legend: null,
 					},
 					x: {
+						...(timeUnit ? { timeUnit } : {}),
 						field: "bin[0]",
+						type,
 						bin: { binned: true },
 						title: "",
 					},

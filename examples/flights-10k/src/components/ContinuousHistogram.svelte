@@ -9,6 +9,8 @@
 	export let countLabel = "Count";
 	export let dimLabel = "";
 	export let onlyFiltered = false;
+	export let type = "quantitative";
+	export let timeUnit = "";
 
 	$: data = convertFormat(state);
 
@@ -35,6 +37,8 @@
 	on:mouseup
 	on:mousedown
 	on:click
+	{timeUnit}
+	{type}
 	{title}
 	{width}
 	{height}

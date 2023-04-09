@@ -8,6 +8,8 @@
 	export let totalCounts: Uint32Array;
 	export let filteredCounts: Uint32Array;
 	export let bins: { binStart: number; binEnd: number }[];
+	export let type = "quantitative";
+	export let timeUnit = "";
 
 	let selection: null | any[] = null;
 </script>
@@ -23,6 +25,8 @@
 			{dimLabel}
 			state={{ bin: bins, filter: filteredCounts, total: totalCounts }}
 			on:select
+			{type}
+			{timeUnit}
 		/>
 	</div>
 </div>

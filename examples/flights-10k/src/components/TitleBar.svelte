@@ -42,4 +42,7 @@
 		color: lightgrey;
 		font-size: smaller;
 	}
+	.title {
+		font-size: 18px;
+	}
 </style>
