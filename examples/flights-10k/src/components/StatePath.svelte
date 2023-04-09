@@ -3,6 +3,7 @@
 
 	export let d: string;
 	export let fill: string;
+	export let title = "";
 	export let stroke: string = "hsla(0, 0%, 0%, 0.075)";
 	export let strokeWidth = 0.75;
 	export let hoveringStroke = "black";
@@ -25,4 +26,8 @@
 		isHovering = false;
 		dispatch("mouseleave");
 	}}
-/>
+>
+	{#if title}
+		<title>{title}</title>
+	{/if}
+</path>

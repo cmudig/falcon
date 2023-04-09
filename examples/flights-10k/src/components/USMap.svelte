@@ -43,6 +43,7 @@
 		{#each states as state}
 			{@const style = stateToStyle.get(state.id) ?? defaultStyle}
 			<StatePath
+				title={state.id}
 				d={state.d}
 				fill={style.fill ?? defaultStyle.fill}
 				stroke={style.stroke ?? defaultStyle.stroke}
