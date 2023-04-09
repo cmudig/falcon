@@ -5,7 +5,8 @@
 	export let fill: string;
 	export let stroke: string = "hsla(0, 0%, 0%, 0.075)";
 	export let strokeWidth = 0.75;
-	export let hoveringStroke = "slateblue";
+	export let hoveringStroke = "black";
+	export let hoveringStrokeWidth = 1;
 	const dispatch = createEventDispatcher();
 	let isHovering = false;
 </script>
@@ -14,7 +15,7 @@
 	{d}
 	stroke={isHovering ? hoveringStroke : stroke}
 	{fill}
-	stroke-width={strokeWidth}
+	stroke-width={isHovering ? hoveringStrokeWidth : strokeWidth}
 	on:click
 	on:mouseenter={() => {
 		isHovering = true;

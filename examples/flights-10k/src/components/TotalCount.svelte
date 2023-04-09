@@ -2,12 +2,13 @@
 	import VegaLite from "svelte-vega/src/VegaLite.svelte";
 	import type { VegaLiteSpec } from "svelte-vega";
 	import TitleBar from "./TitleBar.svelte";
+	import { primary } from "./colors";
 
 	export let filteredCount: number;
 	export let totalCount: number;
 	export let width = 500;
 	export let height = 50;
-	export let barColor = "hsla(172, 97%, 45%, 0.95)";
+	export let barColor = primary;
 	export let title = "Table Rows Selected";
 
 	$: spec = {

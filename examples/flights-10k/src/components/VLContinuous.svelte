@@ -3,6 +3,7 @@
 	import type { VegaLiteSpec } from "svelte-vega";
 	import { VegaLite } from "svelte-vega";
 	import type { View } from "svelte-vega";
+	import { primary } from "./colors";
 
 	const dispatch = createEventDispatcher<{
 		select: [number, number] | null;
@@ -20,8 +21,8 @@
 	export let countLabel = "Count";
 	export let dimLabel = "";
 	export let labelColor = "black";
-	export let backgroundBarColor = "lightgrey";
-	export let foregroundBarColor = "hsla(172, 97%, 45%, 0.95)";
+	export let backgroundBarColor = "hsla(0, 0%, 0%, 0.07)";
+	export let foregroundBarColor = primary;
 	export let backgroundColor = "white";
 	export let onlyFiltered = false;
 	export let type: "quantitative" | "temporal" = "quantitative";

@@ -89,10 +89,9 @@
 	});
 
 	let page = 0;
-	let numEntries = 20;
+	let numEntries = 25;
 	let entries: Iterable<Record<string, any>>;
 	let resolved = true;
-
 	function updateEntriesWhenStateChanges(viewStates: View1DState[]) {
 		// make a request for entries
 		if (falcon && resolved) {
@@ -108,8 +107,24 @@
 				});
 		}
 	}
-
-	$: updateEntriesWhenStateChanges([distanceState, originState]);
+	$: updateEntriesWhenStateChanges([
+		distanceState,
+		originState,
+		arrDelayState,
+		depDelayState,
+		flightDateState,
+	]);
+	let tableKeys = [
+		"FlightDate",
+		"Origin",
+		"OriginState",
+		"Dest",
+		"DestState",
+		"DepDelay",
+		"ArrDelay",
+		"Distance",
+		"AirTime",
+	];
 </script>
 
 <header>
@@ -266,17 +281,21 @@
 					>
 				</div>
 				<div id="images">
-					<table>
-						{#if entries}
-							{@const keys = ["ArrDelay", "Distance"]}
+					<table id="table">
+						{#if entries && countState}
 							<tr>
-								{#each keys as key}
+								{#each tableKeys as key}
 									<th>{key}</th>
 								{/each}
 							</tr>
 							{#each Array.from(entries) as instance}
 								<tr>
-									{#each keys as key}
+									<td
+										>{new Date(
+											instance["FlightDate"]
+										).toDateString()}</td
+									>
+									{#each tableKeys.slice(1) as key}
 										<td>{instance[key]}</td>
 									{/each}
 								</tr>
@@ -292,8 +311,8 @@
 <style>
 	:global(:root) {
 		--bg-color: white;
-		--primary-color: #22ccb5;
-		--text-color: black;
+		--text-color: rgb(53, 53, 53);
+		--primary-color: var(--text-color);
 	}
 	:global(body, html) {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -329,7 +348,6 @@
 		margin-top: 20px;
 		padding: 20px;
 		border-radius: 10px;
-		height: 800px;
 	}
 	#vis {
 		width: 100%;
@@ -353,5 +371,21 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;
+	}
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	td,
+	th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+	}
+	th {
+		font-weight: 500;
+		background-color: #f9f9f9;
 	}
 </style>

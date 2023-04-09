@@ -26,6 +26,7 @@
 </div>
 
 <style>
+	@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,600&display=swap");
 	.top {
 		display: flex;
 		justify-content: space-between;
@@ -43,6 +44,8 @@
 		font-size: smaller;
 	}
 	.title {
+		font-family: "Exo", sans-serif;
 		font-size: 18px;
+		color: var(--primary-color);
 	}
 </style>

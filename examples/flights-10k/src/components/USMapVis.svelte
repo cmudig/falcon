@@ -6,12 +6,13 @@
 	import { createEventDispatcher } from "svelte";
 	import type { View1DState } from "falcon-vis";
 	import Legend from "./Legend.svelte";
+	import { primary } from "./colors";
 
 	const dispatch = createEventDispatcher();
 
 	const primaryColorInterpolate = d3.interpolateRgbBasis([
 		"rgb(255,255,255)",
-		"rgb(14,225,197)",
+		primary,
 	]);
 
 	export let state: View1DState;
