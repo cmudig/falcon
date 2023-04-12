@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { FalconVis, JsonDB, ArrowDB } from "falcon-vis";
 	import type { View0D, View1D, View0DState, View1DState } from "falcon-vis";
+	import GithubButton from "./components/GithubButton.svelte";
 
 	import { onMount } from "svelte";
 	import Histogram from "./components/Histogram.svelte";
@@ -128,11 +129,16 @@
 </script>
 
 <header>
-	<img
-		src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
-		alt="FalconVis Logo"
-		width="300px"
-	/>
+	<div>
+		<a href="https://github.com/cmudig/falcon#falconvis" target="_blank">
+			<img
+				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+				alt="FalconVis Logo"
+				height="60px"
+			/>
+		</a>
+	</div>
+	<GithubButton href="https://github.com/cmudig/falcon" width={40} />
 </header>
 
 <main>
@@ -320,28 +326,23 @@
 		margin: 0;
 		background-color: var(--bg-color);
 		color: var(--text-color);
-		padding: 5px;
+		/* padding: 5px; */
 	}
-	code {
-		font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-			monospace;
-	}
-	.hist {
-		display: flex;
-		flex-wrap: wrap;
-		flex-direction: column;
-		gap: 20px;
-	}
-	#falcon-app {
-		display: flex;
-		flex-direction: row;
-		gap: 30px;
-		height: 100vh;
+	main {
+		padding: 10px;
+		padding-top: 15px;
 	}
 	header {
-		background-color: rgb(237, 237, 237);
-		padding: 15px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background-color: rgb(250, 250, 250);
 		border-radius: 5px;
+		box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.115);
+		margin: 10px;
+		margin-bottom: 5px;
+		padding: 15px;
+		padding-right: 25px;
 	}
 	#table {
 		border: 1px solid lightgrey;
@@ -352,7 +353,6 @@
 	#vis {
 		width: 100%;
 		height: 500px;
-		margin-top: 20px;
 	}
 
 	#charts {

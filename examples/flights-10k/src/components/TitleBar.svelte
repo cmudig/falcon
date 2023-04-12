@@ -26,7 +26,6 @@
 </div>
 
 <style>
-	@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,600&display=swap");
 	.top {
 		display: flex;
 		justify-content: space-between;
