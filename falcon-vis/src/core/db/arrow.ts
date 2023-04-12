@@ -140,11 +140,11 @@ export class ArrowDB implements FalconDB {
     return this.data && this.data.numCols > 0;
   }
 
-  entries(
+  async entries(
     offset: number = 0,
     length: number = Infinity,
     filters?: Filters | undefined
-  ): Iterable<Row | null> {
+  ): Promise<Iterable<Row | null>> {
     const filterMask: BitSet | null = union(
       ...this.getFilterMasks(filters ?? new Map()).values()
     );
