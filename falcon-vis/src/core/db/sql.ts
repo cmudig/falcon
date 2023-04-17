@@ -1,4 +1,5 @@
 import { greatScott } from "../bins";
+import { FalconDB, Filters, AsyncIndex, FalconCube } from "./db";
 import {
   Dimension,
   ContinuousRange,
@@ -6,6 +7,7 @@ import {
   ContinuousDimension,
 } from "../dimension";
 import { FalconArray } from "../falconArray";
+import { Row } from "../iterator";
 import {
   binNumberFunctionContinuousSQL,
   binNumberFunctionCategorical,
@@ -14,10 +16,8 @@ import {
   stepSize,
 } from "../util";
 import { View0D, View1D } from "../views";
-import { FalconDB, Filters, AsyncIndex, FalconCube } from "./db";
-import type { BinConfig } from "../util";
+import type { BinConfig, BinNumberFunction } from "../util";
 import type { View } from "../views";
-import { Row } from "../iterator";
 
 export type SQLNameMap = Map<string, string>;
 export type SQLQuery = string;
@@ -303,7 +303,7 @@ export abstract class SQLDB implements FalconDB {
     view: View,
     sqlFilters: SQLFilters,
     binActive: SQLBin,
-    binActiveIndexMap: (x: any) => number,
+    binActiveIndexMap: BinNumberFunction,
     binCountActive: number
   ) {
     let noFilter: FalconArray;
@@ -374,7 +374,7 @@ export abstract class SQLDB implements FalconDB {
 
     if (view instanceof View0D) {
       for (const { keyActive, cnt } of result) {
-        const binIndex = binActiveIndexMap(keyActive);
+        const binIndex = binActiveIndexMap(keyActive)!;
         if (binIndex >= 0) {
           filter.set(binIndex, cnt);
         }
@@ -382,8 +382,8 @@ export abstract class SQLDB implements FalconDB {
       }
     } else if (view instanceof View1D) {
       for (const { keyActive, key, cnt } of result) {
-        const binActiveIndex = binActiveIndexMap(keyActive);
-        const binPassiveIndex = binPassiveIndexMap!(key);
+        const binActiveIndex = binActiveIndexMap(keyActive)!;
+        const binPassiveIndex = binPassiveIndexMap(key)!;
         if (binActiveIndex >= 0) {
           filter.set(binActiveIndex, binPassiveIndex, cnt);
         }

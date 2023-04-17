@@ -10,6 +10,9 @@ import type { CategoricalRange, ContinuousDimension } from "./dimension";
 
 export type Interval<T> = [T, T];
 
+// takes an item and maps to a integer index
+export type BinNumberFunction = (key: any) => number | undefined;
+
 /**
  * Binning configuration.
  */
