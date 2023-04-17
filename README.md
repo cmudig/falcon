@@ -8,31 +8,98 @@
 
 **🚧 Work in Progress**
 
-A simple javascript API that links visualizations at scale.
+```bash
+npm install falcon-vis
+```
 
-With FalconVis, you can interact with linked visualizations without delay. Seriously! It's latency free on interaction!
+A simple javascript API to link visualizations at scale. FalconVis is a successor to [`vega/falcon`](https://github.com/vega/falcon).
 
-## Live Examples
+Finally, you can cross-filter all the data you've been hoarding without the large delays or slowdowns. Interactions are smooth, fast, and responsive.
 
--   add
--   a
--   list
--   of
--   links
+**Live Browser Examples**
 
-## Usage
+-   TODO: add json 10k
+-   TODO: add arrow 1million
+-   TODO: add duckdb-wasm 5 million
+-   [[30 Million Flights | DuckDB Python]](https://huggingface.co/spaces/donnyb/FalconVis)
 
-TODO: put usage here to get started quick
+## Example
+
+Check out real examples in the [`examples/`](examples/) directory. If you want a quick sneak-peak, keep reading.
+
+TODO make this section more clear.
+
+### Initialization
+
+Create a the `falcon` instance and link it up to some data and some views.
+
+```ts
+import { FalconVis, JsonDB } from "falcon-vis";
+
+/**
+ * 1. create the falcon instance with a database
+ */
+const plainOldJavascriptObject = await fetch("flights-10k.json").then((d) =>
+	d.json()
+);
+const db = new JsonDB(plainOldJavascriptObject);
+falcon = new FalconVis(db);
+
+/**
+ * 2. create the views (you interact with these directly to cross-filter)
+ */
+// 0D is total count (num rows)
+const countView = await falcon.view0D();
+countView.onChange((updatedTotalCount) => {
+	// called every time the count changes
+	console.log(updatedTotalCount); // you can do whatever in here
+});
+
+// 1D is a histogram
+const distanceView = await falcon.view1D({
+	type: "continuous",
+	name: "Distance",
+	resolution: 400,
+	bins: 5,
+});
+distanceView.onChange((updatedHistogram) => {
+	console.log(updatedHistogram);
+});
+
+/**
+ * 3. initialize falcon by linking everything together
+ */
+await falcon.link();
+```
+
+### Cross-filtering
+
+The view you that you want to filter is the active view. Once you do filter an active view, the `onChange` callbacks will be called with the updated counts for all the other linked views.
+
+```ts
+/**
+ * 1. make the view you are interacting with active
+ *    this computes the fast falcon index in the background
+ */
+await distanceView.activate();
+
+/**
+ * 2. select/filter a range between 0 and 100
+ */
+await distanceView.select([0, 100]);
+```
 
 ## API Reference
 
 TODO fill in and add examples
 
+### Core
+
 <br><a href="#">#</a> index.<b>view0D</b>()
 
 <br><a href="#">#</a> index.<b>view1D</b>()
 
-<br><a href="#">#</a> index.<b>all</b>()
+<br><a href="#">#</a> index.<b>link</b>()
 
 <br><a href="#">#</a> index.<b>entries</b>()
 
@@ -42,32 +109,13 @@ TODO fill in and add examples
 
 <br><a href="#">#</a> view.<b>onChange</b>()
 
-## Examples
+## Databases
 
-To see real working examples, check out the self-contained examples in the [`examples/`](examples/) directory.
-
-Check out the workspace [`package.json`](package.json) or the specific example's `package.json` for more information on how to run them.
+<br><a href="#">#</a> <b>JsonDB</b>
+<br><a href="#">#</a> <b>ArrowDB</b>
+<br><a href="#">#</a> <b>DuckDB</b>
+<br><a href="#">#</a> <b>HttpDB</b>
 
 ## Development
 
 Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server.
-
-## Plan
-
--   [x] handle when views are added
-    -   [x] when a passive view0D is added
-    -   [x] when a passive view1D is added
--   [x] automatically compute optimal number of bins
--   [x] update key settings (bins, range/extent)
--   [ ] Create one example at different data levels
-
-    -   [x] Make a larger map
-    -   [x] Orient the histograms and map like figma
-    -   [x] Create a selectable map view
-    -   [ ] Create a title, legend, and reset button
-    -   [ ] Make the views outside of the components and just pass in state
-    -   [ ] Create a nice table
-    -   [ ] Style the website
-    -   [ ] Add links
-
--   [ ] cut out all the unused columns in the flights data
