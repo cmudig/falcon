@@ -21,7 +21,7 @@ import type {
   ContinuousRange,
   Dimension,
 } from "../dimension";
-import type { Interval } from "../util";
+import type { Interval, BinNumberFunction } from "../util";
 import type { View } from "../views";
 
 type DimensionFilterHash = string;
@@ -160,7 +160,7 @@ export class ArrowDB implements FalconDB {
   histogramView1D(view: View1D, filters?: Filters): FalconCounts {
     let filter: FalconArray;
     let noFilter: FalconArray;
-    let bin: (item: any) => number;
+    let bin: BinNumberFunction;
     let binCount: number;
 
     // 1. decide which rows are filtered or not
@@ -186,7 +186,7 @@ export class ArrowDB implements FalconDB {
     const column = this.data.getChild(view.dimension.name)!;
     for (let i = 0; i < this.data.numRows; i++) {
       const value: any = column.get(i)!;
-      const binLocation = bin(value);
+      const binLocation = bin(value)!;
 
       // increment the specific bin
       if (0 <= binLocation && binLocation < binCount && isNotNull(value)) {
@@ -268,7 +268,7 @@ export class ArrowDB implements FalconDB {
     view: View,
     activeCol: Vector,
     filterMasks: FilterMasks<Dimension>,
-    binActive: (x: number) => number,
+    binActive: BinNumberFunction,
     binCountActive: number
   ): FalconCube {
     let noFilter: FalconArray;
@@ -295,14 +295,14 @@ export class ArrowDB implements FalconDB {
           continue;
         }
 
-        const keyActive = binActive(activeCol.get(i)!);
+        const keyActive = binActive(activeCol.get(i)!)!;
         if (0 <= keyActive && keyActive < binCountActive) {
           filter.increment([keyActive]);
         }
         noFilter.increment([0]);
       }
     } else if (view instanceof View1D) {
-      let binPassive: (x: any) => number;
+      let binPassive: BinNumberFunction;
       let binCount: number;
 
       if (view.dimension.type === "continuous") {
@@ -333,8 +333,8 @@ export class ArrowDB implements FalconDB {
 
         const valueActive = activeCol.get(i)!;
         const valuePassive = passiveCol.get(i)!;
-        const keyPassive = binPassive(valuePassive);
-        const keyActive = binActive(valueActive);
+        const keyPassive = binPassive(valuePassive)!;
+        const keyActive = binActive(valueActive)!;
         if (
           0 <= keyPassive &&
           keyPassive < binCount &&
@@ -368,7 +368,7 @@ export class ArrowDB implements FalconDB {
     activeCol: Vector,
     filterMasks: FilterMasks<Dimension>,
     numPixels: number,
-    binActive: (x: number) => number
+    binActive: BinNumberFunction
   ): FalconCube {
     let noFilter: FalconArray;
     let filter: FalconArray;
@@ -395,7 +395,7 @@ export class ArrowDB implements FalconDB {
           continue;
         }
         const valueActive = activeCol.get(i)!;
-        const keyActive = binActive(valueActive) + 1;
+        const keyActive = binActive(valueActive)! + 1;
         if (0 <= keyActive && keyActive < numPixels && isNotNull(valueActive)) {
           filter.increment([keyActive]);
         }
@@ -405,7 +405,7 @@ export class ArrowDB implements FalconDB {
       // falcon magic sauce
       filter.cumulativeSum();
     } else if (view instanceof View1D) {
-      let binPassive: (x: any) => number;
+      let binPassive: BinNumberFunction;
       let binCount: number;
 
       if (view.dimension.type === "continuous") {
@@ -436,8 +436,8 @@ export class ArrowDB implements FalconDB {
 
         const valueActive = activeCol.get(i)!;
         const valuePassive = passiveCol.get(i)!;
-        const keyActive = binActive(valueActive) + 1;
-        const keyPassive = binPassive(valuePassive);
+        const keyActive = binActive(valueActive)! + 1;
+        const keyPassive = binPassive(valuePassive)!;
         if (
           0 <= keyPassive &&
           keyPassive < binCount &&
