@@ -218,6 +218,7 @@ export class ArrowDB implements FalconDB {
     let binCountActive: number;
     let binActive: BinNumberFunction; // maps a value to a bin index
 
+    // first compute the binning function for the active view
     if (activeView.dimension.type === "continuous") {
       const pixels = activeView.dimension.resolution;
       const numPixels = activeView.dimension.resolution + 1; // extending by one pixel so we can compute the right diff later
@@ -233,20 +234,30 @@ export class ArrowDB implements FalconDB {
       throw new Error("Unsupported dimension type for index1D");
     }
 
-    const fetchCube =
-      activeView.dimension.type === "continuous"
-        ? this.cubeSlice1DContinuous
-        : this.cubeSlice1DCategorical;
-    passiveViews.forEach((view) => {
-      const cube = fetchCube(
-        view,
-        activeCol,
-        filterMasks,
-        binCountActive,
-        binActive
-      );
-      cubes.set(view, cube);
-    });
+    // then compute cubes
+    if (activeView.dimension.type === "continuous") {
+      passiveViews.forEach((view) => {
+        const cube = this.cubeSlice1DContinuous(
+          view,
+          activeCol,
+          filterMasks,
+          binCountActive,
+          binActive
+        );
+        cubes.set(view, cube);
+      });
+    } else {
+      passiveViews.forEach((view) => {
+        const cube = this.cubeSlice1DCategorical(
+          view,
+          activeCol,
+          filterMasks,
+          binCountActive,
+          binActive
+        );
+        cubes.set(view, cube);
+      });
+    }
 
     return cubes;
   }
