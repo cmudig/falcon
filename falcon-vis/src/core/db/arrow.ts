@@ -44,7 +44,7 @@ export class ArrowDB implements FalconDB {
   constructor(data: Table, filterMaskCacheSize = 64) {
     this.blocking = true;
     // bitmask to determine what rows filter out or not
-    this.filterMaskIndex = new LRUMap(filterMaskCacheSize); // only save a few recent filter masks in memory
+    this.filterMaskIndex = new LimitedMap(filterMaskCacheSize); // only save a few recent filter masks in memory
     this.data = data;
   }
 
@@ -81,7 +81,9 @@ export class ArrowDB implements FalconDB {
     }
 
     if (dimension.range) {
-      const standardDeviation = Math.sqrt(sampleVariance(arrowColumn)); // \sqrt{\sigma^2}
+      const standardDeviation = Math.sqrt(
+        arrowColumnSampleVariance(arrowColumn)
+      ); // \sqrt{\sigma^2}
       const [min, max] = dimension.range;
       const optimalBins = greatScott(min, max, standardDeviation);
       return Math.min(optimalBins, maxThreshold);
@@ -110,20 +112,14 @@ export class ArrowDB implements FalconDB {
     }
   }
 
-  private categoricalRange(arrowColumn: Vector): CategoricalRange {
-    return arrowColumnUnique(arrowColumn).filter((item) => item !== null);
-  }
-  private continuousRange(arrowColumn: Vector): ContinuousRange {
-    return arrowColumnExtent(arrowColumn);
-  }
   range(dimension: Dimension): ContinuousRange | CategoricalRange {
     const arrowColumn = this.data.getChild(dimension.name);
     const arrowColumnExists = arrowColumn !== null;
     if (arrowColumnExists) {
       if (dimension.type === "continuous") {
-        return this.continuousRange(arrowColumn);
+        return arrowColumnExtent(arrowColumn);
       } else if (dimension.type === "categorical") {
-        return this.categoricalRange(arrowColumn);
+        return arrowColumnUnique(arrowColumn).filter((item) => item !== null);
       } else {
         throw Error("Unsupported Dimension type for range");
       }
@@ -189,7 +185,7 @@ export class ArrowDB implements FalconDB {
       const binLocation = bin(value)!;
 
       // increment the specific bin
-      if (0 <= binLocation && binLocation < binCount && isNotNull(value)) {
+      if (0 <= binLocation && binLocation < binCount && isValidValue(value)) {
         noFilter.increment([binLocation]);
         if (filterMask && !filterMask.get(i)) {
           filter.increment([binLocation]);
@@ -338,12 +334,12 @@ export class ArrowDB implements FalconDB {
         if (
           0 <= keyPassive &&
           keyPassive < binCount &&
-          isNotNull(valuePassive)
+          isValidValue(valuePassive)
         ) {
           if (
             0 <= keyActive &&
             keyActive < binCountActive &&
-            isNotNull(valueActive)
+            isValidValue(valueActive)
           ) {
             filter.increment([keyActive, keyPassive]);
           }
@@ -396,7 +392,11 @@ export class ArrowDB implements FalconDB {
         }
         const valueActive = activeCol.get(i)!;
         const keyActive = binActive(valueActive)! + 1;
-        if (0 <= keyActive && keyActive < numPixels && isNotNull(valueActive)) {
+        if (
+          0 <= keyActive &&
+          keyActive < numPixels &&
+          isValidValue(valueActive)
+        ) {
           filter.increment([keyActive]);
         }
         noFilter.increment([0]);
@@ -441,12 +441,12 @@ export class ArrowDB implements FalconDB {
         if (
           0 <= keyPassive &&
           keyPassive < binCount &&
-          isNotNull(valuePassive)
+          isValidValue(valuePassive)
         ) {
           if (
             0 <= keyActive &&
             keyActive < numPixels &&
-            isNotNull(valueActive)
+            isValidValue(valueActive)
           ) {
             filter.increment([keyActive, keyPassive]);
           }
@@ -562,6 +562,14 @@ export class ArrowDB implements FalconDB {
     return this.filterMaskIndex.get(key);
   }
 }
+
+/**
+ * determines if the value from the arrow column is valid
+ */
+function isValidValue(value: any) {
+  return value !== null;
+}
+
 /**
  * given an arrow column vector, create a filter mask
  *
@@ -629,11 +637,31 @@ function arrowColumnExtent(column: Vector): Interval<number> {
   return [min, max];
 }
 
-function isNotNull(value: any) {
-  return value !== null;
+/**
+ * sample defined by
+ * $$\sigma^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2$$
+ *
+ * this can probably be optimized faster to be like [the boss](https://github.com/d3/d3-array/blob/main/src/variance.js#L1)
+ */
+function arrowColumnSampleVariance(vector: Vector) {
+  let variance = 0,
+    n = vector.length;
+  let mu = arrowColumnMean(vector);
+  for (const x_i of vector) {
+    variance += (x_i - mu) ** 2;
+  }
+  return n > 1 ? variance / (n - 1) : variance;
+}
+function arrowColumnMean(vector: Vector) {
+  let mean = 0,
+    n = vector.length;
+  for (const x_i of vector) {
+    mean += x_i;
+  }
+  return mean / n;
 }
 
-class LRUMap<K, V> extends Map<K, V> {
+class LimitedMap<K, V> extends Map<K, V> {
   private limit: number;
 
   /**
@@ -651,28 +679,4 @@ class LRUMap<K, V> extends Map<K, V> {
     }
     return super.set(key, value);
   }
-}
-
-/**
- * sample defined by
- * $$\sigma^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2$$
- *
- * this can probably be optimized faster to be like [the boss](https://github.com/d3/d3-array/blob/main/src/variance.js#L1)
- */
-function sampleVariance(vector: Vector) {
-  let variance = 0,
-    n = vector.length;
-  let mu = mean(vector);
-  for (const x_i of vector) {
-    variance += (x_i - mu) ** 2;
-  }
-  return n > 1 ? variance / (n - 1) : variance;
-}
-function mean(vector: Vector) {
-  let mean = 0,
-    n = vector.length;
-  for (const x_i of vector) {
-    mean += x_i;
-  }
-  return mean / n;
 }
