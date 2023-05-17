@@ -200,55 +200,53 @@ export class ArrowDB implements FalconDB {
     };
   }
 
+  /**
+   * Given an active view, computes the falcon cube for each passive view and stores it in the falcon index (map)
+   * @param activeView
+   * @param passiveViews
+   * @param filters
+   * @returns a map of passive view to falcon cube
+   */
   falconIndexView1D(
     activeView: View1D,
     passiveViews: View[],
     filters: Filters
   ): FalconIndex {
+    const activeCol = this.data.getChild(activeView.dimension.name)!;
     const filterMasks = this.getFilterMasks(filters);
     const cubes: SyncIndex = new Map();
+    let binCountActive: number;
+    let binActive: BinNumberFunction; // maps a value to a bin index
 
     if (activeView.dimension.type === "continuous") {
-      // 1. bin mapping functions
       const pixels = activeView.dimension.resolution;
-      const activeDim = activeView.dimension;
-      const binActive = binNumberFunctionPixels(activeDim.binConfig!, pixels);
-      const activeCol = this.data.getChild(activeDim.name)!;
-      const numPixels = pixels + 1; // extending by one pixel so we can compute the right diff later
-
-      // 2. iterate over each passive view to compute cubes
-      passiveViews.forEach((view) => {
-        const cube = this.cubeSlice1DContinuous(
-          view,
-          activeCol,
-          filterMasks,
-          numPixels,
-          binActive
-        );
-        cubes.set(view, cube);
-      });
-    } else if (activeView.dimension.type === "categorical") {
-      // 1. bin mapping functions
-      const binActive = binNumberFunctionCategorical(
-        activeView.dimension.range!
+      const numPixels = activeView.dimension.resolution + 1; // extending by one pixel so we can compute the right diff later
+      binActive = binNumberFunctionPixels(
+        activeView.dimension.binConfig!,
+        pixels
       );
-      const binCountActive = numBinsCategorical(activeView.dimension.range!);
-      const activeCol = this.data.getChild(activeView.dimension.name)!;
-
-      // 2. iterate over each passive view to compute cubes
-      passiveViews.forEach((view) => {
-        const cube = this.cubeSlice1DCategorical(
-          view,
-          activeCol,
-          filterMasks,
-          binActive,
-          binCountActive
-        );
-        cubes.set(view, cube);
-      });
+      binCountActive = numPixels;
+    } else if (activeView.dimension.type === "categorical") {
+      binActive = binNumberFunctionCategorical(activeView.dimension.range!);
+      binCountActive = numBinsCategorical(activeView.dimension.range!);
     } else {
       throw new Error("Unsupported dimension type for index1D");
     }
+
+    const fetchCube =
+      activeView.dimension.type === "continuous"
+        ? this.cubeSlice1DContinuous
+        : this.cubeSlice1DCategorical;
+    passiveViews.forEach((view) => {
+      const cube = fetchCube(
+        view,
+        activeCol,
+        filterMasks,
+        binCountActive,
+        binActive
+      );
+      cubes.set(view, cube);
+    });
 
     return cubes;
   }
@@ -264,8 +262,8 @@ export class ArrowDB implements FalconDB {
     view: View,
     activeCol: Vector,
     filterMasks: FilterMasks<Dimension>,
-    binActive: BinNumberFunction,
-    binCountActive: number
+    binCountActive: number,
+    binActive: BinNumberFunction
   ): FalconCube {
     let noFilter: FalconArray;
     let filter: FalconArray;
@@ -352,6 +350,7 @@ export class ArrowDB implements FalconDB {
 
     return { noFilter, filter };
   }
+
   /**
    * Takes a view and computes the falcon cube for that passive view
    * more details in the [paper](https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf)
