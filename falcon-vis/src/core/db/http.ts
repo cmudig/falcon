@@ -21,6 +21,9 @@ export class HttpDB extends SQLDB {
     const t0 = performance.now();
 
     const escapedQuery = this.encodeGETQuery(q);
+    /**
+     * @todo consider using POST so I don't have to do this encodeURI bs
+     */
     const query = await fetch(`${this.url}${escapedQuery}`);
     if (!query.ok) throw new Error(`HTTP ${query.status}: ${query.statusText}`);
 
