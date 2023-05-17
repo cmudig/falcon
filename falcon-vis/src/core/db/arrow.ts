@@ -251,6 +251,21 @@ export class ArrowDB implements FalconDB {
     return cubes;
   }
 
+  private excludeDimensionsFilterMasks(
+    view: View,
+    filterMasks: FilterMasks<Dimension>
+  ) {
+    // 2.1 only filter all other dimensions (filter on same dimension does not apply)
+    const relevantMasks = new Map(filterMasks);
+    if (view instanceof View0D) {
+      // use all filters
+    } else if (view instanceof View1D) {
+      // remove itself from filtering
+      relevantMasks.delete(view.dimension);
+    }
+    return relevantMasks;
+  }
+
   /**
    * Takes a view and computes the falcon cube for that passive view
    * more details in the [paper](https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf)
@@ -268,14 +283,8 @@ export class ArrowDB implements FalconDB {
     let noFilter: FalconArray;
     let filter: FalconArray;
 
-    // 2.1 only filter all other dimensions (filter on same dimension does not apply)
-    const relevantMasks = new Map(filterMasks);
-    if (view instanceof View0D) {
-      // use all filters
-    } else if (view instanceof View1D) {
-      // remove itself from filtering
-      relevantMasks.delete(view.dimension);
-    }
+    // don't have a passive view filter itself
+    const relevantMasks = this.excludeDimensionsFilterMasks(view, filterMasks);
     const filterMask = union(...relevantMasks.values());
 
     if (view instanceof View0D) {
@@ -368,14 +377,8 @@ export class ArrowDB implements FalconDB {
     let noFilter: FalconArray;
     let filter: FalconArray;
 
-    // 2.1 only filter all other dimensions (filter on same dimension does not apply)
-    const relevantMasks = new Map(filterMasks);
-    if (view instanceof View0D) {
-      // use all filters
-    } else if (view instanceof View1D) {
-      // remove itself from filtering
-      relevantMasks.delete(view.dimension);
-    }
+    // don't have a passive view filter itself
+    const relevantMasks = this.excludeDimensionsFilterMasks(view, filterMasks);
     const filterMask = union(...relevantMasks.values());
 
     // 2.2 this count counts for each pixel wise bin
