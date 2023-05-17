@@ -10,7 +10,9 @@ export class HttpDB extends SQLDB {
     private readonly url: string,
     table: string,
     nameMap?: SQLNameMap,
-    private readonly escapeQuery: (query: string) => string = encodeURIComponent
+    private readonly encodeGETQuery: (
+      query: string
+    ) => string = encodeURIComponent
   ) {
     super(table, nameMap);
   }
@@ -18,7 +20,7 @@ export class HttpDB extends SQLDB {
   protected async query(q: SQLQuery): Promise<Table> {
     const t0 = performance.now();
 
-    const escapedQuery = this.escapeQuery(q);
+    const escapedQuery = this.encodeGETQuery(q);
     const query = await fetch(`${this.url}${escapedQuery}`);
     if (!query.ok) throw new Error(`HTTP ${query.status}: ${query.statusText}`);
 
