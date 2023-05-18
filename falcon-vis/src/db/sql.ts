@@ -41,6 +41,10 @@ export abstract class SQLDB implements FalconDB {
     return `${input}`;
   }
 
+  /**
+   * if the column is a time/date column, there may be some modifying
+   * for example, in duckdb we have to do this bs epoch(name)*1000 to convert the date into milliseconds UTC
+   */
   protected castTime(name: string) {
     return name;
   }
@@ -160,6 +164,7 @@ export abstract class SQLDB implements FalconDB {
         FROM ${this.table}`
       );
       const { _min, _max } = this.getASValues(result);
+      // may be bigints so cast to numbers
       return [Number(_min), Number(_max)] as ContinuousRange;
     } else {
       const result = await this.query(
@@ -178,25 +183,25 @@ export abstract class SQLDB implements FalconDB {
   async histogramView1D(view: View1D, filters?: Filters) {
     let binCount: number;
     let bSql: SQLBin;
-    let binIndexMap = (x: any) => x;
+    let bin: BinNumberFunction;
 
+    // construct binning scheme
     if (view.dimension.type === "continuous") {
-      // 1. construct binning scheme
-      const bin = view.dimension.binConfig!;
-      binCount = numBinsContinuous(bin);
-      bSql = this.binSQL(view.dimension, bin);
+      binCount = numBinsContinuous(view.dimension.binConfig!);
+      bSql = this.binSQL(view.dimension, view.dimension.binConfig!);
+      bin = (x) => x;
     } else {
       binCount = numBinsCategorical(view.dimension.range!);
       bSql = this.binSQLCategorical(view.dimension, view.dimension.range!);
-      binIndexMap = binNumberFunctionCategorical(view.dimension.range!);
+      bin = binNumberFunctionCategorical(view.dimension.range!);
     }
 
-    // 2. allocate memory
+    // allocate memory
     const noFilter = FalconArray.allocCounts(binCount);
     const hasFilters = filters && filters.size > 0;
     const filter = hasFilters ? FalconArray.allocCounts(binCount) : noFilter;
 
-    // 3. query and store if we have no filters
+    // query and store when no filters are active
     const result = await this.query(
       `SELECT ${bSql.select}
        AS binIndex, count(*) AS binCount
@@ -205,10 +210,10 @@ export abstract class SQLDB implements FalconDB {
        GROUP BY binIndex`
     );
     for (const { binIndex, binCount } of result) {
-      noFilter.set(binIndexMap(binIndex), binCount);
+      noFilter.set(bin(binIndex)!, binCount);
     }
 
-    // 4. query and store if we have filters
+    // query and store if we have filters
     if (hasFilters) {
       const where = [...this.filtersToSQLWhereClauses(filters).values()].join(
         " AND "
@@ -219,7 +224,6 @@ export abstract class SQLDB implements FalconDB {
          WHERE ${bSql.where} AND ${where} 
          GROUP BY binIndex`;
       const result = await this.query(queryText);
-      console.log(view.dimension.name, queryText);
       for (const { binIndex, binCount } of result) {
         filter.set(binIndex, binCount);
       }
