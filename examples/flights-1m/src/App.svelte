@@ -25,9 +25,8 @@
 	let originState: View1DState;
 
 	onMount(async () => {
-		const buffer = await fetch("flights-1m.arrow").then((d) =>
-			d.arrayBuffer()
-		);
+		const request = await fetch("flights-1m.arrow");
+		const buffer = await request.arrayBuffer();
 		const table = tableFromIPC(buffer);
 
 		const db = new ArrowDB(table);

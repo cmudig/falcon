@@ -37,23 +37,8 @@ export class FalconVis {
       view0D.addOnChangeListener(onChange);
     }
 
-    // // if we have an active view, just compute the passive index for this view0D only
-    // // not the whole thing!
-    // if (this.views.active) {
-    //   await this.addToIndexIfAddedLaterOn(view0D, this.views.active);
-    // }
-
     return view0D;
   }
-
-  // private async addToIndexIfAddedLaterOn(view0D: View0D, av: View1D) {
-  //   // handle the case when there is already an active view
-  //   // aka, just compute the passive index for this view0D
-  //   const index = this.db.falconIndexView1D(av, [view0D], this.filters);
-  //   const view0DCube = await index.get(view0D)!;
-  //   this.index.set(view0D, view0DCube);
-  //   av.select(av.lastFilter, true);
-  // }
 
   /**
    * Creates a 1D view and links with the other views under this falcon object
