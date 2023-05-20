@@ -2,30 +2,24 @@
   <img src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg" width="65%">
 </p>
 
-# FalconVis
-
 [![npm version](https://img.shields.io/npm/v/falcon-vis.svg)](https://www.npmjs.com/package/falcon-vis) ![Tests](https://github.com/cmudig/falcon/workflows/Node.js%20CI/badge.svg) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=rounded)](https://github.com/prettier/prettier)
 
 ```bash
 npm install falcon-vis
 ```
 
-**🚧 Work in Progress**
+`FalconVis` is a javascript library to cross-filter billions of data entries in the browser with no interaction delay.
+`FalconVis` scales to billions of entries by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index to link visualizations.
 
-FalconVis is a javascript library to cross-filter billions of data entries in the browser with no interaction delay.
-FalconVis scales to billions of entries by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index.
+**Live Examples using `FalconVis`**
 
-Check out FalconVis cross-filtering 30 million entries below or try out the live browser examples
-
-**Live Browser Examples**
-
--   [10k movies | JSON]()
--   [10k movies | Apache Arrow]()
--   [10k movies | DuckDB WASM]()
--   [[1 million flights | Apache Arrow]](https://observablehq.com/d/68fae2b29f7f389a)
--   [[3 million flights | DuckDB WASM]](https://observablehq.com/d/75371ab6ea37d20c)
--   [[10 million flights | DuckDB WASM]](https://observablehq.com/d/ee8baae0a36606d7)
--   [[10 million flights | DuckDB Python]](https://huggingface.co/spaces/donnyb/FalconVis)
+| Data                  | Count | Live Demo                                                                               |
+| --------------------- | ----- | --------------------------------------------------------------------------------------- |
+| JSON                  | 10k   | [Click to open on Github Pages]()                                                       |
+| Arrow                 | 1m    | [Click to open on ObservableHQ](https://observablehq.com/d/68fae2b29f7f389a)            |
+| DuckDB WASM           | 3m    | [Click to open on ObservableHQ](https://observablehq.com/d/75371ab6ea37d20c)            |
+| DuckDB WASM           | 10m   | [Click to open on ObservableHQ](https://observablehq.com/d/ee8baae0a36606d7)            |
+| HTTP to DuckDB Python | 10m   | [Click to open on HuggingFace🤗 Spaces](https://huggingface.co/spaces/donnyb/FalconVis) |
 
 ## Example
 
