@@ -12,18 +12,20 @@ npm install falcon-vis
 
 **🚧 Work in Progress**
 
-A Javascript library that links visualizations through performant cross-filtering. FalconVis uses the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index to cross-filter many millions or even billions of data entries with no interaction delay. It's buttery smooth!
+FalconVis is a javascript library to cross-filter billions of data entries in the browser with no interaction delay.
+FalconVis scales to billions of entries by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index.
 
 Check out FalconVis cross-filtering 30 million entries below or try out the live browser examples
 
-![demo](https://user-images.githubusercontent.com/65095341/236651116-dc011a2e-0b9b-4b27-98f5-f84c453cf032.gif)
-
 **Live Browser Examples**
 
--   [[1 Million | Apache Arrow on ObservableHQ]](https://observablehq.com/d/68fae2b29f7f389a)
--   [[3 Million | DuckDB WASM on ObservableHQ]](https://observablehq.com/d/75371ab6ea37d20c)
--   [[10 Million | DuckDB WASM on ObservableHQ]](https://observablehq.com/d/ee8baae0a36606d7)
--   [[10 Million | DuckDB Python on Huggingface Spaces]](https://huggingface.co/spaces/donnyb/FalconVis)
+-   [10k movies | JSON]()
+-   [10k movies | Apache Arrow]()
+-   [10k movies | DuckDB WASM]()
+-   [[1 million flights | Apache Arrow]](https://observablehq.com/d/68fae2b29f7f389a)
+-   [[3 million flights | DuckDB WASM]](https://observablehq.com/d/75371ab6ea37d20c)
+-   [[10 million flights | DuckDB WASM]](https://observablehq.com/d/ee8baae0a36606d7)
+-   [[10 million flights | DuckDB Python]](https://huggingface.co/spaces/donnyb/FalconVis)
 
 ## Example
 
