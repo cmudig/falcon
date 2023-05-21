@@ -37,7 +37,7 @@ They are all typed as `FalconDB`.
 import { JsonDB, ArrowDB, DuckDB, HttpDB } from "falcon-vis";
 ```
 
-### Cross-Filtering
+### Linking Views
 
 First initialize the `FalconVis` instance with your data. I will use the `ArrowDB` for this example for the 1M flights dataset.
 
@@ -107,6 +107,28 @@ Link the views together to fetch the initial counts (outputs are shown above).
 ```ts
 await falcon.link();
 ```
+
+### Cross-Filtering Views
+
+Now, you can cross-filter the views by calling `.select()` on a view. `FalconVis` uses the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index to cross-filter the views.
+
+Falcon works by activating a single view that you plan to interact with. In the background, we compute the Falcon data index when you activate a view. Then, when you `.select()` on an activated view, in we fetch the cross-filtered counts for the other views in constant time.
+
+**For Example**
+
+I directly `.activate()` the `distanceView` from before to prefetch the Falcon data index.
+
+```ts
+await distanceView.activate();
+```
+
+Then, I can apply a filter with `.select([rangeStart, rangeEnd])` for continuous data
+
+```ts
+await distanceView.select([1000, 2000]); // 1k to 2k miles
+```
+
+Which automatically cross-filters and updates the counts for other views in constant time (`onChange` is called for each other view).
 
 <!-- ## Example
 
