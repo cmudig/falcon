@@ -58,6 +58,8 @@ Next, create views that contain the data dimension and what happens when the cro
 
 **1D: Distance in miles**
 
+![dist](https://github.com/cmudig/falcon/assets/65095341/e6c474f5-f717-4f48-baff-eb2a2971dd05)
+
 ```ts
 const distanceView = await falcon.view1D({
 	type: "continuous",
@@ -71,6 +73,8 @@ distanceView.onChange((counts) => {
 ```
 
 **1D: Arrival Delay from -20 to 140 minutes**
+
+![delay](https://github.com/cmudig/falcon/assets/65095341/008968fe-f2be-4577-a04e-0a8323a98509)
 
 ```ts
 const arrivalDelayView = await falcon.view1D({
@@ -86,6 +90,8 @@ arrivalDelay.onChange((counts) => {
 ```
 
 **0D: Total Count**
+
+<img width="276" alt="Screenshot 2023-05-20 at 5 32 33 PM" src="https://github.com/cmudig/falcon/assets/65095341/ec903e37-07b6-43c5-b288-32875db0d073">
 
 ```ts
 const countView = await falcon.view0D();
