@@ -186,6 +186,14 @@ const table = await tableFromIPC(buffer);
 const db = new ArrowDB(table); // ✅
 ```
 
+**Arrow Shorthand Example**
+
+```ts
+import { ArrowDB } from "falcon-vis";
+
+const db = await ArrowDB.fromArrowFile("data/flights-1m.arrow"); // ✅
+```
+
 <br>`class` <b>DuckDB</b>(_duckdb_, _table_)
 
 Takes a [`@duckdb/duckdb-wasm`](https://github.com/duckdb/duckdb-wasm) db and table name within the db and attaches `FalconVis` data index methods to it.
