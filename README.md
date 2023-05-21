@@ -6,6 +6,8 @@
 
 `FalconVis` is a javascript library that links your own custom visualizations at scale! You can cross-filter billions of data entries in the browser with no interaction delay by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index.
 
+`FalconVis` was created by [Donny Bertucci](https://donnybertucci.com) and [Dominik Moritz](https://www.domoritz.de/) because the previous implementation ([`vega/falcon`](https://github.com/vega/falcon)) could not be used as a library or with custom visualizations.
+
 **Live interactive examples using `FalconVis`**
 
 | Data                  | Count | Live Demo                                                                               |
