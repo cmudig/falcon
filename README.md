@@ -246,3 +246,70 @@ import { HttpDB } from "falcon-vis";
 const tableName = "flights";
 const db = new HttpDB("http://localhost:8000", tableName); // ✅
 ```
+
+<br>`class` <b>FalconVis</b>(_db_)
+
+The main logic that orchestrates the cross-filtering between views.
+
+Takes in the data (`JsonDB`, `ArrowDB`, `DuckDB`, or `HttpDB`).
+
+**Example**
+
+```ts
+import { FalconVis } from "falcon-vis";
+
+// given a db: FalconDB
+const falcon = new FalconVis(db); // ✅
+```
+
+I will reference the instance created as <span style="color: orange">falcon</span> in the next methods.
+
+<br>`function` <span style="color: orange">falcon</span>.<b>view0D</b>(onChangeCallback?)
+
+Adds a 0D view onto the `FalconVis` instance named <span style="color: orange">falcon</span> and describes how to use the cross-filtered counts when they are changed.
+
+Takes an `onChangeCallback` function that is called whenever the view count changes (after cross-filtering).
+
+Returns a `View0D` instance (you can add more onChange callbacks to it later).
+
+The `onChangeCallback` gives you access to the updated filtered count and total count of the rows (`View0DState`) object as a parameter.
+
+```ts
+interface View0DState {
+	total: number | null;
+	filter: number | null;
+}
+```
+
+**Example**
+
+```ts
+import { FalconVis } from "falcon-vis";
+
+const falcon = new FalconVis(db);
+const countView = falcon.view0D((count) => {
+	console.log(count.total, count.filter); // gets called every cross-filter
+}); // ✅
+```
+
+**Example multiple and disposable `onChangeCallback`s**
+
+```ts
+import { FalconVis } from "falcon-vis";
+
+const falcon = new FalconVis(db);
+
+// create view0D
+const countView = falcon.view0D();
+// add onChange callbacks
+const disposeA = countView.onChange((count) => {
+	console.log("A", count.total, count.filter);
+}); // ✅
+const disposeB = countView.onChange((count) => {
+	console.log("B", count.total, count.filter);
+}); // ✅
+
+// then can be disposed later to stop listening for onChange
+disposeA();
+disposeB();
+```
