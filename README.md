@@ -4,24 +4,107 @@
 
 [![npm version](https://img.shields.io/npm/v/falcon-vis.svg)](https://www.npmjs.com/package/falcon-vis) ![Tests](https://github.com/cmudig/falcon/workflows/Node.js%20CI/badge.svg) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=rounded)](https://github.com/prettier/prettier)
 
-```bash
-npm install falcon-vis
-```
-
 `FalconVis` is a javascript library to cross-filter billions of data entries in the browser with no interaction delay.
 `FalconVis` scales to billions of entries by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index to link visualizations.
 
-**Live Examples using `FalconVis`**
+**Live interactive examples using `FalconVis`**
 
 | Data                  | Count | Live Demo                                                                               |
 | --------------------- | ----- | --------------------------------------------------------------------------------------- |
-| JSON                  | 10k   | [Click to open on Github Pages]()                                                       |
-| Arrow                 | 1m    | [Click to open on ObservableHQ](https://observablehq.com/d/68fae2b29f7f389a)            |
-| DuckDB WASM           | 3m    | [Click to open on ObservableHQ](https://observablehq.com/d/75371ab6ea37d20c)            |
-| DuckDB WASM           | 10m   | [Click to open on ObservableHQ](https://observablehq.com/d/ee8baae0a36606d7)            |
-| HTTP to DuckDB Python | 10m   | [Click to open on HuggingFace🤗 Spaces](https://huggingface.co/spaces/donnyb/FalconVis) |
+| JSON                  | 10K   | [Click to open on Github Pages]()                                                       |
+| Arrow                 | 1M    | [Click to open on ObservableHQ](https://observablehq.com/d/68fae2b29f7f389a)            |
+| DuckDB WASM           | 3M    | [Click to open on ObservableHQ](https://observablehq.com/d/75371ab6ea37d20c)            |
+| DuckDB WASM           | 10M   | [Click to open on ObservableHQ](https://observablehq.com/d/ee8baae0a36606d7)            |
+| HTTP to DuckDB Python | 10M   | [Click to open on HuggingFace🤗 Spaces](https://huggingface.co/spaces/donnyb/FalconVis) |
 
-## Example
+## Usage
+
+Install `FalconVis` via [npm](https://www.npmjs.com/package/falcon-vis).
+
+```sh
+npm install falcon-vis
+```
+
+### Data
+
+Before you filter your data, you need to tell `FalconVis` about your data.
+
+`FalconVis` currently supports javascript objects, Apache Arrow tables, DuckDB Wasm, and HTTP GET Requests.
+
+They are all typed as `FalconDB`.
+
+```ts
+import { JsonDB, ArrowDB, DuckDB, HttpDB } from "falcon-vis";
+```
+
+### Cross-Filtering
+
+First initialize the `FalconVis` instance with your data. I will use the `ArrowDB` for this example for the 1M flights dataset.
+
+```ts
+import { tableFromIPC } from "@apache-arrow";
+import { FalconVis, ArrowDB } from "falcon-vis";
+
+// load the flights-1m.arrow data into memory
+const buffer = await (await fetch("data/flights-1m.arrow")).arrayBuffer();
+const arrowTable = await tableFromIPC(buffer);
+
+// initialize the falcon instance with the data
+const db = new ArrowDB(arrowTable);
+const falcon = new FalconVis(db);
+```
+
+Next, create views that contain the data dimension and what happens when the cross-filtered counts change. `FalconVis` supports 0D and 1D views.
+
+**1D: Distance in miles**
+
+```ts
+const distanceView = await falcon.view1D({
+	type: "continuous",
+	name: "Distance",
+	bins: 25,
+	resolution: 400,
+});
+distanceView.onChange((counts) => {
+	updateDistanceBarChart(counts);
+});
+```
+
+**1D: Arrival Delay from -20 to 140 minutes**
+
+```ts
+const arrivalDelayView = await falcon.view1D({
+	type: "continuous",
+	name: "ArrDelay",
+	range: [-20, 140],
+	bins: 25,
+	resolution: 400,
+});
+arrivalDelay.onChange((counts) => {
+	updateDelayBarChart(counts);
+});
+```
+
+**0D: Total Count**
+
+```ts
+const countView = await falcon.view0D();
+countView.onChange((count) => {
+	updateCount(count);
+});
+```
+
+Link the views together.
+
+```ts
+await falcon.link();
+```
+
+and you get
+
+<img src="figures/flights-1m-init.png">
+
+<!-- ## Example
 
 Check out real examples in the [`examples/`](examples/) directory. If you want a quick sneak-peak, keep reading.
 
@@ -68,7 +151,7 @@ distanceView.onChange((updatedHistogram) => {
  * 3. initialize falcon by linking everything together
  */
 await falcon.link();
-```
+````
 
 ### Cross-filtering
 
@@ -116,4 +199,4 @@ TODO fill in and add examples
 
 ## Development
 
-Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server.
+Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server. -->
