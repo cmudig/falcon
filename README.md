@@ -186,11 +186,9 @@ const table = await tableFromIPC(buffer);
 const db = new ArrowDB(table); // ✅
 ```
 
-<br>`class` <b>DuckDB</b>(_duckdb_, _table_, _nameMap_?)
+<br>`class` <b>DuckDB</b>(_duckdb_, _table_)
 
 Takes a [`@duckdb/duckdb-wasm`](https://github.com/duckdb/duckdb-wasm) db and table name within the db and attaches `FalconVis` data index methods to it.
-
-nameMap is an optional parameter that maps column names to new column names in SQL queries. This is useful for transforming columns with functions. For example, if I wanted the distanced divided by 5, and take the absolute value of the delay, then I could set the nameMap to `new Map([["Distance", "(Distance/5)"], ["ArrDelay", "abs(ArrDelay)"]])`.
 
 **Example**
 
@@ -226,11 +224,9 @@ import { DuckDB } from "falcon-vis";
 const db = await DuckDB.fromParquetFile("data/flights-1m.parquet"); // ✅
 ```
 
-<br>`class` <b>HttpDB</b>(_url_, _nameMap_?, _encodeQuery_?)
+<br>`class` <b>HttpDB</b>(_url_, _encodeQuery_?)
 
 HttpDB sends SQL queries over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
-
-nameMap is an optional parameter that maps column names to new column names in SQL queries. This is useful for transforming columns with functions. For example, if I wanted the distanced divided by 5, and take the absolute value of the delay, then I could set the nameMap to `new Map([["Distance", "(Distance/5)"], ["ArrDelay", "abs(ArrDelay)"]])`.
 
 encodeQuery is an optional parameter that encodes the SQL query before sending it over HTTP GET. By default it uses the [`encodeURI`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI) function on the SQL query so that it can be sent in the url.
 
@@ -241,100 +237,3 @@ import { HttpDB } from "falcon-vis";
 
 const db = new HttpDB("http://localhost:8000"); // ✅
 ```
-
-<!-- ## Example
-
-Check out real examples in the [`examples/`](examples/) directory. If you want a quick sneak-peak, keep reading.
-
-TODO make this section more clear.
-
-### Initialization
-
-Create a the `falcon` instance and link it up to some data and some views.
-
-```ts
-import { FalconVis, JsonDB } from "falcon-vis";
-
-/**
- * 1. create the falcon instance with a database
- */
-const plainOldJavascriptObject = await fetch("flights-10k.json").then((d) =>
-	d.json()
-);
-const db = new JsonDB(plainOldJavascriptObject);
-falcon = new FalconVis(db);
-
-/**
- * 2. create the views (you interact with these directly to cross-filter)
- */
-// 0D is total count (num rows)
-const countView = await falcon.view0D();
-countView.onChange((updatedTotalCount) => {
-	// called every time the count changes
-	console.log(updatedTotalCount); // you can do whatever in here
-});
-
-// 1D is a histogram
-const distanceView = await falcon.view1D({
-	type: "continuous",
-	name: "Distance",
-	resolution: 400,
-	bins: 5,
-});
-distanceView.onChange((updatedHistogram) => {
-	console.log(updatedHistogram);
-});
-
-/**
- * 3. initialize falcon by linking everything together
- */
-await falcon.link();
-````
-
-### Cross-filtering
-
-The view you that you want to filter is the active view. Once you do filter an active view, the `onChange` callbacks will be called with the updated counts for all the other linked views.
-
-```ts
-/**
- * 1. make the view you are interacting with active
- *    this computes the fast falcon index in the background
- */
-await distanceView.activate();
-
-/**
- * 2. select/filter a range between 0 and 100
- */
-await distanceView.select([0, 100]);
-```
-
-## API Reference
-
-TODO fill in and add examples
-
-### Core
-
-<br><a href="#">#</a> index.<b>view0D</b>()
-
-<br><a href="#">#</a> index.<b>view1D</b>()
-
-<br><a href="#">#</a> index.<b>link</b>()
-
-<br><a href="#">#</a> index.<b>entries</b>()
-
-<br><a href="#">#</a> view.<b>activate</b>()
-
-<br><a href="#">#</a> view.<b>select</b>()
-
-<br><a href="#">#</a> view.<b>onChange</b>()
-
-## Databases
-
-<br><a href="#">#</a> <b>JsonDB</b>
-<br><a href="#">#</a> <b>ArrowDB</b>
-<br><a href="#">#</a> <b>DuckDB</b>
-<br><a href="#">#</a> <b>HttpDB</b>
-
-## Development
-
-Check out the [`CONTRIBUTING.md`](CONTRIBUTING.md) document to see how to run the development server. -->

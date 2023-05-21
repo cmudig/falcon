@@ -46,7 +46,7 @@ export abstract class SQLDB implements FalconDB {
    * for example, in duckdb we have to do this bs epoch(name)*1000 to convert the date into milliseconds UTC
    */
   protected castTime(name: string) {
-    return name;
+    return `epoch(${name})*1000`;
   }
 
   /**

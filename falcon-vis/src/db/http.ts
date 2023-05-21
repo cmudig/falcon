@@ -9,10 +9,10 @@ export class HttpDB extends SQLDB {
   constructor(
     private readonly url: string,
     table: string,
-    nameMap?: SQLNameMap,
     private readonly encodeGETQuery: (
       query: string
-    ) => string = encodeURIComponent
+    ) => string = encodeURIComponent,
+    nameMap?: SQLNameMap
   ) {
     super(table, nameMap);
   }
