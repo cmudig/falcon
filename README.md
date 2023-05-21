@@ -135,6 +135,113 @@ In the [live example](https://observablehq.com/d/68fae2b29f7f389a), you can take
 
 https://github.com/cmudig/falcon/assets/65095341/ab7fa9fc-d51f-4830-89f6-93ac6913a5d3
 
+## API Documentation
+
+`class` <b>JsonDB</b>(_object_)
+
+Takes a javascript object and attaches `FalconVis` data index methods to it. Under the hood, it converts into a <b>ArrowDB</b> class.
+
+The JsonDB supports row-wise or column-wise object formats, but it is recommended to use column-wise format because the row-wise format converts to column-wise with a copy.
+
+**Columns JSON Example**
+
+```ts
+import { JsonDB } from "falcon-vis";
+
+const columnarJson = {
+	names: ["bob", "billy", "joe"],
+	ages: [21, 42, 40],
+};
+
+const db = new JsonDB(columnarJson); // ✅
+```
+
+**Rows JSON Example**
+
+```ts
+import { JsonDB } from "falcon-vis";
+
+const rowJson = [
+	{ name: "bob", age: 21 },
+	{ name: "billy", age: 42 },
+	{ name: "joe", age: 40 },
+];
+
+const db = new JsonDB(rowJson); // ✅, but does a copy over rowJson
+```
+
+<br>`class` <b>ArrowDB</b>(_table_)
+
+Takes an Apache Arrow `Table` created using the [`apache-arrow`](https://www.npmjs.com/package/apache-arrow) package and attaches `FalconVis` data index methods to it.
+
+**Example**
+
+```ts
+import { ArrowDB } from "falcon-vis";
+import { tableFromIPC } from "apache-arrow";
+
+const buffer = await (await fetch("data/flights-1m.arrow")).arrayBuffer();
+const table = await tableFromIPC(buffer);
+
+const db = new ArrowDB(table); // ✅
+```
+
+<br>`class` <b>DuckDB</b>(_duckdb_, _table_, _nameMap_?)
+
+Takes a [`@duckdb/duckdb-wasm`](https://github.com/duckdb/duckdb-wasm) db and table name within the db and attaches `FalconVis` data index methods to it.
+
+nameMap is an optional parameter that maps column names to new column names in SQL queries. This is useful for transforming columns with functions. For example, if I wanted the distanced divided by 5, and take the absolute value of the delay, then I could set the nameMap to `new Map([["Distance", "(Distance/5)"], ["ArrDelay", "abs(ArrDelay)"]])`.
+
+**Example**
+
+```ts
+import { DuckDB } from "falcon-vis";
+import * as duckdb from "@duckdb/duckdb-wasm";
+
+// duckdb setup
+const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
+const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
+const worker = await duckdb.createWorker(bundle.mainWorker!);
+const logger = new duckdb.ConsoleLogger();
+const flightsDb = new duckdb.AsyncDuckDB(logger, worker);
+await flightsDb.instantiate(bundle.mainModule, bundle.pthreadWorker);
+const c = await flightsDb.connect();
+// load parquet file into table called flights
+await c.query(
+	`CREATE TABLE flights
+	 AS SELECT * FROM parquet_scan('${window.location.href}/data/flights-1m.parquet')`
+);
+c.close();
+
+const db = new DuckDB(flightsDb, "flights"); // ✅
+```
+
+**Parquet Shorthand Example**
+
+If you just want to load one parquet file, you can use the shorthand method `DuckDB.fromParquetFile()`.
+
+```ts
+import { DuckDB } from "falcon-vis";
+
+const db = await DuckDB.fromParquetFile("data/flights-1m.parquet"); // ✅
+```
+
+<br>`class` <b>HttpDB</b>(_url_, _nameMap_?, _encodeQuery_?)
+
+HttpDB sends SQL queries over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
+
+nameMap is an optional parameter that maps column names to new column names in SQL queries. This is useful for transforming columns with functions. For example, if I wanted the distanced divided by 5, and take the absolute value of the delay, then I could set the nameMap to `new Map([["Distance", "(Distance/5)"], ["ArrDelay", "abs(ArrDelay)"]])`.
+
+encodeQuery is an optional parameter that encodes the SQL query before sending it over HTTP GET. By default it uses the [`encodeURI`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI) function on the SQL query so that it can be sent in the url.
+
+**Example**
+
+```ts
+import { HttpDB } from "falcon-vis";
+
+const db = new HttpDB("http://localhost:8000"); // ✅
+```
+
 <!-- ## Example
 
 Check out real examples in the [`examples/`](examples/) directory. If you want a quick sneak-peak, keep reading.
