@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/falcon-vis.svg)](https://www.npmjs.com/package/falcon-vis) ![Tests](https://github.com/cmudig/falcon/workflows/Node.js%20CI/badge.svg) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=rounded)](https://github.com/prettier/prettier)
 
-`FalconVis` is a javascript library that links your own custom visualizations at scale! You can cross-filter billions of data entries in the browser with no interaction delay. `FalconVis` scales to billions of entries by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index.
+`FalconVis` is a javascript library that links your own custom visualizations at scale! You can cross-filter billions of data entries in the browser with no interaction delay by using the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) data index.
 
 **Live interactive examples using `FalconVis`**
 
