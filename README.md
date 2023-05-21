@@ -54,9 +54,11 @@ const db = new ArrowDB(arrowTable);
 const falcon = new FalconVis(db);
 ```
 
-Next, create views that contain the data dimension and what happens when the cross-filtered counts change. `FalconVis` supports 0D and 1D views.
+Next, create views that contain the data dimension and what happens when the cross-filtered counts change (`onChange`). `FalconVis` supports 0D and 1D views.
 
-**1D: Distance in miles**
+Note that your specified `onChange` function is called every time the cross-filtered counts change so that you can update your visualization with the new filtered counts.
+
+**Distance View**
 
 ![dist](https://github.com/cmudig/falcon/assets/65095341/e6c474f5-f717-4f48-baff-eb2a2971dd05)
 
@@ -72,7 +74,7 @@ distanceView.onChange((counts) => {
 });
 ```
 
-**1D: Arrival Delay from -20 to 140 minutes**
+**Arrival Delay View**
 
 ![delay](https://github.com/cmudig/falcon/assets/65095341/008968fe-f2be-4577-a04e-0a8323a98509)
 
@@ -89,7 +91,7 @@ arrivalDelay.onChange((counts) => {
 });
 ```
 
-**0D: Total Count**
+**Total Count**
 
 <img width="276" alt="Screenshot 2023-05-20 at 5 32 33 PM" src="https://github.com/cmudig/falcon/assets/65095341/ec903e37-07b6-43c5-b288-32875db0d073">
 
@@ -100,15 +102,11 @@ countView.onChange((count) => {
 });
 ```
 
-Link the views together.
+Link the views together to fetch the initial counts (outputs are shown above).
 
 ```ts
 await falcon.link();
 ```
-
-and you get
-
-<img src="figures/flights-1m-init.png">
 
 <!-- ## Example
 
