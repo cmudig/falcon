@@ -235,5 +235,6 @@ _encodeQuery_ is an optional parameter that encodes the SQL query before sending
 ```ts
 import { HttpDB } from "falcon-vis";
 
-const db = new HttpDB("http://localhost:8000"); // ✅
+const tableName = "flights";
+const db = new HttpDB("http://localhost:8000", tableName); // ✅
 ```
