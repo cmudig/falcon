@@ -130,6 +130,10 @@ await distanceView.select([1000, 2000]); // 1k to 2k miles
 
 Which automatically cross-filters and updates the counts for other views in constant time (`onChange` is called for each other view).
 
+In the [live example](https://observablehq.com/d/68fae2b29f7f389a), you can take mouse events to call the `select()` with user selected filters as shown in the video
+
+https://github.com/cmudig/falcon/assets/65095341/ab7fa9fc-d51f-4830-89f6-93ac6913a5d3
+
 <!-- ## Example
 
 Check out real examples in the [`examples/`](examples/) directory. If you want a quick sneak-peak, keep reading.
