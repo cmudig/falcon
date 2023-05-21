@@ -224,9 +224,9 @@ import { DuckDB } from "falcon-vis";
 const db = await DuckDB.fromParquetFile("data/flights-1m.parquet"); // ✅
 ```
 
-<br>`class` <b>HttpDB</b>(_url_, _encodeQuery_?)
+<br>`class` <b>HttpDB</b>(_url_, _table_, _encodeQuery_?)
 
-HttpDB sends SQL queries over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
+HttpDB sends SQL queries (from _table_ name) over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
 
 encodeQuery is an optional parameter that encodes the SQL query before sending it over HTTP GET. By default it uses the [`encodeURIComponent`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) function on the SQL query so that it can be sent in the url.
 
