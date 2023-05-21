@@ -137,7 +137,7 @@ https://github.com/cmudig/falcon/assets/65095341/ab7fa9fc-d51f-4830-89f6-93ac691
 
 ## API Documentation
 
-`class` <b>JsonDB</b>(_object_)
+<a href="#JsonDB" id="JsonDB">#</a> `class` <b>JsonDB</b>(_object_)
 
 Takes a javascript object and attaches `FalconVis` data index methods to it. Under the hood, it converts into a <b>ArrowDB</b> class.
 
@@ -170,7 +170,7 @@ const rowJson = [
 const db = new JsonDB(rowJson); // ✅, but does a copy over rowJson
 ```
 
-<br>`class` <b>ArrowDB</b>(_table_)
+<br> <a href="#ArrowDB" id="ArrowDB">#</a> `class` <b>ArrowDB</b>(_table_)
 
 Takes an Apache Arrow `Table` created using the [`apache-arrow`](https://www.npmjs.com/package/apache-arrow) package and attaches `FalconVis` data index methods to it.
 
@@ -194,7 +194,7 @@ import { ArrowDB } from "falcon-vis";
 const db = await ArrowDB.fromArrowFile("data/flights-1m.arrow"); // ✅
 ```
 
-<br>`class` <b>DuckDB</b>(_duckdb_, _table_)
+<br> <a href="#DuckDB" id="DuckDB">#</a> `class` <b>DuckDB</b>(_duckdb_, _table_)
 
 Takes a [`@duckdb/duckdb-wasm`](https://github.com/duckdb/duckdb-wasm) db and table name within the db and attaches `FalconVis` data index methods to it.
 
@@ -232,7 +232,7 @@ import { DuckDB } from "falcon-vis";
 const db = await DuckDB.fromParquetFile("data/flights-1m.parquet"); // ✅
 ```
 
-<br>`class` <b>HttpDB</b>(_url_, _table_, _encodeQuery_?)
+<br> <a href="#HttpDB" id="HttpDB">#</a> `class` <b>HttpDB</b>(_url_, _table_, _encodeQuery_?)
 
 HttpDB sends SQL queries (from _table_ name) over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
 
@@ -247,7 +247,7 @@ const tableName = "flights";
 const db = new HttpDB("http://localhost:8000", tableName); // ✅
 ```
 
-<br>`class` <b>FalconVis</b>(_db_)
+<br> <a href="#FalconVis" id="FalconVis">#</a> `class` <b>FalconVis</b>(_db_)
 
 The main logic that orchestrates the cross-filtering between views.
 
@@ -262,11 +262,9 @@ import { FalconVis } from "falcon-vis";
 const falcon = new FalconVis(db); // ✅
 ```
 
-I will reference the instance created as <span style="color: orange">falcon</span> in the next methods.
+<br> <a href="#view0D" id="view0D">#</a> `function` <a href="#FalconVis">falcon</a>.<b>view0D</b>(onChangeCallback?)
 
-<br>`function` <span style="color: orange">falcon</span>.<b>view0D</b>(onChangeCallback?)
-
-Adds a 0D view onto the `FalconVis` instance named <span style="color: orange">falcon</span> and describes how to use the cross-filtered counts when they are changed.
+Adds a 0D view onto an existing `FalconVis` instance named <a href="#FalconVis">falcon</a> and describes what to execute when the counts change.
 
 Takes an `onChangeCallback` function that is called whenever the view count changes (after cross-filtering).
 
