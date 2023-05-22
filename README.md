@@ -311,3 +311,141 @@ const disposeB = countView.onChange((count) => {
 disposeA();
 disposeB();
 ```
+
+<br> <a href="#view1D" id="view1D">#</a> `function` <a href="#FalconVis">falcon</a>.<b>view1D</b>(dimension, onChangeCallback?)
+
+Adds a 1D view onto an existing `FalconVis` instance named <a href="#FalconVis">falcon</a> and describes what to execute when the counts change. A 1D view is a histogram of the data with counts per bin.
+
+<i>dimension</i> is a `Dimension` object that defines which data column to use for the 1D view. (more info below)
+
+Takes an `onChangeCallback` function that is called whenever the view count changes (after cross-filtering).
+
+Returns a `View1D` instance (you can add more onChange callbacks to it later).
+
+The <i>dimension</i> can be `type: "categorical"` for discrete values or `type: "continuous"` for ranged values.
+
+A continuous `Dimension` can be defined as follows:
+
+```ts
+interface ContinuousDimension {
+	/* continuous range of values */
+	type: "continuous";
+
+	/* column name in the data table */
+	name: string;
+
+	/**
+	 * resolution of visualization brushing (e.g., histogram is 400px wide, resolution: 400)
+	 * a smaller resolution than the brush will approximate the counts, but be faster
+	 */
+	resolution: number;
+
+	/**
+	 * max number of bins to create, the result could be less bins
+	 * if not specified, will automatically determine the number of bins
+	 */
+	bins?: number;
+
+	/* [min, max] interval to count between */
+	range?: [number, number];
+
+	/* should format for dates */
+	time?: boolean;
+}
+```
+
+A categorical dimension can be defined as follows:
+
+```ts
+interface CategoricalDimension {
+	/* categorical values */
+	type: "categorical";
+
+	/* column name in the data table */
+	name: string;
+
+	/* values to include, by default includes all */
+	range?: string[];
+}
+```
+
+The `onChangeCallback` gives you access to the updated counts per bin (`View1DState`) object as a parameter.
+
+If the view is type continuous:
+
+```ts
+interface ContinuousView1DState {
+	/* total counts per bin */
+	total: Uint32Array | null;
+	/* filtered counts per bin */
+	filter: Uint32Array | null;
+	/* continuous bins */
+	bin: { binStart: number; binEnd: number }[] | null;
+}
+```
+
+If the view is type categorical:
+
+```ts
+interface CategoricalView1DState {
+	/* total counts per bin */
+	total: Uint32Array | null;
+	/* filtered counts per bin */
+	filter: Uint32Array | null;
+	/* categorical bin labels */
+	bin: string[] | null;
+}
+```
+
+**Initialization**
+
+```ts
+import { FalconVis } from "falcon-vis";
+const falcon = new FalconVis(db);
+
+// continuous
+const distanceView = await falcon.view1D(
+	{
+		type: "continuous",
+		name: "Distance",
+		resolution: 400,
+		bins: 25,
+	},
+	(counts) => {
+		console.log(counts.total, counts.filter, counts.bin); // gets called every cross-filter
+	}
+); // ✅
+
+// categorical
+const originStateView = await falcon.view1D(
+	{
+		type: "categorical",
+		name: "OriginState",
+	},
+	(counts) => {
+		console.log(counts.total, counts.filter, counts.bin);
+	}
+); // ✅
+```
+
+**Interaction**
+
+You can directly interact with you `View1D` instance to filter the dimension and automatically cross-filter all other views on the same `FalconVis` instance.
+
+You must `.activate()` a view before `.select()`ing it. `.activate()` computes the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index so that subsequent `.select()`s are fast (constant time). More details on the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index can be found at the end of the README.
+
+```ts
+await distanceView.activate();
+await distanceView.select([0, 1000]); // filter to only flights with distance between 0 and 1000 miles
+await distanceView.select(); // deselect all
+```
+
+```ts
+await originStateView.activate();
+await originStateView.select(["CA", "PA", "OR"]); // select California, Pennsylvania, and Oregon
+await originStateView.select(); // deselect all
+```
+
+After each `.select()` the `onChangeCallback` will be called with the updated counts on all other views.
+
+<br> <a href="#link" id="link">#</a> `function` <a href="#FalconVis">falcon</a>.<b>link</b>()
