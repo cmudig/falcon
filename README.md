@@ -432,23 +432,43 @@ const originStateView = await falcon.view1D(
 
 **Interaction**
 
-You can directly interact with you `View1D` instance to filter the dimension and automatically cross-filter all other views on the same `FalconVis` instance.
+<a href="#activate" id="activate">#</a> `function` <a href="#view1D">view</a>.<b>activate</b>()
 
-You must `.activate()` a view before `.select()`ing it. `.activate()` computes the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index so that subsequent `.select()`s are fast (constant time). More details on the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index can be found at the end of the README.
+You must `.activate()` a view before `.select()`ing it. `.activate()` computes the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index so that subsequent `.select()`s are fast (constant time). More details on the [Falcon](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf) index can be found in the [paper](https://www.domoritz.de/papers/2019-Falcon-CHI.pdf).
+
+<a href="#select" id="select">#</a> `function` <a href="#view1D">view</a>.<b>select</b>(<i>filter</i>)
+
+You can directly interact with you `View1D` (<a href="#view1D">view</a>) instance to filter the dimension and automatically cross-filter all other views on the same `FalconVis` instance.
+
+You only have to call `.activate()` everytime before you interact with a new view, but only once!
+
+The index changes when new filters are present, so if you `.activate()` a view, then `.activate()` a different view and filter that view, when you come back to the original view you have to call `.activate()` again.
+
+Continuous view selection:
 
 ```ts
-await distanceView.activate();
+await distanceView.activate(); // compute Falcon index
 await distanceView.select([0, 1000]); // filter to only flights with distance between 0 and 1000 miles
+await distanceView.select([600, 800]); // change filter
 await distanceView.select(); // deselect all
 ```
 
+Categorical view selection:
+
 ```ts
-await originStateView.activate();
+await originStateView.activate(); // compute Falcon index
 await originStateView.select(["CA", "PA", "OR"]); // select California, Pennsylvania, and Oregon
+await originStateView.select(["FL"]); // change filter
 await originStateView.select(); // deselect all
 ```
 
 After each `.select()` the `onChangeCallback` will be called with the updated counts on all other views.
+
+<br> <a href="#detach" id="detach">#</a> `function` <a href="#view1D">view</a>.<b>detach</b>()
+Detach is how you remove your view from the `FalconVis` instance. Note that you directly call this on the <a href="#view1D">view</a> instance, not the `FalconVis` instance.
+
+<br><a href="#attach" id="attach">#</a> `function` <a href="#view1D">view</a>.<b>attach</b>()
+Attach is how you add your view back onto the `FalconVis` instance. Note that you directly call this on the <a href="#view1D">view</a> instance, not the `FalconVis` instance.
 
 <br> <a href="#link" id="link">#</a> `function` <a href="#FalconVis">falcon</a>.<b>link</b>()
 
