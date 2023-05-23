@@ -484,3 +484,55 @@ await falcon.link(); // 🔗✅
 ```
 
 Which then proceeds to call the `onChangeCallback` for each view with the initial counts. So you will see two console.logs from this particular example to start.
+
+<br> <a href="#entries" id="entries">#</a> `function` <a href="#FalconVis">falcon</a>.<b>entries</b>(<i>location</i>)
+
+Takes a <i>location</i> defined by
+
+```ts
+interface Location {
+	/* defaults to 0 */
+	offset?: number;
+
+	/* defaults to Infinity (all) */
+	length?: number;
+}
+```
+
+Where `offset` refers to the offset in the data table and `length` refers to the number of rows to return.
+
+Note that `offset` refers to the filtered data table, so if you have a filter applied, the offset will be relative to the filtered data table.
+
+Returns an Iterator over the entries in the data table as `Iterable<Row>` where `Row` is an object with key names corresponding to the column names in the data table.
+
+**Example**
+
+```ts
+import { FalconVis } from "falcon-vis";
+
+const falcon = new FalconVis(db);
+
+const entries = await falcon.entries({
+	offset: 0,
+	length: 25,
+}); // first 25 entries ✅
+
+// print out first 25 distances
+for (const entry of entries) {
+	console.log(entry["Distance"]);
+}
+```
+
+You can easily use offset to shift over 25, to then get the second 25 entries. (or by whatever amount you want).
+
+```ts
+const entries = await falcon.entries({
+	offset: 25, // start after 25 entries
+	length: 25,
+}); // second 25 entries ✅
+
+// print out second 25 distances
+for (const entry of entries) {
+	console.log(entry["Distance"]);
+}
+```
