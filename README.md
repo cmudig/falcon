@@ -487,6 +487,8 @@ Which then proceeds to call the `onChangeCallback` for each view with the initia
 
 <br> <a href="#entries" id="entries">#</a> `function` <a href="#FalconVis">falcon</a>.<b>entries</b>(<i>location</i>)
 
+This gives you access to the filtered entries. So after cross-filtering you need to manually call this if you want to extract the filtered entries.
+
 Takes a <i>location</i> defined by
 
 ```ts
