@@ -377,9 +377,9 @@ If the view is type continuous:
 ```ts
 interface ContinuousView1DState {
 	/* total counts per bin */
-	total: Uint32Array | null;
+	total: Float64Array | null;
 	/* filtered counts per bin */
-	filter: Uint32Array | null;
+	filter: Float64Array | null;
 	/* continuous bins */
 	bin: { binStart: number; binEnd: number }[] | null;
 }
@@ -390,9 +390,9 @@ If the view is type categorical:
 ```ts
 interface CategoricalView1DState {
 	/* total counts per bin */
-	total: Uint32Array | null;
+	total: Float64Array | null;
 	/* filtered counts per bin */
-	filter: Uint32Array | null;
+	filter: Float64Array | null;
 	/* categorical bin labels */
 	bin: string[] | null;
 }
