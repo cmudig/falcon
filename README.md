@@ -285,6 +285,7 @@ interface View0DState {
 import { FalconVis } from "falcon-vis";
 
 const falcon = new FalconVis(db);
+
 const countView = falcon.view0D((count) => {
 	console.log(count.total, count.filter); // gets called every cross-filter
 }); // ✅
@@ -401,6 +402,7 @@ interface CategoricalView1DState {
 
 ```ts
 import { FalconVis } from "falcon-vis";
+
 const falcon = new FalconVis(db);
 
 // continuous
@@ -449,3 +451,36 @@ await originStateView.select(); // deselect all
 After each `.select()` the `onChangeCallback` will be called with the updated counts on all other views.
 
 <br> <a href="#link" id="link">#</a> `function` <a href="#FalconVis">falcon</a>.<b>link</b>()
+
+The link function takes the added views and links them together. This is required before cross-filtering.
+
+link also initializes the counts for all views.
+
+Call link whenever you add or remove views. Calling link once will suffice after adding (or removing) multiple views.
+
+**Example**
+
+```ts
+import { FalconVis } from "falcon-vis";
+
+const falcon = new FalconVis(db);
+
+const distanceView = await falcon.view1D(
+	{
+		type: "continuous",
+		name: "Distance",
+		resolution: 400,
+		bins: 25,
+	},
+	(counts) => {
+		console.log(counts.total, counts.filter, counts.bin);
+	}
+);
+const countView = falcon.view0D((count) => {
+	console.log(count.total, count.filter);
+});
+
+await falcon.link(); // 🔗✅
+```
+
+Which then proceeds to call the `onChangeCallback` for each view with the initial counts. So you will see two console.logs from this particular example to start.
