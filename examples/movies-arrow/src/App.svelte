@@ -11,8 +11,6 @@
 	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
 
-	import logo from "../../../logo/logo.png";
-
 	let index: FalconVis;
 
 	let countState: View0DState;
@@ -26,12 +24,12 @@
 	});
 
 	async function moviesArrow() {
-		// const db = await DuckDB.fromParquetFile("data/movies-3k.parquet");
-		const db = await ArrowDB.fromArrowFile("data/movies-3k.arrow");
+		// const db = await DuckDB.fromParquetFile("movies-3k.parquet");
+		const db = await ArrowDB.fromArrowFile("movies-3k.arrow");
 		index = new FalconVis(db);
 
 		const count = await index.view0D();
-		const rating = await index.view1D({
+		const mpaa = await index.view1D({
 			type: "categorical",
 			name: "MPAA_Rating",
 		});
@@ -39,14 +37,28 @@
 			type: "continuous",
 			name: "US_Gross",
 			resolution: 400,
+			bins: 20,
 		});
 		const worldGross = await index.view1D({
 			type: "continuous",
 			name: "Worldwide_Gross",
 			resolution: 400,
+			bins: 20,
+		});
+		const rottenTomatoesRating = await index.view1D({
+			type: "continuous",
+			name: "Rotten_Tomatoes_Rating",
+			resolution: 400,
+			bins: 20,
+		});
+		const imdbRating = await index.view1D({
+			type: "continuous",
+			name: "IMDB_Rating",
+			resolution: 400,
+			bins: 20,
 		});
 
-		views = [rating, usGross, worldGross];
+		views = [mpaa, usGross, worldGross, imdbRating, rottenTomatoesRating];
 
 		// then define how the states get updated when those linked views change
 		viewStates = new Array(views.length);
@@ -61,13 +73,17 @@
 
 		await index.link();
 
-		console.warn = () => {};
+		console.warn = () => {}; //I live life on the edge
 	}
 </script>
 
 <main>
 	<div>
-		<img src={logo} alt="falcon" width="50px" />
+		<img
+			src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+			alt="falcon"
+			width="500px"
+		/>
 		<h1>Movies</h1>
 
 		<h3>
@@ -103,15 +119,6 @@
 			</div>
 		{/each}
 	</div>
-
-	<button
-		on:click={async () => {
-			views[1].update({
-				...views[1].dimension,
-				bins: 100,
-			});
-		}}>update</button
-	>
 </main>
 
 <style>
