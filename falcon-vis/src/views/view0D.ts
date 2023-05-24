@@ -81,7 +81,7 @@ export class View0D extends ViewAbstract<View0DState> {
       let total = 0;
       for (const s of selection) {
         const binKey = bin(s);
-        if (binKey) {
+        if (binKey !== undefined) {
           total += index.filter.get(binKey);
         }
       }
