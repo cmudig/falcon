@@ -5,7 +5,6 @@
 		type View1DState,
 		View1D,
 		ArrowDB,
-		DuckDB,
 	} from "falcon-vis";
 	import { onMount } from "svelte";
 	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
@@ -24,7 +23,6 @@
 	});
 
 	async function moviesArrow() {
-		// const db = await DuckDB.fromParquetFile("movies-3k.parquet");
 		const db = await ArrowDB.fromArrowFile("movies-3k.arrow");
 		index = new FalconVis(db);
 
