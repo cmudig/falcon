@@ -57,8 +57,22 @@
 			resolution: 400,
 			bins: 20,
 		});
+		const releaseDate = await index.view1D({
+			type: "continuous",
+			name: "Release_Date",
+			resolution: 400,
+			bins: 20,
+			time: true,
+		});
 
-		views = [mpaa, usGross, worldGross, imdbRating, rottenTomatoesRating];
+		views = [
+			mpaa,
+			usGross,
+			worldGross,
+			imdbRating,
+			rottenTomatoesRating,
+			releaseDate,
+		];
 
 		// then define how the states get updated when those linked views change
 		viewStates = new Array(views.length);
@@ -79,11 +93,13 @@
 
 <main>
 	<div>
-		<img
-			src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
-			alt="falcon"
-			width="500px"
-		/>
+		<a href="https://github.com/cmudig/falcon" target="_blank">
+			<img
+				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+				alt="falcon"
+				width="500px"
+			/>
+		</a>
 		<h1>Movies</h1>
 
 		<h3>
@@ -102,6 +118,9 @@
 					: CategoricalHistogram}
 			<div class="hist-baby">
 				<Histogram
+					type={"time" in view.dimension
+						? "temporal"
+						: "quantitative"}
 					{state}
 					dimLabel={view.dimension.name.replaceAll("_", " ")}
 					on:select={(e) => {
