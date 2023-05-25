@@ -62,6 +62,54 @@
 			bins: 20,
 			time: true,
 		});
+		const budget = await index.view1D({
+			type: "continuous",
+			name: "Production_Budget",
+			resolution: 400,
+			bins: 20,
+		});
+		const runningTime = await index.view1D({
+			type: "continuous",
+			name: "Running_Time_min",
+			resolution: 400,
+			bins: 20,
+		});
+		const genre = await index.view1D({
+			type: "categorical",
+			name: "Major_Genre",
+			range: [
+				"Action",
+				"Adventure",
+				"Comedy",
+				"Drama",
+				"Documentary",
+				"Horror",
+				"Musical",
+				"Romantic Comedy",
+				"Thriller/Suspense",
+				"Western",
+			],
+		});
+		const distributor = await index.view1D({
+			type: "categorical",
+			name: "Distributor",
+			range: [
+				"20th Century Fox",
+				"Dreamworks SKG",
+				"Focus Features",
+				"Fox Searchlight",
+				"Lionsgate",
+				"MGM",
+				"Miramax",
+				"New Line",
+				"Paramount Pictures",
+				"Sony Pictures",
+				"Sony Pictures Classics",
+				"Universal",
+				"Walt Disney Pictures",
+				"Warner Bros.",
+			],
+		});
 
 		views = [
 			mpaa,
@@ -70,6 +118,10 @@
 			imdbRating,
 			rottenTomatoesRating,
 			releaseDate,
+			budget,
+			runningTime,
+			genre,
+			distributor,
 		];
 
 		// then define how the states get updated when those linked views change
