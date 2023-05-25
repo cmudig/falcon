@@ -19,10 +19,7 @@
     "build": "yarn workspace falcon-vis build",
     "format": "yarn workspace falcon-vis format",
     "test": "yarn workspace falcon-vis test",
-    "gh-pages": "gh-pages -d examples/live",
-    "clean:sh": "sh scripts/clean.sh",
-    "publish:sh": "sh scripts/publish.sh",
-    "deploy:sh": "sh scripts/deploy.sh"
+    "gh-pages": "gh-pages -d examples/live"
   },
   "devDependencies": {
     "gh-pages": "^5.0.0"
