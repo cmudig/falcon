@@ -10,6 +10,8 @@
 	import CategoricalHistogram from "./components/CategoricalHistogram.svelte";
 	import ContinuousHistogram from "./components/ContinuousHistogram.svelte";
 
+	console.warn = () => {}; //I live life on the edge
+
 	let index: FalconVis;
 
 	let countState: View0DState;
@@ -136,8 +138,6 @@
 		});
 
 		await index.link();
-
-		console.warn = () => {}; //I live life on the edge
 	}
 </script>
 
