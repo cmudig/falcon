@@ -147,10 +147,39 @@
 			<img
 				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
 				alt="falcon"
-				width="500px"
+				width="400px"
 			/>
 		</a>
-		<h1>Movies</h1>
+		<h3 class="description">
+			Using <a href="https://github.com/cmudig/falcon" target="_blank"
+				>FalconVis</a
+			>
+			cross-filtering to explore the
+			<a
+				href="https://github.com/vega/vega-datasets/blob/main/data/movies.json"
+				target="_blank">movies</a
+			> dataset.
+		</h3>
+		<details>
+			<summary>Instructions</summary>
+
+			<div class="description">
+				<img src="demo-movies.gif" alt="demo" />
+			</div>
+
+			<div class="description">
+				Filter a categorical chart by <kbd>click</kbd>ing on a bar or
+				selecting multiple by <kbd>shift</kbd> + <kbd>click</kbd>ing.
+			</div>
+			<div class="description">
+				Filter a continuous chart by <kbd>dragging</kbd> across a range
+				and by
+				<kbd>dragging</kbd> the window around.
+			</div>
+			<div class="description">
+				Reset a filter by <kbd>click</kbd>ing outside the selection.
+			</div>
+		</details>
 
 		<h3>
 			<span style="font-weight: 250;">selected</span>
@@ -204,15 +233,41 @@
 		color: var(--text-color);
 		padding: 20px;
 	}
+	a {
+		color: var(--primary-color);
+	}
 	code {
 		font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
 			monospace;
+	}
+	h1 {
+		font-weight: 400;
+		margin-top: 0;
+	}
+	h3 {
+		font-weight: 400;
 	}
 	.hist {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;
 	}
-	.hist-baby {
+	/* credit to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd */
+	kbd {
+		background-color: #eee;
+		border-radius: 3px;
+		border: 1px solid #b4b4b4;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+			0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+		color: #333;
+		display: inline-block;
+		font-size: 0.85em;
+		font-weight: 700;
+		line-height: 1;
+		padding: 2px 4px;
+		white-space: nowrap;
+	}
+	summary:hover {
+		cursor: pointer;
 	}
 </style>
