@@ -151,10 +151,12 @@
 			/>
 		</a>
 		<h3 class="description">
-			Using <a href="https://github.com/cmudig/falcon" target="_blank"
+			<a href="https://github.com/cmudig/falcon" target="_blank"
 				>FalconVis</a
 			>
-			cross-filtering to explore the
+			cross-filtering with
+			<a href="https://vega.github.io/vega-lite/">Vega Lite</a>
+			to explore the
 			<a
 				href="https://github.com/vega/vega-datasets/blob/main/data/movies.json"
 				target="_blank">movies</a

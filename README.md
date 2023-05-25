@@ -10,13 +10,20 @@
 
 **Live interactive examples using `FalconVis`**
 
-| Data                  | Count | Live Demo                                                                               |
+**`Historical Flights Dataset`**
+| Data | Count | Live Demo |
 | --------------------- | ----- | --------------------------------------------------------------------------------------- |
-| JSON                  | 10K   | [Click to open on Github Pages]()                                                       |
-| Arrow                 | 1M    | [Click to open on ObservableHQ](https://observablehq.com/d/68fae2b29f7f389a)            |
-| DuckDB WASM           | 3M    | [Click to open on ObservableHQ](https://observablehq.com/d/75371ab6ea37d20c)            |
-| DuckDB WASM           | 10M   | [Click to open on ObservableHQ](https://observablehq.com/d/ee8baae0a36606d7)            |
-| HTTP to DuckDB Python | 10M   | [Click to open on HuggingFace🤗 Spaces](https://huggingface.co/spaces/donnyb/FalconVis) |
+| Arrow | 1M | [Click to open on ObservableHQ](https://observablehq.com/d/68fae2b29f7f389a) |
+| DuckDB WASM | 3M | [Click to open on ObservableHQ](https://observablehq.com/d/75371ab6ea37d20c) |
+| DuckDB WASM | 10M | [Click to open on ObservableHQ](https://observablehq.com/d/ee8baae0a36606d7) |
+| HTTP to DuckDB Python | 10M | [Click to open on HuggingFace🤗 Spaces](https://huggingface.co/spaces/donnyb/FalconVis) |
+
+**`Movies Dataset`**
+| Data | Count | Live Demo |
+| ----------- | ----- | -------------------------------------------------------------------------- |
+| Arrow | 3k | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-arrow/) |
+| JSON | 3k | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-json/) |
+| DuckDB WASM | 3k | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-duckdb/) |
 
 ## Usage
 

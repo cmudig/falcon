@@ -24,7 +24,7 @@
     "format": "yarn workspace falcon-vis format",
     "test": "yarn workspace falcon-vis test",
     "build:deploy": "yarn workspace movies-duckdb build",
-    "deploy": "gh-pages -d examples/movies-duckdb/dist",
+    "gh-pages": "gh-pages -d examples/live",
     "clean:sh": "sh scripts/clean.sh",
     "publish:sh": "sh scripts/publish.sh",
     "deploy:sh": "sh scripts/deploy.sh"
