@@ -1,5 +1,5 @@
 {
-  "name": "flights-1m",
+  "name": "flights-duckdb",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,6 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "apache-arrow": "^12.0.0",
     "d3": "^7.8.4",
     "falcon-vis": "0.17.2",
     "svelte-vega": "^1.2.0",

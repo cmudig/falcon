@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FalconVis, ArrowDB } from "falcon-vis";
+	import { FalconVis, DuckDB } from "falcon-vis";
 	import type { View0D, View1D, View0DState, View1DState } from "falcon-vis";
 	import GithubButton from "./components/GithubButton.svelte";
 	import { tableFromIPC } from "apache-arrow";
@@ -8,7 +8,6 @@
 	import Histogram from "./components/Histogram.svelte";
 	import TotalCount from "./components/TotalCount.svelte";
 	import UsMapVis from "./components/USMapVis.svelte";
-	import { WIDTH_HEIGHT } from "svelte-vega/src/constants";
 
 	let falcon: FalconVis;
 	let countView: View0D;
@@ -25,11 +24,7 @@
 	let originState: View1DState;
 
 	onMount(async () => {
-		const request = await fetch("flights-1m.arrow");
-		const buffer = await request.arrayBuffer();
-		const table = tableFromIPC(buffer);
-
-		const db = new ArrowDB(table);
+		const db = await DuckDB.fromParquetFile("flights-3m.parquet");
 		falcon = new FalconVis(db);
 
 		countView = await falcon.view0D((updated) => {
@@ -40,7 +35,7 @@
 			type: "continuous",
 			name: "Distance",
 			resolution: 400,
-			bins: 5,
+			bins: 20,
 		});
 		distanceView.onChange((updated) => {
 			distanceState = updated;
@@ -51,7 +46,7 @@
 			name: "ArrDelay",
 			resolution: 400,
 			range: [-20, 60],
-			bins: 5,
+			bins: 20,
 		});
 		arrDelayView.onChange((updated) => {
 			arrDelayState = updated;
@@ -62,7 +57,7 @@
 			name: "DepDelay",
 			resolution: 400,
 			range: [-20, 60],
-			bins: 5,
+			bins: 20,
 		});
 		depDelayView.onChange((updated) => {
 			depDelayState = updated;
@@ -72,7 +67,8 @@
 			type: "continuous",
 			name: "FlightDate",
 			resolution: 400,
-			bins: 25,
+			bins: 20,
+			time: true,
 		});
 		flightDateView.onChange((updated) => {
 			flightDateState = updated;
@@ -131,7 +127,7 @@
 </script>
 
 <svelte:head>
-	<title>FalconVis | 1m Flights</title>
+	<title>FalconVis 3 Million Flights</title>
 </svelte:head>
 
 <header>
