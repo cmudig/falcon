@@ -28,23 +28,9 @@
 		const moviesJson = await (await fetch("movies-3k.json")).json();
 		// convert the string dates into Date objects
 		for (let i = 0; i < moviesJson.length; i++) {
-			// if (i == 9) {
-			// 	console.log(moviesJson[i]);
-			// }
-			moviesJson[i]["Release_Date_Old"] = structuredClone(
-				moviesJson[i]["Release_Date"]
-			);
 			moviesJson[i]["Release_Date"] = new Date(
 				moviesJson[i]["Release_Date"]
 			);
-		}
-		for (let i = 0; i < moviesJson.length; i++) {
-			const year = moviesJson[i]["Release_Date"].getFullYear();
-			if (year > 2020) {
-				console.log(i, year);
-				console.log(moviesJson[i]);
-				console.log(moviesJson[i]["Release_Date_Old"]);
-			}
 		}
 
 		const db = new JsonDB(moviesJson);
