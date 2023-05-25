@@ -6,9 +6,11 @@ Cross-filter billions of data entries without interaction latency for your own l
 
 **Github pages live examples**
 
--   https://dig.cmu.edu/falcon/movies-arrow/
--   https://dig.cmu.edu/falcon/movies-json/
--   https://dig.cmu.edu/falcon/movies-duckdb/
+| Data        | Count | Live Demo                                                                  |
+| ----------- | ----- | -------------------------------------------------------------------------- |
+| Arrow       | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-arrow/)  |
+| JSON        | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-json/)   |
+| DuckDB WASM | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon/movies-duckdb/) |
 
 **More**
 
