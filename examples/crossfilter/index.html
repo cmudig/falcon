@@ -256,9 +256,9 @@
 		selected.
 	</aside>
 
-	<div id="lists">
+	<!-- <div id="lists">
 		<div id="flight-list" class="list"></div>
-	</div>
+	</div> -->
 
 	<footer>
 		<!-- <span style="float: right">
@@ -378,7 +378,7 @@
 			});
 
 		// Render the initial lists.
-		var list = d3.selectAll(".list").data([flightList]);
+		// var list = d3.selectAll(".list").data([flightList]);
 
 		// Render the total.
 		d3.selectAll("#total").text(formatNumber(flight.size()));
@@ -393,7 +393,7 @@
 		// Whenever the brush moves, re-rendering everything.
 		function renderAll() {
 			chart.each(render);
-			list.each(render);
+			// list.each(render);
 			d3.select("#active").text(formatNumber(all.value()));
 		}
 
