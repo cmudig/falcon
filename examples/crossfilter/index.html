@@ -154,16 +154,9 @@
 </style>
 
 <div id="body">
-	<h1>
-		<a href="https://github.com/cmudig/falcon-vis" target="_blank">
-			<img
-				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
-				width="50%"
-			/>
-		</a>
-	</h1>
+	<h1>FalconVis</h1>
 
-	<h2>Scalable Filtering between Linked Views</h2>
+	<h2>Cross-Filter Millions of Entries for Linked Visualizations</h2>
 
 	<p>
 		This demo was forked from the
@@ -174,24 +167,37 @@
 		<a href="https://github.com/cmudig/falcon-vis"
 			>FalconVis Javascript Library</a
 		>
-		has faster performance for much larger amounts of data.
+		has faster performance for much larger amounts of data. Instead of the
+		<a href="https://crossfilter.github.io/crossfilter/"
+			>CrossFilter Demo</a
+		>
+		with ~260 thousand entries, we use 3 million with no interaction
+		latency.
 	</p>
 
 	<p>
-		(TODO put FalconVis performance reasons) Since most interactions only
-		involve a single dimension, and then only small adjustments are made to
-		the filter values, incremental filtering and reducing is significantly
-		faster than starting from scratch. Crossfilter uses sorted indexes (and
-		a few bit-twiddling hacks) to make this possible, dramatically
-		increasing the perfor&shy;mance of live histograms and top-<i>K</i>
-		lists. For more details on how Crossfilter works, see the
-		<a href="https://github.com/crossfilter/crossfilter/wiki/API-Reference"
-			>API reference</a
-		>.
+		FalconVis uses the
+		<a href="https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf"
+			>Falcon</a
+		>
+		data index so that there is no delay when actively filtering a
+		dimension. The index works by considering a view we are interacting
+		(brushing) with as active and ones we are not as passive. The index is
+		computed beforehand such that any filter over the active view can
+		instantly update the passive views. The result is latency free brushing
+		over views with instant updating.
 	</p>
 
 	<h2>Example: Airline on-time performance</h2>
 
+	<p>
+		Again, note that this demo was forked from
+		<a href="https://github.com/crossfilter/crossfilter/tree/gh-pages"
+			>here</a
+		>. The following example and text was created by them. The only change
+		is the use of the FalconVis library instead for cross-filtering the
+		data.
+	</p>
 	<p>
 		The coordinated visualizations below (built with
 		<a href="http://mbostock.github.com/d3/">D3</a>) show nearly a
@@ -228,10 +234,6 @@
 		>, or
 		<a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and
 		<a href="javascript:filter([[21, 24], null, null, null])">nights</a>?
-		<a href="https://github.com/square/crossfilter/tree/gh-pages"
-			>Fork this example</a
-		>
-		and try your own data!
 	</p>
 
 	<div id="charts">
@@ -272,13 +274,6 @@
 		on github
 	</footer>
 </div>
-
-<a href="https://github.com/crossfilter/crossfilter"
-	><img
-		style="position: absolute; top: 0; right: 0; border: 0"
-		src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
-		alt="Fork me on GitHub"
-/></a>
 
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v3.min.js"></script>
