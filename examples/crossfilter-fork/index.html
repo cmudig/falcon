@@ -293,8 +293,31 @@
 <script src="d3.v3.min.js"></script>
 <!-- <script type="module" src="/main.js"></script> -->
 <script type="module">
-	import { FalconVis } from "falcon-vis";
-	console.log(FalconVis);
+	import { FalconVis, DuckDB } from "falcon-vis";
+
+	// Initialize FalconVis + Flights Data
+	const db = await DuckDB.fromParquetFile("flights-1m.parquet");
+	const falcon = new FalconVis(db);
+
+	// initialize the views
+	const totalCount = await falcon.view0D((count) => {
+		console.log(count);
+	});
+	const arrivalDelay = await falcon.view1D(
+		{
+			type: "continuous",
+			name: "ARR_DELAY",
+			range: [-20, 140],
+			resolution: 300,
+			bins: 10,
+		},
+		(counts) => {
+			console.log(counts);
+		}
+	);
+
+	// link em!
+	await falcon.link();
 
 	// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
 	d3.csv("flights-3m.json", function (error, flights) {
@@ -316,6 +339,7 @@
 			d.delay = +d.delay;
 			d.distance = +d.distance;
 		});
+		console.log(flights);
 
 		// Create the crossfilter for the relevant dimensions and groups.
 		var flight = crossfilter(flights),
@@ -353,6 +377,7 @@
 			// 	),
 
 			barChart()
+				.view(arrivalDelay)
 				.dimension(delay)
 				.group(delays)
 				.x(
@@ -398,7 +423,7 @@
 		// Render the initial lists.
 		// var list = d3.selectAll(".list").data([flightList]);
 
-		// Render the total.
+		// Render the totalu
 		d3.selectAll("#total").text(formatNumber(flight.size()));
 
 		renderAll();
@@ -533,7 +558,8 @@
 				brushDirty,
 				dimension,
 				group,
-				round;
+				round,
+				view;
 
 			function chart(div) {
 				var width = x.range()[1],
@@ -547,6 +573,9 @@
 
 					// Create the skeletal chart.
 					if (g.empty()) {
+						div.on("mouseenter", async function (d, i) {
+							await view.activate();
+						});
 						div.select(".title")
 							.append("a")
 							.attr("href", "javascript:reset(" + id + ")")
@@ -689,12 +718,12 @@
 				}
 			}
 
-			brush.on("brushstart.chart", function () {
+			brush.on("brushstart.chart", async function () {
 				var div = d3.select(this.parentNode.parentNode.parentNode);
 				div.select(".title a").style("display", null);
 			});
 
-			brush.on("brush.chart", function () {
+			brush.on("brush.chart", async function () {
 				var g = d3.select(this.parentNode),
 					extent = brush.extent();
 				if (round)
@@ -705,11 +734,11 @@
 				g.select("#clip-" + id + " rect")
 					.attr("x", x(extent[0]))
 					.attr("width", x(extent[1]) - x(extent[0]));
-				console.log(extent);
 				dimension.filterRange(extent);
+				await view.select(extent);
 			});
 
-			brush.on("brushend.chart", function () {
+			brush.on("brushend.chart", async function () {
 				if (brush.empty()) {
 					var div = d3.select(this.parentNode.parentNode.parentNode);
 					div.select(".title a").style("display", "none");
@@ -717,8 +746,15 @@
 						.attr("x", null)
 						.attr("width", "100%");
 					dimension.filterAll();
+					await view.select();
 				}
 			});
+
+			chart.view = function (_) {
+				if (!arguments.length) return view;
+				view = _;
+				return chart;
+			};
 
 			chart.margin = function (_) {
 				if (!arguments.length) return margin;
