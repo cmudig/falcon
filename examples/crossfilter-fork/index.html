@@ -289,10 +289,13 @@
 	</footer>
 </div>
 
-<script type="module" src="/main.js"></script>
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v3.min.js"></script>
-<script>
+<!-- <script type="module" src="/main.js"></script> -->
+<script type="module">
+	import { FalconVis } from "falcon-vis";
+	console.log(FalconVis);
+
 	// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
 	d3.csv("flights-3m.json", function (error, flights) {
 		// Various formatters.
@@ -339,15 +342,15 @@
 			});
 
 		var charts = [
-			barChart()
-				.dimension(hour)
-				.group(hours)
-				.x(
-					d3.scale
-						.linear()
-						.domain([0, 24])
-						.rangeRound([0, 10 * 24])
-				),
+			// barChart()
+			// 	.dimension(hour)
+			// 	.group(hours)
+			// 	.x(
+			// 		d3.scale
+			// 			.linear()
+			// 			.domain([0, 24])
+			// 			.rangeRound([0, 10 * 24])
+			// 	),
 
 			barChart()
 				.dimension(delay)
@@ -359,27 +362,27 @@
 						.rangeRound([0, 10 * 21])
 				),
 
-			barChart()
-				.dimension(distance)
-				.group(distances)
-				.x(
-					d3.scale
-						.linear()
-						.domain([0, 2000])
-						.rangeRound([0, 10 * 40])
-				),
+			// barChart()
+			// 	.dimension(distance)
+			// 	.group(distances)
+			// 	.x(
+			// 		d3.scale
+			// 			.linear()
+			// 			.domain([0, 2000])
+			// 			.rangeRound([0, 10 * 40])
+			// 	),
 
-			barChart()
-				.dimension(date)
-				.group(dates)
-				.round(d3.time.day.round)
-				.x(
-					d3.time
-						.scale()
-						.domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
-						.rangeRound([0, 10 * 90])
-				)
-				.filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
+			// barChart()
+			// 	.dimension(date)
+			// 	.group(dates)
+			// 	.round(d3.time.day.round)
+			// 	.x(
+			// 		d3.time
+			// 			.scale()
+			// 			.domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
+			// 			.rangeRound([0, 10 * 90])
+			// 	)
+			// 	.filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
 		];
 
 		// Given our array of charts, which we assume are in the same order as the

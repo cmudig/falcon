@@ -1,4 +1,6 @@
 // import "./style.css";
-import { FalconVis } from "falcon-vis";
+// import * from { FalconVis } from "falcon-vis";
 
-console.log(FalconVis);
+// console.log(FalconVis);
+
+// export const testit = 1;
