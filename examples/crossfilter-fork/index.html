@@ -1,3 +1,17 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html> -->
+
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <title>FalconVis</title>
@@ -275,6 +289,7 @@
 	</footer>
 </div>
 
+<script type="module" src="/main.js"></script>
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v3.min.js"></script>
 <script>
@@ -687,6 +702,7 @@
 				g.select("#clip-" + id + " rect")
 					.attr("x", x(extent[0]))
 					.attr("width", x(extent[1]) - x(extent[0]));
+				console.log(extent);
 				dimension.filterRange(extent);
 			});
 
