@@ -295,32 +295,45 @@
 <script type="module">
 	import { FalconVis, DuckDB } from "falcon-vis";
 
-	// Initialize FalconVis + Flights Data
-	const db = await DuckDB.fromParquetFile("flights-1m.parquet");
-	const falcon = new FalconVis(db);
-
-	// initialize the views
-	const totalCount = await falcon.view0D((count) => {
-		console.log(count);
-	});
-	const arrivalDelay = await falcon.view1D(
-		{
-			type: "continuous",
-			name: "ARR_DELAY",
-			range: [-20, 140],
-			resolution: 300,
-			bins: 10,
-		},
-		(counts) => {
-			console.log(counts);
-		}
-	);
-
-	// link em!
-	await falcon.link();
-
 	// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
-	d3.csv("flights-3m.json", function (error, flights) {
+	d3.csv("flights-3m.json", async function (error, flights) {
+		// Initialize FalconVis + Flights Data
+		const db = await DuckDB.fromParquetFile("flights-1m.parquet");
+		const falcon = new FalconVis(db);
+
+		// initialize the views
+		const totalCount = await falcon.view0D((count) => {
+			console.log(count);
+		});
+		const arrivalDelay = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "ARR_DELAY",
+				range: [-60, 150],
+				resolution: 50,
+				bins: 25,
+			},
+			(counts) => {
+				updateChart({
+					bin: counts.bin,
+					filter: counts.filter,
+					total: counts.total,
+				});
+			}
+		);
+		let arrivalDelayState;
+
+		// link em!
+		await falcon.link();
+
+		/**
+		 * Given the bins, counts, and filtered counts render a bar chart
+		 */
+		function updateChart({ chart, bin, filter, total } = {}) {
+			// ideally, given
+			console.log(bin, total, filter);
+		}
+
 		// Various formatters.
 		var formatNumber = d3.format(",d"),
 			formatChange = d3.format("+,d"),
@@ -339,7 +352,6 @@
 			d.delay = +d.delay;
 			d.distance = +d.distance;
 		});
-		console.log(flights);
 
 		// Create the crossfilter for the relevant dimensions and groups.
 		var flight = crossfilter(flights),
@@ -565,6 +577,18 @@
 				var width = x.range()[1],
 					height = y.range()[0];
 
+				// console.log({
+				// 	x,
+				// 	y,
+				// 	id,
+				// 	axis,
+				// 	brush,
+				// 	brushDirty,
+				// 	dimension,
+				// 	group,
+				// 	round,
+				// 	view,
+				// });
 				y.domain([0, group.top(1)[0].value]);
 
 				div.each(function () {
@@ -611,7 +635,7 @@
 								return d + " bar";
 							})
 							.datum(group.all());
-
+						// console.log(group.all());
 						g.selectAll(".foreground.bar").attr(
 							"clip-path",
 							"url(#clip-" + id + ")"
