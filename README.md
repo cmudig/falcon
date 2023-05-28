@@ -18,12 +18,13 @@
 
 **`Github Pages`**
 
-| Data                  | Type        | Count | Live Demo                                                                       |
-| --------------------- | ----------- | ----- | ------------------------------------------------------------------------------- |
-| Movies                | Arrow       | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-arrow/)   |
-| Movies                | JSON        | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-json/)    |
-| Movies                | DuckDB WASM | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-duckdb/)  |
-| Flights (with US Map) | DuckDB WASM | 3m    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/flights-duckdb/) |
+| Data                                                                                     | Type        | Count | Live Demo                                                                       |
+| ---------------------------------------------------------------------------------------- | ----------- | ----- | ------------------------------------------------------------------------------- |
+| Movies                                                                                   | Arrow       | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-arrow/)   |
+| Movies                                                                                   | JSON        | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-json/)    |
+| Movies                                                                                   | DuckDB WASM | 3k    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/movies-duckdb/)  |
+| Flights (with US Map)                                                                    | DuckDB WASM | 3m    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/flights-duckdb/) |
+| Flights (comparison with [crossfilter](https://github.com/crossfilter/crossfilter) fork) | DuckDB WASM | 3m    | [Click to open on Github Pages](https://dig.cmu.edu/falcon-vis/crossfilter/)    |
 
 **`ObservableHQ`**
 
@@ -244,7 +245,7 @@ const c = await flightsDb.connect();
 // load parquet file into table called flights
 await c.query(
 	`CREATE TABLE flights
-	 AS SELECT * FROM parquet_scan('${window.location.href}/data/flights-1m.parquet')`
+     AS SELECT * FROM parquet_scan('${window.location.href}/data/flights-1m.parquet')`
 );
 c.close();
 
