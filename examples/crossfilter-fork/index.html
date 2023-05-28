@@ -251,18 +251,18 @@
 	</p>
 
 	<div id="charts">
-		<div id="hour-chart" class="chart">
+		<!-- <div id="hour-chart" class="chart">
 			<div class="title">Time of Day</div>
-		</div>
+		</div> -->
 		<div id="delay-chart" class="chart">
 			<div class="title">Arrival Delay (min.)</div>
 		</div>
 		<div id="distance-chart" class="chart">
 			<div class="title">Distance (mi.)</div>
 		</div>
-		<div id="date-chart" class="chart">
+		<!-- <div id="date-chart" class="chart">
 			<div class="title">Date</div>
-		</div>
+		</div> -->
 	</div>
 
 	<aside id="totals">
@@ -312,14 +312,28 @@
 		const db = await DuckDB.fromParquetFile("flights-1m.parquet");
 		const falcon = new FalconVis(db);
 
-		let arrivalDelayState;
-		let countState;
-		// initialize the views
 		const totalCount = await falcon.view0D((count) => {
 			d3.select("#active").text(formatNumber(count.filter));
-			countState = count;
+			d3.selectAll("#total").text(formatNumber(count.total));
 		});
-		const arrivalDelay = await falcon.view1D(
+		let distanceChart;
+		const distanceView = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "DISTANCE",
+				range: [0, 2000],
+				resolution: 50,
+				bins: 40,
+			},
+			(counts) => {
+				const node = d3.select("#distance-chart.chart");
+				if (node && distanceChart) {
+					distanceChart(node);
+				}
+			}
+		);
+		let delayChart;
+		const delayView = await falcon.view1D(
 			{
 				type: "continuous",
 				name: "ARR_DELAY",
@@ -328,25 +342,15 @@
 				bins: 25,
 			},
 			(counts) => {
-				updateChart({
-					bin: counts.bin,
-					filter: counts.filter,
-					total: counts.total,
-				});
-				arrivalDelayState = counts;
+				const node = d3.select("#delay-chart.chart");
+				if (node && delayChart) {
+					delayChart(node);
+				}
 			}
 		);
 
 		// link em!
 		await falcon.link();
-
-		/**
-		 * Given the bins, counts, and filtered counts render a bar chart
-		 */
-		function updateChart({ chart, bin, filter, total } = {}) {
-			// ideally, given
-			console.log(bin, total, filter);
-		}
 
 		// A little coercion, since the CSV is untyped.
 		flights.forEach(function (d, i) {
@@ -380,6 +384,23 @@
 				return Math.floor(d / 50) * 50;
 			});
 
+		delayChart = barChart()
+			.view(delayView)
+			.x(
+				d3.scale
+					.linear()
+					.domain([-60, 150])
+					.rangeRound([0, 10 * 21])
+			);
+		distanceChart = barChart()
+			.view(distanceView)
+			.x(
+				d3.scale
+					.linear()
+					.domain([0, 2000])
+					.rangeRound([0, 10 * 40])
+			);
+
 		var charts = [
 			// barChart()
 			// 	.dimension(hour)
@@ -390,18 +411,8 @@
 			// 			.domain([0, 24])
 			// 			.rangeRound([0, 10 * 24])
 			// 	),
-
-			barChart()
-				.view(arrivalDelay)
-				.dimension(delay)
-				.group(delays)
-				.x(
-					d3.scale
-						.linear()
-						.domain([-60, 150])
-						.rangeRound([0, 10 * 21]) // 10px by 21 bins???? shitty way to do things.
-				),
-
+			delayChart,
+			distanceChart,
 			// barChart()
 			// 	.dimension(distance)
 			// 	.group(distances)
@@ -428,19 +439,12 @@
 		// Given our array of charts, which we assume are in the same order as the
 		// .chart elements in the DOM, bind the charts to the DOM and render them.
 		// We also listen to the chart's brush events to update the display.
-		var chart = d3
-			.selectAll(".chart")
-			.data(charts)
-			.each(function (chart) {
-				chart.on("brush", renderAll).on("brushend", renderAll);
-			});
 
-		// Render the initial lists.
-		// var list = d3.selectAll(".list").data([flightList]);
-
-		// Render the totalu
-		// d3.selectAll("#total").text(formatNumber(flight.size()));
-		d3.selectAll("#total").text(formatNumber(countState.total));
+		var chart = d3.selectAll(".chart").data(charts);
+		// .each(function (chart) {
+		// console.log(chart);
+		// chart.on("brush", renderAll).on("brushend", renderAll);
+		// });
 
 		renderAll();
 
@@ -452,8 +456,6 @@
 		// Whenever the brush moves, re-rendering everything.
 		function renderAll() {
 			chart.each(render);
-			// list.each(render);
-			// d3.select("#active").text(formatNumber(all.value()));
 		}
 
 		// Like d3.time.format, but faster.
@@ -498,14 +500,8 @@
 				// y.domain([0, group.top(1)[0].value]);
 				const initialMaxValue = d3.max(view.state.filter);
 				y.domain([0, initialMaxValue]);
-				const binDomain = [
-					view.state.bin[0]["binStart"],
-					view.state.bin.at(-1)["binEnd"],
-				];
-				const x = d3.scale
-					.linear()
-					.domain(binDomain)
-					.rangeRound([0, 10 * view.state.bin.length]);
+
+				console.log("procced");
 
 				var width = x.range()[1],
 					height = y.range()[0];
@@ -513,7 +509,6 @@
 				div.each(function () {
 					var div = d3.select(this),
 						g = div.select("g");
-
 					// Create the skeletal chart.
 					if (g.empty()) {
 						div.on("mouseenter", async function (d, i) {
@@ -559,18 +554,6 @@
 						// console.log(view.state);
 						// console.log(transform(view.state));
 
-						function transform(state) {
-							const _t = new Array(state.bin.length);
-							for (let i = 0; i < _t.length; i++) {
-								const { binStart } = state.bin[i];
-								_t[i] = {
-									key: binStart,
-									value: state.filter[i],
-								};
-							}
-							return _t;
-						}
-
 						g.selectAll(".foreground.bar").attr(
 							"clip-path",
 							"url(#clip-" + id + ")"
@@ -613,7 +596,9 @@
 						}
 					}
 
-					g.selectAll(".bar").attr("d", barPath);
+					g.selectAll(".bar")
+						.datum(transform(view.state))
+						.attr("d", barPath);
 				});
 
 				function barPath(groups) {
@@ -693,7 +678,7 @@
 				g.select("#clip-" + id + " rect")
 					.attr("x", x(extent[0]))
 					.attr("width", x(extent[1]) - x(extent[0]));
-				dimension.filterRange(extent);
+				// dimension.filterRange(extent);
 				await view.select(extent);
 			});
 
@@ -704,7 +689,7 @@
 					div.select("#clip-" + id + " rect")
 						.attr("x", null)
 						.attr("width", "100%");
-					dimension.filterAll();
+					// dimension.filterAll();
 					await view.select();
 				}
 			});
@@ -712,6 +697,15 @@
 			chart.view = function (_) {
 				if (!arguments.length) return view;
 				view = _;
+
+				const binDomain = [
+					view.state.bin[0]["binStart"],
+					view.state.bin.at(-1)["binEnd"],
+				];
+				x = d3.scale
+					.linear()
+					.domain(binDomain)
+					.rangeRound([0, 10 * view.state.bin.length]);
 				return chart;
 			};
 
@@ -851,4 +845,16 @@
 			});
 		}
 	});
+
+	function transform(state) {
+		const _t = new Array(state.bin.length);
+		for (let i = 0; i < _t.length; i++) {
+			const { binStart } = state.bin[i];
+			_t[i] = {
+				key: binStart,
+				value: state.filter[i],
+			};
+		}
+		return _t;
+	}
 </script>
