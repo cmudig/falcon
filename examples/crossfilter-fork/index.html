@@ -251,9 +251,9 @@
 	</p>
 
 	<div id="charts">
-		<!-- <div id="hour-chart" class="chart">
+		<div id="hour-chart" class="chart">
 			<div class="title">Time of Day</div>
-		</div> -->
+		</div>
 		<div id="delay-chart" class="chart">
 			<div class="title">Arrival Delay (min.)</div>
 		</div>
@@ -270,9 +270,9 @@
 		selected.
 	</aside>
 
-	<!-- <div id="lists">
+	<div id="lists">
 		<div id="flight-list" class="list"></div>
-	</div> -->
+	</div>
 
 	<footer>
 		<!-- <span style="float: right">
@@ -307,16 +307,38 @@
 		var nestByDate = d3.nest().key(function (d) {
 			return d3.time.day(d.date);
 		});
+		var nestByDate2 = d3.nest().key(function (d) {
+			return d3.time.day(d["FlightDate"]);
+		});
 
 		// Initialize FalconVis + Flights Data
-		const db = await DuckDB.fromParquetFile("flights-10m.parquet");
+		const db = await DuckDB.fromParquetFile("crossfilter-3m.parquet");
 		// const db = await ArrowDB.fromArrowFile("flights-1m.arrow");
 		const falcon = new FalconVis(db);
+		let entries;
+		let entriesRequest = false;
 
 		const totalCount = await falcon.view0D((count) => {
 			d3.select("#active").text(formatNumber(count.filter));
 			d3.selectAll("#total").text(formatNumber(count.total));
 		});
+
+		let hourChart;
+		const hourView = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "DepTime",
+				resolution: 50,
+				bins: 24,
+			},
+			(counts) => {
+				const node = d3.select("#hour-chart.chart");
+				if (node && hourChart) {
+					hourChart(node);
+				}
+			}
+		);
+
 		let distanceChart;
 		const distanceView = await falcon.view1D(
 			{
@@ -357,7 +379,12 @@
 				name: "FlightDate",
 				resolution: 50,
 				bins: 90,
+				exact: true,
 				time: true,
+				range: [
+					new Date(2006, 0, 0).getTime(),
+					new Date(2006, 5, 0).getTime(),
+				],
 			},
 			(counts) => {
 				const node = d3.select("#date-chart.chart");
@@ -402,6 +429,14 @@
 				return Math.floor(d / 50) * 50;
 			});
 
+		hourChart = barChart()
+			.view(hourView)
+			.x(
+				d3.scale
+					.linear()
+					.domain([0, 24])
+					.rangeRound([0, 10 * 24])
+			);
 		delayChart = barChart()
 			.view(delayView)
 			.x(
@@ -420,7 +455,7 @@
 			);
 		dateChart = barChart()
 			.view(dateView)
-			.round(d3.time.day.round)
+			// .round(d3.time.day.round)
 			.x(
 				d3.time
 					.scale()
@@ -430,51 +465,8 @@
 					])
 					.rangeRound([0, 10 * dateView.state.bin.length])
 			);
-		dateView.state.filter.forEach((filter, i) => {
-			if (filter === 0) {
-				console.log(
-					new Date(dateView.state.bin[i]["binStart"]),
-					filter
-				);
-			}
-		});
-		// .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
 
-		var charts = [
-			// barChart()
-			// 	.dimension(hour)
-			// 	.group(hours)
-			// 	.x(
-			// 		d3.scale
-			// 			.linear()
-			// 			.domain([0, 24])
-			// 			.rangeRound([0, 10 * 24])
-			// 	),
-			delayChart,
-			distanceChart,
-			dateChart,
-			// barChart()
-			// 	.dimension(distance)
-			// 	.group(distances)
-			// 	.x(
-			// 		d3.scale
-			// 			.linear()
-			// 			.domain([0, 2000])
-			// 			.rangeRound([0, 10 * 40])
-			// 	),
-
-			// barChart()
-			// 	.dimension(date)
-			// 	.group(dates)
-			// 	.round(d3.time.day.round)
-			// 	.x(
-			// 		d3.time
-			// 			.scale()
-			// 			.domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
-			// 			.rangeRound([0, 10 * 90])
-			// 	)
-			// 	.filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
-		];
+		var charts = [hourChart, delayChart, distanceChart, dateChart];
 
 		// Given our array of charts, which we assume are in the same order as the
 		// .chart elements in the DOM, bind the charts to the DOM and render them.
@@ -486,6 +478,9 @@
 		// chart.on("brush", renderAll).on("brushend", renderAll);
 		// });
 
+		var list = d3.selectAll(".list").data([flightList]);
+		renderAll();
+		await dateChart.filter([new Date(2006, 1, 1), new Date(2006, 2, 1)]);
 		renderAll();
 
 		// Renders the specified chart or list.
@@ -496,6 +491,7 @@
 		// Whenever the brush moves, re-rendering everything.
 		function renderAll() {
 			chart.each(render);
+			list.each(render);
 		}
 
 		// Like d3.time.format, but faster.
@@ -509,15 +505,15 @@
 			);
 		}
 
-		window.filter = function (filters) {
-			filters.forEach(function (d, i) {
-				charts[i].filter(d);
-			});
+		window.filter = async function (filters) {
+			for (let i = 0; i < filters.length; i++) {
+				await charts[i].filter(d);
+			}
 			renderAll();
 		};
 
-		window.reset = function (i) {
-			charts[i].filter(null);
+		window.reset = async function (i) {
+			await charts[i].filter(null);
 			renderAll();
 		};
 
@@ -723,6 +719,16 @@
 				} else {
 					await view.select(extent);
 				}
+				// if (!entriesRequest) {
+				// 	entriesRequest = true;
+				// 	falcon.entries({ length: 40 }).then((d) => {
+				// 		const nest = d3.nest().key(function (d) {
+				// 			return d3.time.day(d["FlightDate"]);
+				// 		});
+				// 		entries = nest.entries(Array.from(d));
+				// 		entriesRequest = false;
+				// 	});
+				// }
 			});
 
 			brush.on("brushend.chart", async function () {
@@ -778,13 +784,21 @@
 				return chart;
 			};
 
-			chart.filter = function (_) {
+			chart.filter = async function (_) {
 				if (_) {
 					brush.extent(_);
-					dimension.filterRange(_);
+					await view.activate();
+					// dimension.filterRange(_);
+					if ("time" in view.dimension) {
+						await view.select([_[0].getTime(), _[1].getTime()]);
+					} else {
+						await view.select(_);
+					}
 				} else {
 					brush.clear();
-					dimension.filterAll();
+					// dimension.filterAll();
+					await view.activate();
+					await view.select(_);
 				}
 				brushDirty = true;
 				return chart;
@@ -851,19 +865,19 @@
 						return formatTime(d.date);
 					});
 
-				flightEnter
-					.append("div")
-					.attr("class", "origin")
-					.text(function (d) {
-						return d.origin;
-					});
+				// flightEnter
+				// 	.append("div")
+				// 	.attr("class", "origin")
+				// 	.text(function (d) {
+				// 		return d.origin;
+				// 	});
 
-				flightEnter
-					.append("div")
-					.attr("class", "destination")
-					.text(function (d) {
-						return d.destination;
-					});
+				// flightEnter
+				// 	.append("div")
+				// 	.attr("class", "destination")
+				// 	.text(function (d) {
+				// 		return d.destination;
+				// 	});
 
 				flightEnter
 					.append("div")
