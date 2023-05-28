@@ -354,7 +354,7 @@ Returns a `View1D` instance (you can add more onChange callbacks to it later).
 
 The <i>dimension</i> can be `type: "categorical"` for discrete values or `type: "continuous"` for ranged values.
 
-A continuous `Dimension` can be defined as follows:
+A continuous `Dimension` can be defined as follows (with ? being optional parameters):
 
 ```ts
 interface ContinuousDimension {
@@ -372,11 +372,23 @@ interface ContinuousDimension {
 
 	/**
 	 * max number of bins to create, the result could be less bins
-	 * if not specified, will automatically determine the number of bins
+	 *
+	 * @default computed from the data using scotts rule
 	 */
 	bins?: number;
 
-	/* [min, max] interval to count between */
+	/**
+	 * forces the specified number bins to use exactly
+	 * otherwise, will use the specified number of bins as a suggestion
+	 *
+	 * @default false
+	 */
+	exact?: boolean;
+
+	/**
+	 * [min, max] extent to limit the range of data values
+	 * @default computed from the data
+	 */
 	range?: [number, number];
 
 	/* should format for dates */
@@ -394,7 +406,11 @@ interface CategoricalDimension {
 	/* column name in the data table */
 	name: string;
 
-	/* values to include, by default includes all */
+	/**
+	 * categorical values to include
+	 *
+	 * @default computed from the data
+	 */
 	range?: string[];
 }
 ```

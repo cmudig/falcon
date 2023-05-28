@@ -82,7 +82,8 @@ export class View1D extends ViewAbstract<View1DState> {
 
         this.dimension.binConfig = createBinConfigContinuous(
           this.dimension,
-          this.dimension.range!
+          this.dimension.range!,
+          this.dimension.exact ?? false
         );
       } else {
         throw Error("Invalid bin config or bins not specified");
