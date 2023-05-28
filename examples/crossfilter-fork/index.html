@@ -17,17 +17,40 @@
 <title>FalconVis</title>
 <style>
 	@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
-	/* @import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,600&display=swap"); */
+	@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,600&display=swap");
 
 	body {
 		font-family: "Helvetica Neue";
 		margin: 40px auto;
 		width: 960px;
 		min-height: 2000px;
+		--primary-lighter: #00c9ab;
+		--primary: #02b299;
+		--primary-darker: #008672;
+		color: #222222;
 	}
 
 	#body {
 		position: relative;
+	}
+
+	/* credit to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd */
+	kbd {
+		background-color: #eee;
+		border-radius: 3px;
+		border: 1px solid #b4b4b4;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+			0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+		color: #333;
+		display: inline-block;
+		font-size: 0.85em;
+		font-weight: 700;
+		line-height: 1;
+		padding: 2px 4px;
+		white-space: nowrap;
+	}
+	summary:hover {
+		cursor: pointer;
 	}
 
 	footer {
@@ -46,13 +69,13 @@
 	}
 
 	h2 {
-		font-weight: 400;
-		font-size: 28px;
+		font-weight: 450;
+		font-size: 25px;
 	}
 
 	h1,
 	h2 {
-		font-family: "Yanone Kaffeesatz";
+		font-family: "Exo";
 		text-rendering: optimizeLegibility;
 	}
 
@@ -75,7 +98,7 @@
 	.reset {
 		padding-left: 1em;
 		font-size: smaller;
-		color: #ccc;
+		color: #a9a9a9a9;
 	}
 
 	.background.bar {
@@ -83,7 +106,8 @@
 	}
 
 	.foreground.bar {
-		fill: steelblue;
+		fill: var(--primary);
+		/* fill: steelblue; */
 	}
 
 	.axis path,
@@ -98,7 +122,7 @@
 	}
 
 	.brush rect.extent {
-		fill: steelblue;
+		fill: var(--primary);
 		fill-opacity: 0.125;
 	}
 
@@ -127,36 +151,59 @@
 		min-height: 1024px;
 	}
 
-	#flight-list .date,
-	#flight-list .day {
+	.date,
+	.day {
 		margin-bottom: 0.4em;
 	}
 
-	#flight-list .flight {
+	.flight {
 		line-height: 1.5em;
 		background: #eee;
 		width: 640px;
 		margin-bottom: 1px;
 	}
 
-	#flight-list .time {
+	.time {
 		color: #999;
+		width: 120px !important;
 	}
 
-	#flight-list .flight div {
+	.flight div {
 		display: inline-block;
 		width: 100px;
+		/* outline: 1px solid red; */
 	}
 
-	#flight-list div.distance,
-	#flight-list div.delay {
-		width: 160px;
+	div.distance,
+	div.delay {
+		width: 140px;
 		padding-right: 10px;
 		text-align: right;
 	}
 
-	#flight-list .early {
+	/* div.delay {
+		width: 160px;
+		padding-right: 10px;
+		text-align: right;
+	} */
+	/* .flight div {
+		display: inline-block;
+		width: 100px;
+		outline: 1px red solid;
+	}
+
+	.distance,
+	.delay {
+		width: 160px;
+		padding-right: 10px;
+		text-align: right;
+	} */
+
+	.early {
 		color: green;
+	}
+	.late {
+		color: rgb(192, 51, 51);
 	}
 
 	aside {
@@ -165,64 +212,138 @@
 		font-size: smaller;
 		width: 220px;
 	}
+
+	.middle {
+		text-align: left;
+		background: transparent;
+	}
+
+	a {
+		font-weight: 400;
+		/* color: #646cff; */
+		color: var(--primary-lighter);
+		text-decoration: inherit;
+		transition: color 800ms linear;
+	}
+	a:hover {
+		color: var(--primary-darker);
+	}
+
+	#active {
+		color: var(--primary);
+	}
+
+	.description {
+		line-height: 1.7;
+	}
 </style>
 
 <div id="body">
-	<h1>FalconVis</h1>
+	<h1>
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis">
+			<img
+				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+				alt="FalconVis Logo"
+				width="65%"
+			/>
+		</a>
+	</h1>
 
-	<h2>Cross-Filter Millions of Entries for Linked Visualizations</h2>
+	<h2>Cross-Filtering at Scale</h2>
 
 	<p>
-		This demo was forked from the
-		<a href="https://github.com/crossfilter/crossfilter"
-			>CrossFilter JavaScript library</a
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
 		>
-		to show how the
-		<a href="https://github.com/cmudig/falcon-vis"
-			>FalconVis Javascript Library</a
-		>
-		has faster performance for much larger amounts of data. Instead of the
-		<a href="https://crossfilter.github.io/crossfilter/"
-			>CrossFilter Demo</a
-		>
-		with ~260 thousand entries, we use 3 million with no interaction
-		latency.
+		enables you explore millions (or even billions) of data entries with
+		<strong>no</strong> interaction delay.
 	</p>
 
 	<p>
-		FalconVis uses the
-		<a href="https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf"
+		With a large amount of data, cross-filtering is painfully slow. When you
+		filter one visualization, you might expect the others to instantly
+		update, but they might lag behind with large delays or your browser
+		might crash. The filtering lag disrupts the whole cross-filtering
+		experience!
+	</p>
+
+	<p>
+		Should you give up? No! You should try out
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>.
+	</p>
+
+	<p>
+		We remove the latency from where it matters (the cross-filtering user
+		interaction) and put it where latency doesn't matter (before
+		interaction).
+	</p>
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		computes the
+		<a
+			target="_blank"
+			href="https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf"
 			>Falcon</a
 		>
-		data index so that there is no delay when actively filtering a
-		dimension. The index works by considering a view we are interacting
-		(brushing) with as active and ones we are not as passive. The index is
-		computed beforehand such that any filter over the active view can
-		instantly update the passive views. The result is latency free brushing
-		over views with instant updating.
+		data index right before you interact with a view. As you filter the
+		view, we use the index to instantly compute the counts for all other
+		views. The result is smooth interaction at any scale.
 	</p>
 
-	<h2>Example: Airline on-time performance</h2>
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		also supports data formats that scale: in-browser formats (<a
+			target="_blank"
+			href="https://github.com/cmudig/falcon-vis#JsonDB"
+			>JSON</a
+		>,
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#ArrowDB"
+			>Apache Arrow</a
+		>, and
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#DuckDB"
+			>DuckDB WASM</a
+		>) and backend formats (<a
+			target="_blank"
+			href="https://github.com/cmudig/falcon-vis#HeavyaiDB"
+			>HeavyAI</a
+		>
+		or
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#HttpDB"
+			>HTTP</a
+		>
+		requests to any backend SQL server you want).
+	</p>
+
+	<h2>Live Example: Airline on-time performance</h2>
 
 	<p>
-		Again, note that this demo was forked from
-		<a href="https://github.com/crossfilter/crossfilter/tree/gh-pages"
-			>here</a
-		>. The following example and text was created by them. The only change
-		is the use of the FalconVis library instead for cross-filtering the
-		data.
+		This live demo was forked from the
+		<a target="_blank" href="https://github.com/crossfilter/crossfilter"
+			>CrossFilter Javascript Library</a
+		>'s
+		<a target="_blank" href="https://crossfilter.github.io/crossfilter/"
+			>live demo</a
+		>
+		to compare performance with an existing library.
 	</p>
 	<p>
-		The coordinated visualizations below (built with
-		<a href="http://mbostock.github.com/d3/">D3</a>) show nearly a
-		quarter-million flights from early 2001: part of the
-		<a href="http://stat-computing.org/dataexpo/2009/">ASA Data Expo</a>
-		dataset. The dataset is 5.3MB, so it might take a few seconds to
-		download. Click and drag on any chart to filter by the associated
-		dimension. The table beneath shows the eighty most recent flights that
-		match the current filters; these are the <i>details on demand</i>,
-		anecdotal evidence you can use to weigh different hypotheses.
+		We take the same
+		<a target="_blank" href="https://d3js.org/">D3</a> visualizations from
+		<a target="_blank" href="https://crossfilter.github.io/crossfilter/"
+			>their live demo</a
+		>, but using
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		instead with more than 10x the data (from ~260,000 to 3,000,000).
 	</p>
+	<p>Try out the live demo below!</p>
 
 	<p>
 		Some questions to consider: How does time-of-day correlate with
@@ -234,20 +355,38 @@
 		<a href="javascript:filter([null, null, [0, 300], null])">shorter</a>
 		flights more likely to arrive early? What happened on
 		<a
-			href="javascript:filter([null, [80, 150], null, [new Date(2001, 0, 12), new Date(2001, 0, 13)]])"
+			href="javascript:filter([null, [80, 150], null, [new Date(2006, 0, 12), new Date(2006, 0, 13)]])"
 			>January 12</a
 		>? How do flight patterns differ between
-		<a
-			href="javascript:filter([null, null, null, [new Date(2001, 0, 27), new Date(2001, 0, 29)]])"
-			>weekends</a
-		>
-		and
-		<a
-			href="javascript:filter([null, null, null, [new Date(2001, 0, 29), new Date(2001, 1, 3)]])"
-			>weekdays</a
-		>, or
 		<a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and
 		<a href="javascript:filter([[21, 24], null, null, null])">nights</a>?
+	</p>
+
+	<p>
+		<details>
+			<summary>Click for help</summary>
+
+			<div class="description">
+				<img src="demo-filter.gif" alt="demo" width="400px" />
+			</div>
+
+			<div class="description">
+				Filter a chart by
+				<kbd>click</kbd>ing and <kbd>drag</kbd>ing your cursor across a
+				range to create a window.
+			</div>
+			<div>
+				Then, you can <kbd>drag</kbd> the window around if you'd like.
+			</div>
+			<div class="description">
+				Reset a chart by <kbd>click</kbd>ing
+				<span style="color: #a9a9a9">reset</span> or by
+				<kbd>click</kbd>ing outside the window selection.
+			</div>
+			<div class="description">
+				Reset a filter by <kbd>click</kbd>ing outside the selection.
+			</div>
+		</details>
 	</p>
 
 	<div id="charts">
@@ -266,11 +405,17 @@
 	</div>
 
 	<aside id="totals">
-		<span id="active">-</span> of <span id="total">-</span> flights
-		selected.
+		<span id="active">-</span> of <span id="total">-</span> selected
 	</aside>
 
 	<div id="lists">
+		<div class="flight" style="background: none">
+			<div class="time">Date</div>
+			<div class="origin">Origin</div>
+			<div class="destination">Destination</div>
+			<div class="distance">Distance</div>
+			<div class="delay">Delay</div>
+		</div>
 		<div id="flight-list" class="list"></div>
 	</div>
 
@@ -282,7 +427,9 @@
 			>.
 		</span> -->
 		Forked from
-		<a href="https://github.com/crossfilter/crossfilter/tree/gh-pages"
+		<a
+			target="_blank"
+			href="https://github.com/crossfilter/crossfilter/tree/gh-pages"
 			>crossfilter</a
 		>
 		on github
@@ -295,13 +442,13 @@
 <script type="module">
 	import { FalconVis, DuckDB, ArrowDB } from "falcon-vis";
 
-	// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
-	d3.csv("flights-3m.json", async function (error, flights) {
+	async function main() {
 		// Various formatters.
 		var formatNumber = d3.format(",d"),
 			formatChange = d3.format("+,d"),
 			formatDate = d3.time.format("%B %d, %Y"),
 			formatTime = d3.time.format("%I:%M %p");
+		var formatMonthDay = d3.time.format("%m/%d");
 
 		// A nest operator, for grouping the flight list.
 		var nestByDate = d3.nest().key(function (d) {
@@ -328,7 +475,7 @@
 			{
 				type: "continuous",
 				name: "DepTime",
-				resolution: 50,
+				resolution: 240,
 				bins: 24,
 			},
 			(counts) => {
@@ -345,7 +492,7 @@
 				type: "continuous",
 				name: "Distance",
 				range: [0, 2000],
-				resolution: 50,
+				resolution: 400,
 				bins: 40,
 			},
 			(counts) => {
@@ -361,7 +508,7 @@
 				type: "continuous",
 				name: "ArrDelay",
 				range: [-60, 150],
-				resolution: 50,
+				resolution: 250,
 				bins: 25,
 			},
 			(counts) => {
@@ -377,7 +524,7 @@
 			{
 				type: "continuous",
 				name: "FlightDate",
-				resolution: 50,
+				resolution: 450,
 				bins: 90,
 				exact: true,
 				time: true,
@@ -397,38 +544,7 @@
 		// link em!
 		await falcon.link();
 
-		// A little coercion, since the CSV is untyped.
-		flights.forEach(function (d, i) {
-			d.index = i;
-			d.date = parseDate(d.date);
-			d.delay = +d.delay;
-			d.distance = +d.distance;
-		});
-
-		// Create the crossfilter for the relevant dimensions and groups.
-		var flight = crossfilter(flights),
-			all = flight.groupAll(),
-			date = flight.dimension(function (d) {
-				return d.date;
-			}),
-			dates = date.group(d3.time.day),
-			hour = flight.dimension(function (d) {
-				return d.date.getHours() + d.date.getMinutes() / 60;
-			}),
-			hours = hour.group(Math.floor),
-			delay = flight.dimension(function (d) {
-				return Math.max(-60, Math.min(149, d.delay));
-			}),
-			delays = delay.group(function (d) {
-				return Math.floor(d / 10) * 10;
-			}),
-			distance = flight.dimension(function (d) {
-				return Math.min(1999, d.distance);
-			}),
-			distances = distance.group(function (d) {
-				return Math.floor(d / 50) * 50;
-			});
-
+		// define the DOM charts
 		hourChart = barChart()
 			.view(hourView)
 			.x(
@@ -455,7 +571,6 @@
 			);
 		dateChart = barChart()
 			.view(dateView)
-			// .round(d3.time.day.round)
 			.x(
 				d3.time
 					.scale()
@@ -473,14 +588,12 @@
 		// We also listen to the chart's brush events to update the display.
 
 		var chart = d3.selectAll(".chart").data(charts);
-		// .each(function (chart) {
-		// console.log(chart);
-		// chart.on("brush", renderAll).on("brushend", renderAll);
-		// });
+		var list = d3.selectAll(".list").data([flightEntries]);
 
-		var list = d3.selectAll(".list").data([flightList]);
+		// start out with filtered by date
 		renderAll();
 		await dateChart.filter([new Date(2006, 1, 1), new Date(2006, 2, 1)]);
+		entries = Array.from(await falcon.entries({ length: 40 }));
 		renderAll();
 
 		// Renders the specified chart or list.
@@ -494,20 +607,9 @@
 			list.each(render);
 		}
 
-		// Like d3.time.format, but faster.
-		function parseDate(d) {
-			return new Date(
-				2001,
-				d.substring(0, 2) - 1,
-				d.substring(2, 4),
-				d.substring(4, 6),
-				d.substring(6, 8)
-			);
-		}
-
 		window.filter = async function (filters) {
 			for (let i = 0; i < filters.length; i++) {
-				await charts[i].filter(d);
+				await charts[i].filter(filters[i]);
 			}
 			renderAll();
 		};
@@ -719,16 +821,15 @@
 				} else {
 					await view.select(extent);
 				}
-				// if (!entriesRequest) {
-				// 	entriesRequest = true;
-				// 	falcon.entries({ length: 40 }).then((d) => {
-				// 		const nest = d3.nest().key(function (d) {
-				// 			return d3.time.day(d["FlightDate"]);
-				// 		});
-				// 		entries = nest.entries(Array.from(d));
-				// 		entriesRequest = false;
-				// 	});
-				// }
+				if (!entriesRequest) {
+					entriesRequest = true;
+					falcon.entries({ length: 40 }).then((d) => {
+						entries = Array.from(d);
+						entriesRequest = false;
+					});
+				}
+
+				list.each(render);
 			});
 
 			brush.on("brushend.chart", async function () {
@@ -740,6 +841,14 @@
 						.attr("width", "100%");
 					// dimension.filterAll();
 					await view.select();
+					if (!entriesRequest) {
+						entriesRequest = true;
+						falcon.entries({ length: 40 }).then((d) => {
+							entries = Array.from(d);
+							entriesRequest = false;
+						});
+					}
+					list.each(render);
 				}
 			});
 
@@ -819,87 +928,67 @@
 			return d3.rebind(chart, brush, "on");
 		}
 
-		function flightList(div) {
-			var flightsByDate = nestByDate.entries(date.top(40));
+		function flightEntries(div) {
+			if (entries) {
+				div.each(function () {
+					// todo figure out why I need to remove everything for stuff to update
+					// after some testing it has to do with how .data(entries) changes since entries
+					d3.select(this).selectAll(".flight").remove();
 
-			div.each(function () {
-				var date = d3
-					.select(this)
-					.selectAll(".date")
-					.data(flightsByDate, function (d) {
-						return d.key;
-					});
+					var flight = d3
+						.select(this)
+						.selectAll(".flight")
+						.data(entries);
 
-				date.enter()
-					.append("div")
-					.attr("class", "date")
-					.append("div")
-					.attr("class", "day")
-					.text(function (d) {
-						return formatDate(d.values[0].date);
-					});
+					var flightEnter = flight
+						.enter()
+						.append("div")
+						.attr("class", "flight");
 
-				date.exit().remove();
+					flightEnter
+						.append("div")
+						.attr("class", "time")
+						.text(function (d) {
+							return (
+								formatMonthDay(d["FlightDate"]) +
+								" - " +
+								decimalToTime(d["DepTime"])
+							);
+						});
 
-				var flight = date
-					.order()
-					.selectAll(".flight")
-					.data(
-						function (d) {
-							return d.values;
-						},
-						function (d) {
-							return d.index;
-						}
-					);
+					flightEnter
+						.append("div")
+						.attr("class", "origin")
+						.text(function (d) {
+							return d["Origin"];
+						});
 
-				var flightEnter = flight
-					.enter()
-					.append("div")
-					.attr("class", "flight");
+					flightEnter
+						.append("div")
+						.attr("class", "destination")
+						.text(function (d) {
+							return d["Dest"];
+						});
 
-				flightEnter
-					.append("div")
-					.attr("class", "time")
-					.text(function (d) {
-						return formatTime(d.date);
-					});
+					flightEnter
+						.append("div")
+						.attr("class", "distance")
+						.text(function (d) {
+							return formatNumber(d["Distance"]) + " mi.";
+						});
 
-				// flightEnter
-				// 	.append("div")
-				// 	.attr("class", "origin")
-				// 	.text(function (d) {
-				// 		return d.origin;
-				// 	});
-
-				// flightEnter
-				// 	.append("div")
-				// 	.attr("class", "destination")
-				// 	.text(function (d) {
-				// 		return d.destination;
-				// 	});
-
-				flightEnter
-					.append("div")
-					.attr("class", "distance")
-					.text(function (d) {
-						return formatNumber(d.distance) + " mi.";
-					});
-
-				flightEnter
-					.append("div")
-					.attr("class", "delay")
-					.classed("early", function (d) {
-						return d.delay < 0;
-					})
-					.text(function (d) {
-						return formatChange(d.delay) + " min.";
-					});
-
-				flight.exit().remove();
-
-				flight.order();
-			});
+					flightEnter
+						.append("div")
+						.attr("class", "delay")
+						.classed("late", function (d) {
+							return d["ArrDelay"] > 0;
+						})
+						.text(function (d) {
+							return formatChange(d["ArrDelay"]) + " min.";
+						});
+					flight.exit().remove();
+				});
+			}
 		}
 		function transform(state, time = false) {
 			const _t = new Array(state.bin.length);
@@ -912,5 +1001,22 @@
 			}
 			return _t;
 		}
-	});
+		//https://stackoverflow.com/questions/17599054/is-there-a-simple-way-to-convert-a-decimal-time-e-g-1-074-minutes-into-mmss
+		// what can I say, its late
+		function decimalToTime(minutes) {
+			var sign = minutes < 0 ? "-" : "";
+			var min = Math.floor(Math.abs(minutes));
+			var sec = Math.floor((Math.abs(minutes) * 60) % 60);
+			return (
+				sign +
+				(min < 10 ? "0" : "") +
+				min +
+				":" +
+				(sec < 10 ? "0" : "") +
+				sec
+			);
+		}
+	}
+
+	main();
 </script>
