@@ -261,6 +261,55 @@ import { DuckDB } from "falcon-vis";
 const db = await DuckDB.fromParquetFile("data/flights-1m.parquet"); // ⬅️
 ```
 
+<br> <a href="#HeavyaiDB" id="HeavyaiDB">#</a> `class` <b>HeavyaiDB</b>(_session_, _table_)
+
+Takes in a _session_ from [`@heavyai/connector`](https://docs.heavy.ai/apis-and-interfaces/heavyai-connector) with a given _table_ name.
+
+**Example**
+
+```ts
+import { HeavyaiDB } from "falcon-vis";
+import HeavyaiCon from "@heavyai/connector";
+
+const connector = new HeavyaiCon();
+const conn = {
+	host: "your host url address",
+	db: "db name",
+	user: "user name",
+	password: "password",
+	protocol: "https",
+	port: 443,
+};
+const connection = connector
+	.protocol(conn.protocol)
+	.host(conn.host)
+	.port(conn.port)
+	.dbName(conn.db)
+	.user(conn.user)
+	.password(conn.password);
+
+const session = await connection.connectAsync();
+
+const tableName = "flights";
+const db = new HeavyaiDB(session, tableName); // ⬅
+```
+
+**Session Connection Shorthand**
+
+```ts
+import { HeavyaiDB } from "falcon-vis";
+
+const tableName = "flights";
+const db = await HeavyaiDB.connectSession(️{
+    host: "your host url address",
+    db: "db name",
+    user: "user name",
+    password: "password",
+    protocol: "https",
+    port: 443
+  }, tableName); // ⬅
+```
+
 <br> <a href="#HttpDB" id="HttpDB">#</a> `class` <b>HttpDB</b>(_url_, _table_, _encodeQuery_?)
 
 HttpDB sends SQL queries (from _table_ name) over HTTP GET to the _url_ and hopes to receive an Apache Arrow table bytes in response.
@@ -280,7 +329,7 @@ const db = new HttpDB("http://localhost:8000", tableName); // ⬅️
 
 The main logic that orchestrates the cross-filtering between views.
 
-Takes in the data (`JsonDB`, `ArrowDB`, `DuckDB`, or `HttpDB`).
+Takes in the data ([`JsonDB`](#JsonDB), [`ArrowDB`](#ArrowDB), [`DuckDB`](#DuckDB), [`HeavyaiDB`](#HeavyaiDB), or [`HttpDB`](#HttpDB)).
 
 **Example**
 
