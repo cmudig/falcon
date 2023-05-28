@@ -101,7 +101,7 @@ export function createBinConfigContinuous(
   return binningFunc(dimension.bins!, extent);
 }
 
-export function readableBinsContinuous(binConfig: BinConfig) {
+export function binStartBinEndArray(binConfig: BinConfig) {
   let bins: { binStart: number; binEnd: number }[] = [];
   let curStart = binConfig.start;
   let curEnd = curStart + binConfig.step;
