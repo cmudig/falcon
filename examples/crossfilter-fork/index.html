@@ -260,9 +260,9 @@
 		<div id="distance-chart" class="chart">
 			<div class="title">Distance (mi.)</div>
 		</div>
-		<!-- <div id="date-chart" class="chart">
+		<div id="date-chart" class="chart">
 			<div class="title">Date</div>
-		</div> -->
+		</div>
 	</div>
 
 	<aside id="totals">
@@ -293,7 +293,7 @@
 <script src="d3.v3.min.js"></script>
 <!-- <script type="module" src="/main.js"></script> -->
 <script type="module">
-	import { FalconVis, DuckDB } from "falcon-vis";
+	import { FalconVis, DuckDB, ArrowDB } from "falcon-vis";
 
 	// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
 	d3.csv("flights-3m.json", async function (error, flights) {
@@ -309,7 +309,8 @@
 		});
 
 		// Initialize FalconVis + Flights Data
-		const db = await DuckDB.fromParquetFile("flights-1m.parquet");
+		const db = await DuckDB.fromParquetFile("flights-10m.parquet");
+		// const db = await ArrowDB.fromArrowFile("flights-1m.arrow");
 		const falcon = new FalconVis(db);
 
 		const totalCount = await falcon.view0D((count) => {
@@ -320,7 +321,7 @@
 		const distanceView = await falcon.view1D(
 			{
 				type: "continuous",
-				name: "DISTANCE",
+				name: "Distance",
 				range: [0, 2000],
 				resolution: 50,
 				bins: 40,
@@ -336,7 +337,7 @@
 		const delayView = await falcon.view1D(
 			{
 				type: "continuous",
-				name: "ARR_DELAY",
+				name: "ArrDelay",
 				range: [-60, 150],
 				resolution: 50,
 				bins: 25,
@@ -345,6 +346,23 @@
 				const node = d3.select("#delay-chart.chart");
 				if (node && delayChart) {
 					delayChart(node);
+				}
+			}
+		);
+
+		let dateChart;
+		const dateView = await falcon.view1D(
+			{
+				type: "continuous",
+				name: "FlightDate",
+				resolution: 50,
+				bins: 90,
+				time: true,
+			},
+			(counts) => {
+				const node = d3.select("#date-chart.chart");
+				if (node && dateChart) {
+					dateChart(node);
 				}
 			}
 		);
@@ -400,6 +418,27 @@
 					.domain([0, 2000])
 					.rangeRound([0, 10 * 40])
 			);
+		dateChart = barChart()
+			.view(dateView)
+			.round(d3.time.day.round)
+			.x(
+				d3.time
+					.scale()
+					.domain([
+						new Date(dateView.state.bin.at(0)["binStart"]),
+						new Date(dateView.state.bin.at(-1)["binEnd"]),
+					])
+					.rangeRound([0, 10 * dateView.state.bin.length])
+			);
+		dateView.state.filter.forEach((filter, i) => {
+			if (filter === 0) {
+				console.log(
+					new Date(dateView.state.bin[i]["binStart"]),
+					filter
+				);
+			}
+		});
+		// .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
 
 		var charts = [
 			// barChart()
@@ -413,6 +452,7 @@
 			// 	),
 			delayChart,
 			distanceChart,
+			dateChart,
 			// barChart()
 			// 	.dimension(distance)
 			// 	.group(distances)
@@ -501,8 +541,6 @@
 				const initialMaxValue = d3.max(view.state.filter);
 				y.domain([0, initialMaxValue]);
 
-				console.log("procced");
-
 				var width = x.range()[1],
 					height = y.range()[0];
 
@@ -548,11 +586,9 @@
 							.attr("class", function (d) {
 								return d + " bar";
 							})
-							.datum(transform(view.state));
-						// .datum(group.all());
-						// console.log(group.all());
-						// console.log(view.state);
-						// console.log(transform(view.state));
+							.datum(
+								transform(view.state, "time" in view.dimension)
+							);
 
 						g.selectAll(".foreground.bar").attr(
 							"clip-path",
@@ -597,7 +633,7 @@
 					}
 
 					g.selectAll(".bar")
-						.datum(transform(view.state))
+						.datum(transform(view.state, "time" in view.dimension))
 						.attr("d", barPath);
 				});
 
@@ -679,7 +715,14 @@
 					.attr("x", x(extent[0]))
 					.attr("width", x(extent[1]) - x(extent[0]));
 				// dimension.filterRange(extent);
-				await view.select(extent);
+				if ("time" in view.dimension) {
+					await view.select([
+						extent[0].getTime(),
+						extent[1].getTime(),
+					]);
+				} else {
+					await view.select(extent);
+				}
 			});
 
 			brush.on("brushend.chart", async function () {
@@ -844,17 +887,16 @@
 				flight.order();
 			});
 		}
-	});
-
-	function transform(state) {
-		const _t = new Array(state.bin.length);
-		for (let i = 0; i < _t.length; i++) {
-			const { binStart } = state.bin[i];
-			_t[i] = {
-				key: binStart,
-				value: state.filter[i],
-			};
+		function transform(state, time = false) {
+			const _t = new Array(state.bin.length);
+			for (let i = 0; i < _t.length; i++) {
+				const { binStart } = state.bin[i];
+				_t[i] = {
+					key: time ? binStart : binStart,
+					value: state.filter[i],
+				};
+			}
+			return _t;
 		}
-		return _t;
-	}
+	});
 </script>
