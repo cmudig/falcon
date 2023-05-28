@@ -1,24 +1,8 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/main.js"></script>
-  </body>
-</html> -->
-
 <!DOCTYPE html>
 <meta charset="utf-8" />
+<link rel="icon" href="logo.png" type="image/png" />
 <title>FalconVis</title>
 <style>
-	@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
-	@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@1,600&display=swap");
-
 	body {
 		font-family: "Helvetica Neue";
 		margin: 40px auto;
@@ -75,7 +59,6 @@
 
 	h1,
 	h2 {
-		font-family: "Exo";
 		text-rendering: optimizeLegibility;
 	}
 
@@ -261,21 +244,15 @@
 
 	<p>
 		With a large amount of data, cross-filtering is painfully slow. When you
-		filter one visualization, you might expect the others to instantly
-		update, but they might lag behind with large delays or your browser
-		might crash. The filtering lag disrupts the whole cross-filtering
-		experience!
+		filter one visualization, the other visualizations take a while to
+		update. The filtering lag disrupts the whole cross-filtering experience!
 	</p>
 
 	<p>
-		Should you give up? No! You should try out
 		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
 			>FalconVis</a
-		>.
-	</p>
-
-	<p>
-		We remove the latency from where it matters (the cross-filtering user
+		>
+		removes the latency from where it matters (the cross-filtering user
 		interaction) and put it where latency doesn't matter (before
 		interaction).
 	</p>
@@ -436,7 +413,7 @@
 	</footer>
 </div>
 
-<script src="crossfilter.v1.min.js"></script>
+<!-- <script src="crossfilter.v1.min.js"></script> -->
 <script src="d3.v3.min.js"></script>
 <!-- <script type="module" src="/main.js"></script> -->
 <script type="module">
@@ -460,8 +437,8 @@
 
 		// Initialize FalconVis + Flights Data
 		const db = await DuckDB.fromParquetFile("crossfilter-3m.parquet");
-		// const db = await ArrowDB.fromArrowFile("flights-1m.arrow");
 		const falcon = new FalconVis(db);
+
 		let entries;
 		let entriesRequest = false;
 
