@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<script type="module" crossorigin src="assets/index-ae12a957.js"></script>
+
+<meta charset="utf-8" />
+<link rel="icon" href="logo.png" type="image/png" />
+<title>FalconVis</title>
+<style>
+	body {
+		font-family: "Helvetica Neue";
+		margin: 40px auto;
+		width: 960px;
+		min-height: 2000px;
+		--primary-lighter: #00c9ab;
+		--primary: #02b299;
+		--primary-darker: #008672;
+		color: #222222;
+	}
+
+	#body {
+		position: relative;
+	}
+
+	/* credit to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd */
+	kbd {
+		background-color: #eee;
+		border-radius: 3px;
+		border: 1px solid #b4b4b4;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+			0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+		color: #333;
+		font-weight: 700;
+		line-height: 1;
+		padding: 2px 4px;
+		white-space: nowrap;
+	}
+	summary:hover {
+		cursor: pointer;
+	}
+
+	footer {
+		padding: 2em 0 1em 0;
+		font-size: 12px;
+	}
+
+	h1 {
+		font-size: 96px;
+		margin-top: 0.3em;
+		margin-bottom: 0;
+	}
+
+	h1 + h2 {
+		margin-top: 0;
+	}
+
+	h2 {
+		font-weight: 450;
+		font-size: 25px;
+	}
+
+	h1,
+	h2 {
+		text-rendering: optimizeLegibility;
+	}
+
+	#body > p {
+		line-height: 1.5em;
+		width: 640px;
+		text-rendering: optimizeLegibility;
+	}
+
+	#charts {
+		padding: 10px 0;
+	}
+
+	.chart {
+		display: inline-block;
+		height: 151px;
+		margin-bottom: 20px;
+	}
+
+	.reset {
+		padding-left: 1em;
+		font-size: smaller;
+		color: #a9a9a9a9;
+	}
+
+	.background.bar {
+		fill: #ccc;
+	}
+
+	.foreground.bar {
+		fill: var(--primary);
+	}
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
+	.axis text {
+		font: 10px sans-serif;
+	}
+
+	.brush rect.extent {
+		fill: var(--primary);
+		fill-opacity: 0.125;
+	}
+
+	.brush .resize path {
+		fill: #eee;
+		stroke: #666;
+	}
+
+	#hour-chart {
+		width: 260px;
+	}
+
+	#delay-chart {
+		width: 230px;
+	}
+
+	#distance-chart {
+		width: 420px;
+	}
+
+	#date-chart {
+		width: 920px;
+	}
+
+	#flight-list {
+		min-height: 1024px;
+	}
+
+	.date,
+	.day {
+		margin-bottom: 0.4em;
+	}
+
+	.flight {
+		line-height: 1.5em;
+		background: #eee;
+		width: 640px;
+		margin-bottom: 1px;
+	}
+
+	.time {
+		color: #999;
+		width: 120px !important;
+	}
+
+	.flight div {
+		display: inline-block;
+		width: 100px;
+	}
+
+	div.distance,
+	div.delay {
+		width: 140px;
+		padding-right: 10px;
+		text-align: right;
+	}
+
+	.early {
+		color: green;
+	}
+	.late {
+		color: rgb(192, 51, 51);
+	}
+
+	aside {
+		position: absolute;
+		left: 740px;
+		font-size: smaller;
+		width: 220px;
+	}
+
+	.middle {
+		text-align: left;
+		background: transparent;
+	}
+
+	a {
+		font-weight: 400;
+		color: var(--primary-lighter);
+		text-decoration: inherit;
+		transition: color 800ms linear;
+	}
+	a:hover {
+		color: var(--primary-darker);
+	}
+
+	#active {
+		color: var(--primary);
+	}
+
+	.description {
+		line-height: 1.7;
+	}
+</style>
+
+<div id="body">
+	<h1>
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis">
+			<img
+				src="https://user-images.githubusercontent.com/65095341/224896033-afc8bd8e-d0e0-4031-a7b2-3857bef51327.svg"
+				alt="FalconVis Logo"
+				width="65%"
+			/>
+		</a>
+	</h1>
+
+	<h2>Cross-Filtering at Scale</h2>
+
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		enables you to explore millions (or even billions) of data entries with
+		<strong>no</strong> interaction delay.
+	</p>
+
+	<p>
+		With a large amount of data, cross-filtering is painfully slow. When you
+		filter one visualization, the other visualizations take a while to
+		update. The filtering lag disrupts the whole cross-filtering experience!
+	</p>
+
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		removes the latency from where it matters (the cross-filtering user
+		interaction) and puts it where latency doesn't matter (before
+		interaction).
+	</p>
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		computes the
+		<a
+			target="_blank"
+			href="https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf"
+			>Falcon</a
+		>
+		data index right before you interact with a view. As you filter the
+		view, we use the index to instantly compute the counts for all other
+		views. The result is smooth interaction at any scale.
+	</p>
+
+	<p>
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		also supports data formats that scale: in-browser formats (<a
+			target="_blank"
+			href="https://github.com/cmudig/falcon-vis#JsonDB"
+			>JSON</a
+		>,
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#ArrowDB"
+			>Apache Arrow</a
+		>, and
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#DuckDB"
+			>DuckDB WASM</a
+		>) and backend formats (<a
+			target="_blank"
+			href="https://github.com/cmudig/falcon-vis#HeavyaiDB"
+			>HeavyAI</a
+		>
+		or
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#HttpDB"
+			>HTTP</a
+		>
+		requests to any backend SQL server you want).
+	</p>
+
+	<h2>Live Example: Airline on-time performance</h2>
+
+	<p>
+		This live demo was forked from the
+		<a target="_blank" href="https://github.com/crossfilter/crossfilter"
+			>CrossFilter Javascript Library</a
+		>'s
+		<a target="_blank" href="https://crossfilter.github.io/crossfilter/"
+			>live demo</a
+		>
+		to compare performance with an existing library.
+	</p>
+	<p>
+		We take the same
+		<a target="_blank" href="https://d3js.org/">D3</a> visualizations from
+		<a target="_blank" href="https://crossfilter.github.io/crossfilter/"
+			>their live demo</a
+		>, but using
+		<a href="https://github.com/cmudig/falcon-vis" target="_blank"
+			>FalconVis</a
+		>
+		instead with more than 10x the data (from ~260,000 to 3,000,000). We use
+		a parquet file loaded into the
+		<a target="_blank" href="https://github.com/cmudig/falcon-vis#DuckDB"
+			>DuckDB</a
+		>
+		WASM in-browser database in this example.
+	</p>
+	<p>Try out the live demo below!</p>
+
+	<p>
+		Some questions to consider: How does time-of-day correlate with
+		<a href="javascript:filter([null, [100, 150], null, null])"
+			>arrival delay</a
+		>? Are
+		<a href="javascript:filter([null, null, [1700, 2000], null])">longer</a>
+		or
+		<a href="javascript:filter([null, null, [0, 300], null])">shorter</a>
+		flights more likely to arrive early? How do flight patterns differ
+		between
+		<a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and
+		<a href="javascript:filter([[21, 24], null, null, null])">nights</a>?
+	</p>
+
+	<p>
+		<details>
+			<summary>Click for help</summary>
+
+			<div class="description">
+				<img src="demo-filter.gif" alt="demo" width="400px" />
+			</div>
+
+			<div class="description">
+				Filter a chart by
+				<kbd>click</kbd>ing and <kbd>drag</kbd>ing your cursor across a
+				range to create a window.
+			</div>
+			<div>
+				Then, you can <kbd>drag</kbd> the window around if you'd like.
+			</div>
+			<div class="description">
+				Reset a chart by <kbd>click</kbd>ing
+				<span style="color: #a9a9a9">reset</span> or by
+				<kbd>click</kbd>ing outside the window selection.
+			</div>
+			<div class="description">
+				Reset a filter by <kbd>click</kbd>ing outside the selection.
+			</div>
+		</details>
+	</p>
+
+	<div id="charts">
+		<div id="hour-chart" class="chart">
+			<div class="title">Time of Day</div>
+		</div>
+		<div id="delay-chart" class="chart">
+			<div class="title">Arrival Delay (min.)</div>
+		</div>
+		<div id="distance-chart" class="chart">
+			<div class="title">Distance (mi.)</div>
+		</div>
+		<div id="date-chart" class="chart">
+			<div class="title">Date</div>
+		</div>
+	</div>
+
+	<aside id="totals">
+		<span id="active">-</span> of <span id="total">-</span> selected
+	</aside>
+
+	<div id="lists">
+		<div class="flight" style="background: none">
+			<div class="time">Date</div>
+			<div class="origin">Origin</div>
+			<div class="destination">Destination</div>
+			<div class="distance">Distance</div>
+			<div class="delay">Delay</div>
+		</div>
+		<div id="flight-list" class="list"></div>
+	</div>
+
+	<footer>
+		Forked from
+		<a
+			target="_blank"
+			href="https://github.com/crossfilter/crossfilter/tree/gh-pages"
+			>crossfilter</a
+		>
+		on github
+	</footer>
+</div>
+
+<script src="d3.v3.min.js"></script>
+
