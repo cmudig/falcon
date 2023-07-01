@@ -3681,10 +3681,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-check@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-3.3.0.tgz#c748a0331c47acb0263ad900bdcbae7577491508"
-  integrity sha512-wZtOvY8V2fjzCbS4dGjDp0Ebh6VyXg6A39s7TDc8wc0154yqWKu18Rd9Ad+GOs7sXst7dbTmjvOaexjwoqPM7A==
+svelte-check@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/svelte-check/-/svelte-check-3.4.4.tgz#201850747f8b5ec3b104f69a69a034b1a742a40f"
+  integrity sha512-Uys9+R65cj8TmP8f5UpS7B2xKpNLYNxEWJsA5ZoKcWq/uwvABFF7xS6iPQGLoa7hxz0DS6xU60YFpmq06E4JxA==
   dependencies:
     "@jridgewell/trace-mapping" "^0.3.17"
     chokidar "^3.4.1"
