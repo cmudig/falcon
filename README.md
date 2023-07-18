@@ -15,6 +15,7 @@ You can cross-filter billions of data entries in the browser with no interaction
 -   [Examples](#examples)
 -   [Usage](#usage)
 -   [API Reference](#api-reference)
+-   [Developer Instructions](DEVELOPMENT.md)
 
 ## Examples
 

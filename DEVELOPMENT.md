@@ -12,6 +12,9 @@ To cut down on node garbage, we are using [yarn workspaces](https://classic.yarn
 yarn
 ```
 
+> **Warning**
+> If you're using `npm` to do this, use `npm install --legacy-peer-deps`
+
 **To run the development server**
 
 ```bash
