@@ -103,7 +103,6 @@ export function binTime(
   extent: Interval<number>,
   exact = false
 ): BinConfig {
-  console.log("hit");
   if (exact) {
     return binRegularIntervals(maxbins, extent);
   }
