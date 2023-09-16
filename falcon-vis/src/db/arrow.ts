@@ -182,14 +182,14 @@ export class ArrowDB implements FalconDB {
     const column = this.data.getChild(view.dimension.name)!;
     for (let i = 0; i < this.data.numRows; i++) {
       const value: any = column.get(i)!;
-      const binLocation = bin(value)!;
+      const key = bin(value)!;
 
       // increment the specific bin
-      if (0 <= binLocation && binLocation < binCount && isValidValue(value)) {
-        noFilter.increment([binLocation]);
+      if (IsValid.row(value, key, binCount)) {
         if (filterMask && !filterMask.get(i)) {
-          filter.increment([binLocation]);
+          filter.increment([key]);
         }
+        noFilter.increment([key]);
       }
     }
 
@@ -222,10 +222,11 @@ export class ArrowDB implements FalconDB {
     if (activeView.dimension.type === "continuous") {
       const pixels = activeView.dimension.resolution;
       const numPixels = activeView.dimension.resolution + 1; // extending by one pixel so we can compute the right diff later
-      binActive = binNumberFunctionPixels(
+      const _binActive = binNumberFunctionPixels(
         activeView.dimension.binConfig!,
         pixels
       );
+      binActive = (x) => _binActive(x) + 1; // account for shifted by 1
       binCountActive = numPixels;
     } else if (activeView.dimension.type === "categorical") {
       binActive = binNumberFunctionCategorical(activeView.dimension.range!);
@@ -235,29 +236,18 @@ export class ArrowDB implements FalconDB {
     }
 
     // then compute cubes
-    if (activeView.dimension.type === "continuous") {
-      passiveViews.forEach((view) => {
-        const cube = this.cubeSlice1DContinuous(
-          view,
-          activeCol,
-          filterMasks,
-          binCountActive,
-          binActive
-        );
-        cubes.set(view, cube);
-      });
-    } else {
-      passiveViews.forEach((view) => {
-        const cube = this.cubeSlice1DCategorical(
-          view,
-          activeCol,
-          filterMasks,
-          binCountActive,
-          binActive
-        );
-        cubes.set(view, cube);
-      });
-    }
+    const shouldCumulativeSum = activeView.dimension.type === "continuous";
+    passiveViews.forEach((view) => {
+      const cube = this.cubeSlice1D(
+        view,
+        activeCol,
+        filterMasks,
+        binCountActive,
+        binActive,
+        shouldCumulativeSum
+      );
+      cubes.set(view, cube);
+    });
 
     return cubes;
   }
@@ -284,12 +274,13 @@ export class ArrowDB implements FalconDB {
    * @note Only works for 0D and 1D continuous views at the moment
    * @returns a cube as FalconArray for the passive view
    */
-  cubeSlice1DCategorical(
+  cubeSlice1D(
     view: View,
     activeCol: Vector,
     filterMasks: FilterMasks<Dimension>,
     binCountActive: number,
-    binActive: BinNumberFunction
+    binActive: BinNumberFunction,
+    cumSumAfter: boolean = false
   ): FalconCube {
     let noFilter: FalconArray;
     let filter: FalconArray;
@@ -309,32 +300,36 @@ export class ArrowDB implements FalconDB {
           continue;
         }
 
-        const keyActive = binActive(activeCol.get(i)!)!;
-        if (0 <= keyActive && keyActive < binCountActive) {
+        const valueActive = activeCol.get(i)!;
+        const keyActive = binActive(valueActive)!;
+        if (IsValid.row(valueActive, keyActive, binCountActive)) {
           filter.increment([keyActive]);
         }
         noFilter.increment([0]);
       }
+      if (cumSumAfter) {
+        filter.cumulativeSum();
+      }
     } else if (view instanceof View1D) {
       let binPassive: BinNumberFunction;
-      let binCount: number;
+      let binCountPassive: number;
 
       if (view.dimension.type === "continuous") {
         // continuous bins for passive view that we accumulate across
         const binConfig = view.dimension.binConfig!;
         binPassive = binNumberFunctionContinuous(binConfig);
-        binCount = numBinsContinuous(binConfig);
+        binCountPassive = numBinsContinuous(binConfig);
       } else {
         // categorical bins for passive view that we accumulate across
         binPassive = binNumberFunctionCategorical(view.dimension.range!);
-        binCount = numBinsCategorical(view.dimension.range!);
+        binCountPassive = numBinsCategorical(view.dimension.range!);
       }
 
-      filter = FalconArray.allocCounts(binCountActive * binCount, [
+      filter = FalconArray.allocCounts(binCountActive * binCountPassive, [
         binCountActive,
-        binCount,
+        binCountPassive,
       ]);
-      noFilter = FalconArray.allocCounts(binCount, [binCount]);
+      noFilter = FalconArray.allocCounts(binCountPassive, [binCountPassive]);
 
       const passiveCol = this.data.getChild(view.dimension.name)!;
 
@@ -349,19 +344,22 @@ export class ArrowDB implements FalconDB {
         const valuePassive = passiveCol.get(i)!;
         const keyPassive = binPassive(valuePassive)!;
         const keyActive = binActive(valueActive)!;
-        if (
-          0 <= keyPassive &&
-          keyPassive < binCount &&
-          isValidValue(valuePassive)
-        ) {
-          if (
-            0 <= keyActive &&
-            keyActive < binCountActive &&
-            isValidValue(valueActive)
-          ) {
+        if (IsValid.row(valuePassive, keyPassive, binCountPassive)) {
+          if (IsValid.row(valueActive, keyActive, binCountActive)) {
             filter.increment([keyActive, keyPassive]);
           }
           noFilter.increment([keyPassive]);
+        }
+      }
+
+      if (cumSumAfter) {
+        for (
+          let passiveBinIndex = 0;
+          passiveBinIndex < filter.shape[1];
+          passiveBinIndex++
+        ) {
+          // sum across column (passive bin aggregate)
+          filter.slice(null, passiveBinIndex).cumulativeSum();
         }
       }
     } else {
@@ -369,120 +367,6 @@ export class ArrowDB implements FalconDB {
     }
 
     return { noFilter, filter };
-  }
-
-  /**
-   * Takes a view and computes the falcon cube for that passive view
-   * more details in the [paper](https://idl.cs.washington.edu/files/2019-Falcon-CHI.pdf)
-   *
-   * @note Only works for 0D and 1D continuous views at the moment
-   * @returns a cube as FalconArray for the passive view
-   */
-  cubeSlice1DContinuous(
-    view: View,
-    activeCol: Vector,
-    filterMasks: FilterMasks<Dimension>,
-    numPixels: number,
-    binActive: BinNumberFunction
-  ): FalconCube {
-    let noFilter: FalconArray;
-    let filter: FalconArray;
-
-    // don't have a passive view filter itself
-    const relevantMasks = this.excludeDimensionsFilterMasks(view, filterMasks);
-    const filterMask = union(...relevantMasks.values());
-
-    // 2.2 this count counts for each pixel wise bin
-    if (view instanceof View0D) {
-      filter = FalconArray.allocCumulative(numPixels);
-      noFilter = FalconArray.allocCounts(1, [1]);
-
-      // add data to aggregation matrix
-      for (let i = 0; i < this.data.numRows; i++) {
-        // ignore filtered entries
-        if (filterMask && filterMask.get(i)) {
-          continue;
-        }
-        const valueActive = activeCol.get(i)!;
-        const keyActive = binActive(valueActive)! + 1;
-        if (
-          0 <= keyActive &&
-          keyActive < numPixels &&
-          isValidValue(valueActive)
-        ) {
-          filter.increment([keyActive]);
-        }
-        noFilter.increment([0]);
-      }
-
-      // falcon magic sauce
-      filter.cumulativeSum();
-    } else if (view instanceof View1D) {
-      let binPassive: BinNumberFunction;
-      let binCount: number;
-
-      if (view.dimension.type === "continuous") {
-        // continuous bins for passive view that we accumulate across
-        const binConfig = view.dimension.binConfig!;
-        binPassive = binNumberFunctionContinuous(binConfig);
-        binCount = numBinsContinuous(binConfig);
-      } else {
-        // categorical bins for passive view that we accumulate across
-        binPassive = binNumberFunctionCategorical(view.dimension.range!);
-        binCount = numBinsCategorical(view.dimension.range!);
-      }
-
-      filter = FalconArray.allocCumulative(numPixels * binCount, [
-        numPixels,
-        binCount,
-      ]);
-      noFilter = FalconArray.allocCounts(binCount, [binCount]);
-
-      const passiveCol = this.data.getChild(view.dimension.name)!;
-
-      // add data to aggregation matrix
-      for (let i = 0; i < this.data.numRows; i++) {
-        // ignore filtered entries
-        if (filterMask && filterMask.get(i)) {
-          continue;
-        }
-
-        const valueActive = activeCol.get(i)!;
-        const valuePassive = passiveCol.get(i)!;
-        const keyActive = binActive(valueActive)! + 1;
-        const keyPassive = binPassive(valuePassive)!;
-        if (
-          0 <= keyPassive &&
-          keyPassive < binCount &&
-          isValidValue(valuePassive)
-        ) {
-          if (
-            0 <= keyActive &&
-            keyActive < numPixels &&
-            isValidValue(valueActive)
-          ) {
-            filter.increment([keyActive, keyPassive]);
-          }
-          noFilter.increment([keyPassive]);
-        }
-      }
-
-      for (
-        let passiveBinIndex = 0;
-        passiveBinIndex < filter.shape[1];
-        passiveBinIndex++
-      ) {
-        // sum across column (passive bin aggregate)
-        filter.slice(null, passiveBinIndex).cumulativeSum();
-      }
-    } else {
-      throw Error("only 0D and 1D views");
-    }
-
-    return {
-      noFilter,
-      filter,
-    };
   }
 
   /**
@@ -574,13 +458,6 @@ export class ArrowDB implements FalconDB {
     // return the value of the mask
     return this.filterMaskIndex.get(key);
   }
-}
-
-/**
- * determines if the value from the arrow column is valid
- */
-function isValidValue(value: any) {
-  return value !== null;
 }
 
 /**
@@ -691,5 +568,20 @@ class LimitedMap<K, V> extends Map<K, V> {
       this.delete(this.keys().next().value);
     }
     return super.set(key, value);
+  }
+}
+
+class IsValid {
+  static value(v: any) {
+    return v !== null;
+  }
+  static binIndex(k: number, totalBins: number) {
+    // between 0 and (totalBins - 1)
+    const geq0 = k >= 0;
+    const lemin1 = k < totalBins;
+    return geq0 && lemin1;
+  }
+  static row(value: any, index: number, maxIndex: number) {
+    return IsValid.binIndex(index, maxIndex) && IsValid.value(value);
   }
 }
