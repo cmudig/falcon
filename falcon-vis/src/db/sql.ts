@@ -99,7 +99,9 @@ export abstract class SQLDB implements FalconDB {
     sortAscending?: boolean,
   ) {
     const whereQuery = filters
-      ? [...this.filtersToSQLWhereClauses(filters).values()].join(" AND ")
+      ? `WHERE ${[...this.filtersToSQLWhereClauses(filters).values()].join(
+          " AND ",
+        )}`
       : "";
     const columnsToReturn = Array.from(this.nameMap?.values() ?? []); // .values() returns an iterator so need to convert to array
     const sortQuery = sortBy
