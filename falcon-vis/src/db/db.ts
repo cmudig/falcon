@@ -31,7 +31,7 @@ export interface FalconDB {
   estimateNumBins(
     dimension: ContinuousDimension,
     maxThreshold?: number,
-    noKnowledgeEstimate?: number
+    noKnowledgeEstimate?: number,
   ): AsyncOrSync<number>;
 
   /**
@@ -65,13 +65,17 @@ export interface FalconDB {
    *
    * @param length is the max number of rows to return
    * @param offset is the number of initial rows to skip
+   * @param sortBy will order the data by this dimension, for categorical dimensions, it will be sorted by the order of the categories
+   * @param sortAscending will sort the data in ascending order if true (ie small to large), descending order if false (ie large to small)
    *
    * @returns an iterable over the rows
    */
   entries(
     offset?: number,
     length?: number,
-    filters?: Filters
+    filters?: Filters,
+    sortBy?: Dimension,
+    sortAscending?: boolean,
   ): AsyncOrSync<Iterable<Row | null>>;
 
   /**
@@ -91,6 +95,6 @@ export interface FalconDB {
   falconIndexView1D(
     activeView: View1D,
     passiveViews: View[],
-    filters: Filters
+    filters: Filters,
   ): FalconIndex;
 }

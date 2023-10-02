@@ -70,13 +70,13 @@ export abstract class SQLDB implements FalconDB {
    * @note Check out duckdb.ts or mapd.ts for examples.
    */
   protected abstract query(
-    q: SQLQuery
+    q: SQLQuery,
   ): SQLQueryResult | Promise<SQLQueryResult>;
 
   async dimensionExists(dimension: Dimension): Promise<boolean> {
     const result = await this.query(
       `SELECT EXISTS 
-      (SELECT 0 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${this.table}' AND COLUMN_NAME = '${dimension.name}') as _exists`
+      (SELECT 0 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${this.table}' AND COLUMN_NAME = '${dimension.name}') as _exists`,
     );
     const { _exists } = this.getASValues(result);
     return _exists;
@@ -85,7 +85,7 @@ export abstract class SQLDB implements FalconDB {
   async tableExists(): Promise<boolean> {
     const result = await this.query(
       `SELECT EXISTS 
-      (SELECT 0 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${this.table}') as _exists`
+      (SELECT 0 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${this.table}') as _exists`,
     );
     const { _exists } = this.getASValues(result);
     return _exists;
@@ -94,20 +94,27 @@ export abstract class SQLDB implements FalconDB {
   async entries(
     offset: number = 0,
     length: number = Infinity,
-    filters?: Filters
+    filters?: Filters,
+    sortBy?: Dimension,
+    sortAscending?: boolean,
   ) {
-    const where = filters
+    const whereQuery = filters
       ? [...this.filtersToSQLWhereClauses(filters).values()].join(" AND ")
-      : undefined;
-    const additionalNames = this.nameMap?.values() ?? [];
-    const filteredTable = await this.query(`SELECT *, ${Array.from(
-      additionalNames
-    )}
-              FROM ${this.table}
-              ${where ? `WHERE ${where}` : ""}
-              ${length >= 0 && length < Infinity ? `LIMIT ${length}` : ""}
-              OFFSET ${offset}`);
-    return filteredTable;
+      : "";
+    const columnsToReturn = Array.from(this.nameMap?.values() ?? []); // .values() returns an iterator so need to convert to array
+    const sortQuery = sortBy
+      ? `ORDER BY "${this.getName(sortBy)}${sortAscending ? " ASC" : " DESC"}`
+      : "";
+    const offsetQuery = offset > 0 ? `OFFSET ${offset}` : "";
+    const limitQuery =
+      length >= 0 && length < Infinity ? `LIMIT ${length}` : "";
+    const entriesQuery = `SELECT *, ${columnsToReturn} FROM ${this.table}
+       ${whereQuery}
+       ${sortQuery}
+       ${limitQuery}
+       ${offsetQuery}`;
+    const entries = (await this.query(entriesQuery)) as Iterable<Row>;
+    return entries;
   }
 
   /**
@@ -121,7 +128,7 @@ export abstract class SQLDB implements FalconDB {
   async estimateNumBins(
     dimension: ContinuousDimension,
     maxThreshold = 200,
-    noKnowledgeEstimate = 15
+    noKnowledgeEstimate = 15,
   ): Promise<number> {
     const count = await this.length();
     if (count <= 1) {
@@ -132,7 +139,7 @@ export abstract class SQLDB implements FalconDB {
       const standardDeviationQuery = await this.query(
         `SELECT STDDEV(${this.getName(dimension)}) AS standardDeviation FROM ${
           this.table
-        }`
+        }`,
       );
       const { standardDeviation } = this.getASValues(standardDeviationQuery);
       const [min, max] = dimension.range;
@@ -147,13 +154,13 @@ export abstract class SQLDB implements FalconDB {
     let filterSQL = "";
     if (filters) {
       filterSQL = [...this.filtersToSQLWhereClauses(filters).values()].join(
-        " AND "
+        " AND ",
       );
     }
     const result = await this.query(
       `SELECT count(*) AS _count
        FROM ${this.table}
-       ${filterSQL ? `WHERE ${filterSQL}` : ""}`
+       ${filterSQL ? `WHERE ${filterSQL}` : ""}`,
     );
     const { _count } = this.getASValues(result);
     return _count;
@@ -164,14 +171,14 @@ export abstract class SQLDB implements FalconDB {
     if (dimension.type === "continuous") {
       const result = await this.query(
         `SELECT  MIN(${field}) AS _min, MAX(${field}) AS _max
-        FROM ${this.table}`
+        FROM ${this.table}`,
       );
       const { _min, _max } = this.getASValues(result);
       // may be bigints so cast to numbers
       return [Number(_min), Number(_max)] as ContinuousRange;
     } else {
       const result = await this.query(
-        `SELECT DISTINCT "${field}" AS _unique FROM ${this.table}`
+        `SELECT DISTINCT "${field}" AS _unique FROM ${this.table}`,
       );
 
       let range: CategoricalRange[] = [];
@@ -210,7 +217,7 @@ export abstract class SQLDB implements FalconDB {
        AS binIndex, count(*) AS binCount
        FROM ${this.table} 
        WHERE ${bSql.where} 
-       GROUP BY binIndex`
+       GROUP BY binIndex`,
     );
     for (const { binIndex, binCount } of result) {
       noFilter.set(bin(binIndex)!, binCount);
@@ -219,7 +226,7 @@ export abstract class SQLDB implements FalconDB {
     // query and store if we have filters
     if (hasFilters) {
       const where = [...this.filtersToSQLWhereClauses(filters).values()].join(
-        " AND "
+        " AND ",
       );
       const queryText = `SELECT ${bSql.select}
          AS binIndex, count(*) AS binCount
@@ -238,7 +245,7 @@ export abstract class SQLDB implements FalconDB {
   falconIndexView1D(
     activeView: View1D,
     passiveViews: View[],
-    filters: Filters
+    filters: Filters,
   ) {
     const t0 = performance.now();
 
@@ -251,7 +258,7 @@ export abstract class SQLDB implements FalconDB {
       const binActive = this.binSQLPixel(
         activeView.dimension,
         activeView.dimension.binConfig!,
-        numPixelBins
+        numPixelBins,
       );
       const numPixels = numPixelBins + 1; // for example 10 bins -> 11 total edges (pixels)
 
@@ -262,7 +269,7 @@ export abstract class SQLDB implements FalconDB {
           view,
           sqlFilters,
           binActive,
-          numPixels
+          numPixels,
         );
         promises.push(cube);
         cubes.set(view, cube);
@@ -276,11 +283,11 @@ export abstract class SQLDB implements FalconDB {
       // 1. active bin for each pixel
       const binActive = this.binSQLCategorical(
         activeView.dimension,
-        activeView.dimension.range!
+        activeView.dimension.range!,
       );
       const numBins = numBinsCategorical(activeView.dimension.range!);
       const binActiveIndexMap = binNumberFunctionCategorical(
-        activeView.dimension.range!
+        activeView.dimension.range!,
       );
 
       // 2. iterate through passive views and compute cubes
@@ -291,7 +298,7 @@ export abstract class SQLDB implements FalconDB {
           sqlFilters,
           binActive,
           binActiveIndexMap,
-          numBins
+          numBins,
         );
         promises.push(cube);
         cubes.set(view, cube);
@@ -311,7 +318,7 @@ export abstract class SQLDB implements FalconDB {
     sqlFilters: SQLFilters,
     binActive: SQLBin,
     binActiveIndexMap: BinNumberFunction,
-    binCountActive: number
+    binCountActive: number,
   ) {
     let noFilter: FalconArray;
     let filter: FalconArray;
@@ -353,12 +360,12 @@ export abstract class SQLDB implements FalconDB {
       } else {
         // categorical bins for passive view that we accumulate across
         binPassiveIndexMap = binNumberFunctionCategorical(
-          view.dimension.range!
+          view.dimension.range!,
         );
         binCount = numBinsCategorical(view.dimension.range!);
         binPassive = this.binSQLCategorical(
           view.dimension,
-          view.dimension.range!
+          view.dimension.range!,
         );
       }
 
@@ -413,7 +420,7 @@ export abstract class SQLDB implements FalconDB {
     view: View,
     sqlFilters: SQLFilters,
     binActive: SQLBin,
-    numPixels: number
+    numPixels: number,
   ) {
     let noFilter: FalconArray;
     let filter: FalconArray;
@@ -454,11 +461,11 @@ export abstract class SQLDB implements FalconDB {
       } else {
         passiveBin = this.binSQLCategorical(
           view.dimension,
-          view.dimension.range!
+          view.dimension.range!,
         );
         binCount = numBinsCategorical(view.dimension.range!);
         binPassiveIndexMap = binNumberFunctionCategorical(
-          view.dimension.range!
+          view.dimension.range!,
         );
       }
 
@@ -549,7 +556,7 @@ export abstract class SQLDB implements FalconDB {
     const select: PartialSQLQuery = binNumberFunctionContinuousSQL(
       field,
       binConfig,
-      this.castBins
+      this.castBins,
     );
     const where: PartialSQLQuery = `${field} BETWEEN ${binConfig.start} AND ${binConfig.stop}`;
     return {
@@ -591,7 +598,7 @@ export abstract class SQLDB implements FalconDB {
   private binSQLPixel(
     dimension: ContinuousDimension,
     binConfig: BinConfig,
-    pixels?: number
+    pixels?: number,
   ) {
     const step =
       pixels !== undefined ? stepSize(binConfig, pixels) : binConfig.step;
