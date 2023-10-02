@@ -24,7 +24,7 @@
     "publish-falcon-vis": "sh scripts/publish.sh"
   },
   "devDependencies": {
-    "gh-pages": "^5.0.0"
+    "gh-pages": "^6.0.0"
   },
   "directories": {
     "examples": "./examples/*",
