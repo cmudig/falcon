@@ -64,8 +64,13 @@ export class FalconVis {
    * @param length the number of entries to return
    * @returns iterator over the filtered entries basically a list of objects
    */
-  async entries({ offset = 0, length = Infinity } = {}) {
-    return this.db.entries(offset, length, this.filters);
+  async entries({
+    offset = 0,
+    length = Infinity,
+    sortBy = undefined,
+    sortAscending = undefined,
+  } = {}) {
+    return this.db.entries(offset, length, this.filters, sortBy, sortAscending);
   }
 
   /**
@@ -133,7 +138,7 @@ export class FalconVis {
         const dimensionExistsInDB = await this.db.dimensionExists(dimension);
         if (!dimensionExistsInDB) {
           throw new Error(
-            `Dimension '${dimension.name}' does not exist in the data table`
+            `Dimension '${dimension.name}' does not exist in the data table`,
           );
         }
       }

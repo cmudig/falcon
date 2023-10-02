@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <meta charset="utf-8" />
 <link rel="icon" href="logo.png" type="image/png" />
 <title>FalconVis</title>
@@ -23,7 +23,8 @@
 		background-color: #eee;
 		border-radius: 3px;
 		border: 1px solid #b4b4b4;
-		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+		box-shadow:
+			0 1px 1px rgba(0, 0, 0, 0.2),
 			0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
 		color: #333;
 		font-weight: 700;
@@ -544,7 +545,12 @@
 		renderAll();
 		await dateChart.filter([new Date(2006, 1, 1), new Date(2006, 2, 1)]);
 		if (computeEntries) {
-			entries = Array.from(await falcon.entries({ length: 40 }));
+			entries = Array.from(
+				await falcon.entries({
+					length: 40,
+					sortBy: { name: columnNames.delay },
+				})
+			);
 		}
 		renderAll();
 
@@ -775,10 +781,15 @@
 				}
 				if (!entriesRequest && computeEntries) {
 					entriesRequest = true;
-					falcon.entries({ length: 40 }).then((d) => {
-						entries = Array.from(d);
-						entriesRequest = false;
-					});
+					falcon
+						.entries({
+							length: 40,
+							sortBy: { name: columnNames.delay },
+						})
+						.then((d) => {
+							entries = Array.from(d);
+							entriesRequest = false;
+						});
 				}
 
 				list.each(render);
@@ -795,10 +806,15 @@
 					await view.select();
 					if (!entriesRequest && computeEntries) {
 						entriesRequest = true;
-						falcon.entries({ length: 40 }).then((d) => {
-							entries = Array.from(d);
-							entriesRequest = false;
-						});
+						falcon
+							.entries({
+								length: 40,
+								sortBy: { name: columnNames.delay },
+							})
+							.then((d) => {
+								entries = Array.from(d);
+								entriesRequest = false;
+							});
 					}
 					list.each(render);
 				}

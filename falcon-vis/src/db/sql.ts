@@ -105,7 +105,7 @@ export abstract class SQLDB implements FalconDB {
       : "";
     const columnsToReturn = Array.from(this.nameMap?.values() ?? []); // .values() returns an iterator so need to convert to array
     const sortQuery = sortBy
-      ? `ORDER BY "${this.getName(sortBy)}${sortAscending ? " ASC" : " DESC"}`
+      ? `ORDER BY ${this.getName(sortBy)} ${sortAscending ? "ASC" : "DESC"}`
       : "";
     const offsetQuery = offset > 0 ? `OFFSET ${offset}` : "";
     const limitQuery =
