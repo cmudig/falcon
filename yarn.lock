@@ -745,10 +745,10 @@
     svelte-hmr "^0.15.3"
     vitefu "^0.2.4"
 
-"@tsconfig/svelte@^4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@tsconfig/svelte/-/svelte-4.0.1.tgz#f36c1085fbdd868c10fb0426141956483dd4867b"
-  integrity sha512-B+XlGpmuAQzJqDoBATNCvEPqQg0HkO7S8pM14QDI5NsmtymzRexQ1N+nX2H6RTtFbuFgaZD4I8AAi8voGg0GLg==
+"@tsconfig/svelte@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@tsconfig/svelte/-/svelte-5.0.2.tgz#c9ed3575c5445afb14965bb76e8446fbf7e4a0e6"
+  integrity sha512-BRbo1fOtyVbhfLyuCWw6wAWp+U8UQle+ZXu84MYYWzYSEB28dyfnRBIE99eoG+qdAC0po6L2ScIEivcT07UaMA==
 
 "@types/babel__core@^7.1.14":
   version "7.20.0"
