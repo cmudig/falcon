@@ -811,10 +811,10 @@
   resolved "https://registry.yarnpkg.com/@types/cwise-parser/-/cwise-parser-1.0.1.tgz#c099e6ba0f59fb3f39e040a65212bbacc381b5c4"
   integrity sha512-+0C9uznudexJL/I38gQLEz6mdnObPBx313xDJmRRlZ40MOMfOKJIW1ws62rj+Nt2jltETRRTxAJLeZJO4sytJw==
 
-"@types/cwise@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@types/cwise/-/cwise-1.0.4.tgz#2ee0052a75a623d9c719cd1bcc71e0324e2337dc"
-  integrity sha512-ODlc0Cv5BI7//4ekyc3AD/nBezLMyrg6+SXFarHEAG8iGXNS6IBXHU6p/zH/pxmddYqXW3OfrzEqohM7wgJlGw==
+"@types/cwise@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@types/cwise/-/cwise-1.0.5.tgz#33833277b63ff65c18cd48d38620e3d15489207b"
+  integrity sha512-cVqYPeYe3b7Kj0169VUwSwdN7dRyc12m4+0fCj+RP9kP1TXt6Y1uh5PzzpjDUPuD5mnSkzcc3Ns3ZkY/BVVv8A==
   dependencies:
     "@types/cwise-compiler" "*"
     "@types/ndarray" "*"
