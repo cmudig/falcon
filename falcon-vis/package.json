@@ -14,7 +14,7 @@
     "pub": "yarn build && yarn publish"
   },
   "dependencies": {
-    "@duckdb/duckdb-wasm": "^1.27.0",
+    "@duckdb/duckdb-wasm": "^1.28.0",
     "@heavyai/connector": "^7.0.0",
     "apache-arrow": "^13.0.0",
     "cwise": "^1.0.10",
