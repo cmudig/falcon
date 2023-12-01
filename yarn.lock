@@ -1189,10 +1189,10 @@ apache-arrow@^11.0.0:
     pad-left "^2.1.0"
     tslib "^2.4.0"
 
-apache-arrow@^13.0.0:
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-13.0.0.tgz#8c8c69ca8ec53b804b4e10fe6b57483bda46dfbd"
-  integrity sha512-3gvCX0GDawWz6KFNC28p65U+zGh/LZ6ZNKWNu74N6CQlKzxeoWHpi4CgEQsgRSEMuyrIIXi1Ea2syja7dwcHvw==
+apache-arrow@^14.0.1:
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-14.0.1.tgz#34fb09139b61e5cbb4cc8a3630c74774d660ec1b"
+  integrity sha512-UTpL70GJLu4L8lXPF8NH2XaGgm1/xTZGIljqmz0Yr4D4G4soO6Xa+WWWw0oqCmyr99UBmHC0sqSboPKBrpsVjA==
   dependencies:
     "@types/command-line-args" "5.2.0"
     "@types/command-line-usage" "5.0.2"
